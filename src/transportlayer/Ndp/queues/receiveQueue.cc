@@ -1,8 +1,8 @@
 
-#include "inet/ndp/ndptransportlayer/Ndp/queues/receiveQueue.h"
-#include "inet/ndp/application/ndpapp/GenericAppMsgNdp_m.h"
+#include "receiveQueue.h"
+#include "../../../application/ndpapp/GenericAppMsgNdp_m.h"
 
-#include "inet/ndp/ndptransportlayer/Ndp/ndp_common/NDPSegment.h"
+#include "../../../transportlayer/Ndp/ndp_common/NDPSegment.h"
 
 namespace inet {
 

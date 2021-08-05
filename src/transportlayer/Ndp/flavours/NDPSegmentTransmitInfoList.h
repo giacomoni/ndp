@@ -2,7 +2,7 @@
 #ifndef __INET_NDPSEGMENTTRANSMITINFOLIST_H
 #define __INET_NDPSEGMENTTRANSMITINFOLIST_H
 
-#include "../../../transportlayer/Ndp/flavours/NDPBaseAlg.h"
+#include "NDPBaseAlg.h"
 #include "inet/common/INETDefs.h"
 
 

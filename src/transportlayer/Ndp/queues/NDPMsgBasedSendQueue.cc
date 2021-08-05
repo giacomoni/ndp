@@ -1,8 +1,8 @@
 
-#include "inet/ndp/ndptransportlayer/Ndp/queues/NDPMsgBasedSendQueue.h"
-#include "inet/ndp/application/ndpapp/GenericAppMsgNdp_m.h"
+#include "NDPMsgBasedSendQueue.h"
+#include "../../../application/ndpapp/GenericAppMsgNdp_m.h"
 
-#include "inet/ndp/ndptransportlayer/Ndp/ndp_common/NDPSegment.h"
+#include "../../../transportlayer/Ndp/ndp_common/NDPSegment.h"
 
 namespace inet {
 

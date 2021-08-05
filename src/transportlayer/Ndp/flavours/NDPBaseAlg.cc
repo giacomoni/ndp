@@ -60,7 +60,7 @@ NDPBaseAlgStateVariables::NDPBaseAlgStateVariables() {
 
 std::string NDPBaseAlgStateVariables::info() const {
     std::stringstream out;
-    out << NDPStateVariables::info();
+    out << NdpStateVariables::info();
     out << " snd_cwnd=" << snd_cwnd;
     out << " rto=" << rexmit_timeout;
     return out.str();
@@ -68,7 +68,7 @@ std::string NDPBaseAlgStateVariables::info() const {
 
 std::string NDPBaseAlgStateVariables::detailedInfo() const {
     std::stringstream out;
-    out << NDPStateVariables::detailedInfo();
+    out << NdpStateVariables::detailedInfo();
     out << "snd_cwnd=" << snd_cwnd << "\n";
     out << "rto=" << rexmit_timeout << "\n";
     out << "persist_timeout=" << persist_timeout << "\n";

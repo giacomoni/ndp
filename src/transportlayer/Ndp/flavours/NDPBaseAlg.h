@@ -13,7 +13,7 @@ namespace ndp {
 /**
  * State variables for NDPBaseAlg.
  */
-class INET_API NDPBaseAlgStateVariables : public NDPStateVariables
+class INET_API NDPBaseAlgStateVariables : public NdpStateVariables
 {
   public:
     NDPBaseAlgStateVariables();

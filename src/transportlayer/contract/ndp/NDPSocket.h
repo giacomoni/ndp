@@ -1,16 +1,20 @@
 
-#ifndef __INET_NDPSocket_H
-#define __INET_NDPSocket_H
+#ifndef __NDP_NDPSocket_H
+#define __NDP_NDPSocket_H
 
 #include "NDPCommand_m.h"
 #include "inet/common/INETDefs.h"
+#include "inet/common/packet/ChunkQueue.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
+#include "inet/common/socket/ISocket.h"
 
 namespace inet {
 
 class NDPStatusInfo;
 
-class INET_API NDPSocket
+class INET_API NDPSocket : public ISocket
 {
   public:
     /**
@@ -21,17 +25,18 @@ class INET_API NDPSocket
      * classes may have both this class and cSimpleModule as base class,
      * and cSimpleModule is already a cObject.
      */
-    class CallbackInterface
+    class INET_API ICallback
     {
       public:
-        virtual ~CallbackInterface() {}
-        virtual void socketDataArrived(int connId, void *yourPtr, cPacket *msg, bool urgent) = 0;
-        virtual void socketEstablished(int connId, void *yourPtr) {}
-        virtual void socketPeerClosed(int connId, void *yourPtr) {}
-        virtual void socketClosed(int connId, void *yourPtr) {}
-        virtual void socketFailure(int connId, void *yourPtr, int code) {}
-        virtual void socketStatusArrived(int connId, void *yourPtr,NDPStatusInfo *status) { delete status; }
-        virtual void socketDeleted(int connId, void *yourPtr) {}
+        virtual ~ICallback() {}
+        virtual void socketDataArrived(NDPSocket *socket, Packet *packet, bool urgent) = 0;
+        virtual void socketAvailable(NDPSocket *socket, NDPAvailableInfo *availableInfo) = 0;
+        virtual void socketEstablished(NDPSocket *socket) {}
+        virtual void socketPeerClosed(NDPSocket *socket) {}
+        virtual void socketClosed(NDPSocket *socket) {}
+        virtual void socketFailure(NDPSocket *socket, int code) {}
+        virtual void socketStatusArrived(NDPSocket *socket,NDPStatusInfo *status) { delete status; }
+        virtual void socketDeleted(NDPSocket *socket) {}
     };
 
     enum State { NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED, PEER_CLOSED, LOCALLY_CLOSED, CLOSED, SOCKERROR };
@@ -45,7 +50,7 @@ class INET_API NDPSocket
     L3Address remoteAddr;
     int remotePrt;
 
-    CallbackInterface *cb;
+    ICallback *cb;
     void *yourPtr;
 
     cGate *gateToNdp;
@@ -74,6 +79,11 @@ class INET_API NDPSocket
     NDPSocket(cMessage *msg);
 
     /**
+     * Constructor, to be used with forked sockets (see listen()).
+     */
+    NDPSocket(NDPAvailableInfo *availableInfo);
+
+    /**
      * Destructor
      */
     ~NDPSocket();
@@ -83,7 +93,7 @@ class INET_API NDPSocket
      * to identify the connection when it receives a command from the application
      * (or NDPSocket).
      */
-    int getConnectionId() const { return connId; }
+    int getSocketId() const { return connId; }
 
     /**
      * Returns the socket state, one of NOT_BOUND, CLOSED, LISTENING, CONNECTING,
@@ -163,6 +173,10 @@ class INET_API NDPSocket
     void listenOnce() { listen(false); }
 
     /**
+     * Accepts a new incoming connection reported as available.
+     */
+    void accept(int socketId);
+    /**
      * Active OPEN to the given remote socket.
      */
     void connect(L3Address  localAddress , L3Address remoteAddr, int remotePort, bool isSender , bool isReceiver ,  unsigned int numPacketsToSend, bool isLongFlow    , unsigned int priorityValue);
@@ -183,12 +197,17 @@ class INET_API NDPSocket
      * connection until the remote NDP closes too (or the FIN_WAIT_1 timeout
      * expires)
      */
-    void close();
+    void close() override;
 
     /**
      * Aborts the connection.
      */
     void abort();
+
+    /**
+     * Destroy the connection.
+     */
+    virtual void destroy() override;
 
     /**
      * Causes NDP to reply with a fresh NDPStatusInfo, attached to a dummy
@@ -217,6 +236,8 @@ class INET_API NDPSocket
      * after it reported "connection closed" to us.
      */
     void renewSocket();
+
+    virtual bool isOpen() const override;
     //@}
 
     /** @name Handling of messages arriving from NDP */
@@ -226,7 +247,7 @@ class INET_API NDPSocket
      * has a NDPCommand as getControlInfo(), and the connId in it matches
      * that of the socket.)
      */
-    bool belongsToSocket(cMessage *msg);
+    bool belongsToSocket(cMessage *msg) const override;
 
     /**
      * Returns true if the message belongs to any NDPSocket instance.
@@ -256,7 +277,7 @@ class INET_API NDPSocket
      * in that case you don't have to look it up by connId in the callbacks,
      * you can have it passed to you as yourPtr.
      */
-    void setCallbackObject(CallbackInterface *cb, void *yourPtr = nullptr);
+    void setCallback(ICallback *cb);
 
     /**
      * Examines the message (which should have arrived from NDP),
@@ -274,7 +295,7 @@ class INET_API NDPSocket
      * the message belongs to this socket, i.e. belongsToSocket(msg) would
      * return true!
      */
-    void processMessage(cMessage *msg);
+    void processMessage(cMessage *msg) override;
     //@}
 };
 

@@ -1,6 +1,6 @@
 
 
-#include "../../../transportlayer/Ndp/flavours/NDPSegmentTransmitInfoList.h"
+#include "NDPSegmentTransmitInfoList.h"
 
 #include <algorithm>    // min,max
 

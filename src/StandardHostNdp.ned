@@ -3,7 +3,7 @@
 package ndp;
 
 import ndp.transportlayer.contract.INdp;
-import inet.ndp.application.contract.INdpApp;
+import ndp.application.contract.INdpApp;
 
 import inet.transportlayer.contract.ITcp;
 

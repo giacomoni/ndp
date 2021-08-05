@@ -5,7 +5,7 @@
 
 #include "inet/common/INETDefs.h"
 #include "../../transportlayer/contract/ndp/NDPSocket.h"
-#include "../../transportlayer/Ndp/Ndp.h"
+#include "inet/applications/base/ApplicationBase.h"
 
 namespace inet {
 
@@ -15,7 +15,7 @@ namespace inet {
  *
  * It needs the following NED parameters: localAddress, localPort, connectAddress, connectPort.
  */
-class INET_API NdpAppBase : public cSimpleModule, public NDPSocket::CallbackInterface
+class INET_API NdpAppBase : public ApplicationBase, public NDPSocket::ICallback
 {
   protected:
     NDPSocket socket;
@@ -43,14 +43,16 @@ class INET_API NdpAppBase : public cSimpleModule, public NDPSocket::CallbackInte
     virtual void sendPacket(cPacket *pkt);
     virtual void setStatusString(const char *s);
 
-    /* NDPSocket::CallbackInterface callback methods */
+    /* NDPSocket::ICallback callback methods */
     virtual void handleTimer(cMessage *msg) = 0;
-    virtual void socketEstablished(int connId, void *yourPtr) override;
-    virtual void socketDataArrived(int connId, void *yourPtr, cPacket *msg, bool urgent) override;
-    virtual void socketPeerClosed(int connId, void *yourPtr) override;
-    virtual void socketClosed(int connId, void *yourPtr) override;
-    virtual void socketFailure(int connId, void *yourPtr, int code) override;
-    virtual void socketStatusArrived(int connId, void *yourPtr, NDPStatusInfo *status) override { delete status; }
+
+    virtual void socketEstablished(NDPSocket *socket) override;
+    virtual void socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) override;
+    virtual void socketAvailable(NDPSocket *socket, NDPAvailableInfo *availableInfo) override { socket->accept(availableInfo->getNewSocketId()); }
+    virtual void socketPeerClosed(NDPSocket *socket) override;
+    virtual void socketClosed(NDPSocket *socket) override;
+    virtual void socketFailure(NDPSocket *socket, int code) override;
+    virtual void socketStatusArrived(NDPSocket *socket, NDPStatusInfo *status) override { delete status; }
 };
 
 } // namespace inet

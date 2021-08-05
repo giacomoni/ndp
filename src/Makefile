@@ -35,31 +35,35 @@ OBJS = \
     $O/application/ndpapp/NdpAppBase.o \
     $O/application/ndpapp/NdpBasicClientApp.o \
     $O/application/ndpapp/NdpEchoApp.o \
+    $O/application/ndpapp/NdpServerHostApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NDPConnectionBase.o \
     $O/transportlayer/Ndp/NDPConnectionEventProc.o \
     $O/transportlayer/Ndp/NDPConnectionRcvSegment.o \
     $O/transportlayer/Ndp/NDPConnectionUtil.o \
+    $O/transportlayer/Ndp/NDPReceiveQueue.o \
+    $O/transportlayer/Ndp/NDPSendQueue.o \
     $O/transportlayer/Ndp/flavours/DumbNDP.o \
     $O/transportlayer/Ndp/flavours/NDPBaseAlg.o \
     $O/transportlayer/Ndp/flavours/NDPSegmentTransmitInfoList.o \
-    $O/transportlayer/Ndp/ndp_common/NDPSegment.o \
+    $O/transportlayer/Ndp/ndp_common/NdpHeader.o \
     $O/transportlayer/Ndp/queues/NDPMsgBasedSendQueue.o \
     $O/transportlayer/Ndp/queues/receiveQueue.o \
-    $O/transportlayer/base/TransportProtocolBase.o \
     $O/transportlayer/contract/ndp/NDPSocket.o \
     $O/transportlayer/contract/ndp/NDPSocketMap.o \
     $O/application/base/ApplicationPacketNdp_m.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
-    $O/transportlayer/Ndp/ndp_common/NDPSegment_m.o \
+    $O/transportlayer/Ndp/NDPConnection_m.o \
+    $O/transportlayer/Ndp/ndp_common/NdpHeader_m.o \
     $O/transportlayer/contract/ndp/NDPCommand_m.o
 
 # Message files
 MSGFILES = \
     application/base/ApplicationPacketNdp.msg \
     application/ndpapp/GenericAppMsgNdp.msg \
-    transportlayer/Ndp/ndp_common/NDPSegment.msg \
+    transportlayer/Ndp/NDPConnection.msg \
+    transportlayer/Ndp/ndp_common/NdpHeader.msg \
     transportlayer/contract/ndp/NDPCommand.msg
 
 # SM files
@@ -109,6 +113,9 @@ endif
 #------------------------------------------------------------------------------
 # User-supplied makefile fragment(s)
 # >>>
+# inserted from file 'makefrag':
+MSGC:=$(MSGC) --msg6
+
 # <<<
 #------------------------------------------------------------------------------
 

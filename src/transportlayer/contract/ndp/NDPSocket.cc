@@ -1,4 +1,7 @@
 #include "../../../transportlayer/contract/ndp/NDPSocket.h"
+#include "inet/common/packet/Message.h"
+#include "inet/common/ProtocolTag_m.h"
+#include "inet/applications/common/SocketTag_m.h"
 
 namespace inet {
 
@@ -42,9 +45,23 @@ NDPSocket::NDPSocket(cMessage *msg) {
     }
 }
 
+NDPSocket::NDPSocket(NDPAvailableInfo *availableInfo)
+{
+    connId = availableInfo->getNewSocketId();
+    sockstate = CONNECTED;
+    localAddr = availableInfo->getLocalAddr();
+    remoteAddr = availableInfo->getRemoteAddr();
+    localPrt = availableInfo->getLocalPort();
+    remotePrt = availableInfo->getRemotePort();
+    cb = nullptr;
+    yourPtr = nullptr;
+    gateToNdp = nullptr;
+}
+
 NDPSocket::~NDPSocket() {
     if (cb)
-        cb->socketDeleted(connId, yourPtr);
+        cb->socketDeleted(this);
+        cb = nullptr;
 }
 
 const char *NDPSocket::stateName(int state) {
@@ -121,6 +138,13 @@ void NDPSocket::bind(L3Address lAddr, int lPort) {
     sendToNDP(msg);
     sockstate = LISTENING;
 }
+ void NDPSocket::accept(int socketId)
+ {
+     auto request = new Request("ACCEPT", NDP_C_ACCEPT);
+     NDPAcceptCommand *acceptCmd = new NDPAcceptCommand();
+     request->setControlInfo(acceptCmd);
+     sendToNDP(request);
+ }
 
 // note: moh i added localAddress here, so instead of waiting for the syn/ack to be received to know my loaca add
 // this is now should be known from the par("localAddress"); --> so this par should be specified correctly now
@@ -212,6 +236,16 @@ void NDPSocket::abort() {
     sockstate = CLOSED;
 }
 
+void NDPSocket::destroy()
+{
+    auto request = new cMessage("DESTROY", NDP_C_DESTROY);
+    NDPCommand *cmd = new NDPCommand();
+    cmd->setConnId(connId);
+    request->setControlInfo(cmd);
+    sendToNDP(request);
+    sockstate = CLOSED;
+}
+
 void NDPSocket::requestStatus() {
     cMessage *msg = new cMessage("STATUS", NDP_C_STATUS);
     NDPCommand *cmd = new NDPCommand();
@@ -227,7 +261,26 @@ void NDPSocket::renewSocket() {
     sockstate = NOT_BOUND;
 }
 
-bool NDPSocket::belongsToSocket(cMessage *msg) {
+bool NDPSocket::isOpen() const
+{
+    switch (sockstate) {
+    case BOUND:
+    case LISTENING:
+    case CONNECTING:
+    case CONNECTED:
+    case PEER_CLOSED:
+    case LOCALLY_CLOSED:
+    case SOCKERROR: //TODO check SOCKERROR is opened or is closed socket
+        return true;
+    case NOT_BOUND:
+    case CLOSED:
+        return false;
+    default:
+        throw cRuntimeError("invalid NdpSocket state: %d", sockstate);
+    }
+}
+
+bool NDPSocket::belongsToSocket(cMessage *msg) const {
     return dynamic_cast<NDPCommand *>(msg->getControlInfo())
             && ((NDPCommand *) (msg->getControlInfo()))->getConnId() == connId;
 }
@@ -236,9 +289,8 @@ bool NDPSocket::belongsToAnyNDPSocket(cMessage *msg) {
     return dynamic_cast<NDPCommand *>(msg->getControlInfo());
 }
 
-void NDPSocket::setCallbackObject(CallbackInterface *callback, void *yourPointer) {
+void NDPSocket::setCallback(ICallback *callback) {
     cb = callback;
-    yourPtr = yourPointer;
 }
 
 void NDPSocket::processMessage(cMessage *msg) {
@@ -251,7 +303,7 @@ void NDPSocket::processMessage(cMessage *msg) {
     switch (msg->getKind()) {
     case NDP_I_DATA:
         if (cb)
-            cb->socketDataArrived(connId, yourPtr, PK(msg), false); // see NdpBasicClientApp::socketDataArrived
+            cb->socketDataArrived(this, check_and_cast<Packet*>(msg), false); // see NdpBasicClientApp::socketDataArrived
         else
             delete msg;
 
@@ -259,7 +311,7 @@ void NDPSocket::processMessage(cMessage *msg) {
 
     case NDP_I_URGENT_DATA:
         if (cb)
-            cb->socketDataArrived(connId, yourPtr, PK(msg), true);
+            cb->socketDataArrived(this, check_and_cast<Packet*>(msg), true);
         else
             delete msg;
 
@@ -280,7 +332,7 @@ void NDPSocket::processMessage(cMessage *msg) {
         delete msg;
 
         if (cb)
-            cb->socketEstablished(connId, yourPtr); // MOH: this calls  NdpBasicClientApp::socketEstablished(int connId, void *ptr) to send the first request
+            cb->socketEstablished(this); // MOH: this calls  NdpBasicClientApp::socketEstablished(int connId, void *ptr) to send the first request
 
         break;
 
@@ -290,7 +342,7 @@ void NDPSocket::processMessage(cMessage *msg) {
         delete msg;
 
         if (cb)
-            cb->socketPeerClosed(connId, yourPtr);
+            cb->socketPeerClosed(this);
 
         break;
 
@@ -301,7 +353,7 @@ void NDPSocket::processMessage(cMessage *msg) {
         delete msg;
 
         if (cb) {
-            cb->socketClosed(connId, yourPtr);
+            cb->socketClosed(this);
         }
 
         break;
@@ -312,7 +364,7 @@ void NDPSocket::processMessage(cMessage *msg) {
         sockstate = SOCKERROR;
 
         if (cb)
-            cb->socketFailure(connId, yourPtr, msg->getKind());
+            cb->socketFailure(this, msg->getKind());
 
         delete msg;
         break;
@@ -322,7 +374,7 @@ void NDPSocket::processMessage(cMessage *msg) {
         delete msg;
 
         if (cb)
-            cb->socketStatusArrived(connId, yourPtr, status);
+            cb->socketStatusArrived(this, status);
 
         break;
 

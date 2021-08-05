@@ -18,12 +18,15 @@ enum NDPCommandCode
 {
     NDP_C_OPEN_ACTIVE = 1;   // active open (must carry ~NDPOpenCommand)
     NDP_C_OPEN_PASSIVE = 2;  // passive open (must carry ~NDPOpenCommand)
-    NDP_C_SEND = 3;          // send data (set on data packet)
+    NDP_C_ACCEPT = 3;
+    NDP_C_SEND = 4;          // send data (set on data packet)
     NDP_C_CLOSE = 5;         // "I have no more data to send"
     NDP_C_ABORT = 6;         // abort connection
     NDP_C_STATUS = 7;        // request status info (NDP_I_STATUS) from NDP
     NDP_C_QUEUE_BYTES_LIMIT = 8; // set send queue limit (in bytes)
     NDP_C_READ = 9;       // send request to NDP to deliver data
+    NDP_C_DESTROY = 10;      // send request to NDP to destroy the socket descriptor
+    NDP_SETOPTION = 11;    // setting NDP socket options
 }
 
 
@@ -37,15 +40,16 @@ enum NDPStatusInd
 {
     NDP_I_DATA = 1;              // data packet (set on data packet)
     NDP_I_URGENT_DATA = 2;       // urgent data (set on data packet)
-    NDP_I_ESTABLISHED = 3;       // connection established
-    NDP_I_PEER_CLOSED = 4;       // FIN received from remote NDP
-    NDP_I_CLOSED = 5;            // connection closed normally (via FIN exchange)
-    NDP_I_CONNECTION_REFUSED = 6; // connection refused
-    NDP_I_CONNECTION_RESET = 7;  // connection reset
-    NDP_I_TIMED_OUT = 8;         // conn-estab timer went off, or max retransm. count reached
-    NDP_I_STATUS = 9;            // status info (will carry ~NDPStatusInfo)
-    NDP_I_SEND_MSG = 10;         // send queue abated, send more messages
-    NDP_I_DATA_NOTIFICATION = 11; // notify the upper layer that data has arrived
+    NDP_I_AVAILABLE = 3;         // conncetion available
+    NDP_I_ESTABLISHED = 4;       // connection established
+    NDP_I_PEER_CLOSED = 5;       // FIN received from remote NDP
+    NDP_I_CLOSED = 6;            // connection closed normally (via FIN exchange)
+    NDP_I_CONNECTION_REFUSED = 7; // connection refused
+    NDP_I_CONNECTION_RESET = 8;  // connection reset
+    NDP_I_TIMED_OUT = 9;         // conn-estab timer went off, or max retransm. count reached
+    NDP_I_STATUS = 10;            // status info (will carry ~NDPStatusInfo)
+    NDP_I_SEND_MSG = 11;         // send queue abated, send more messages
+    NDP_I_DATA_NOTIFICATION = 12; // notify the upper layer that data has arrived
 }
 
 
@@ -89,12 +93,23 @@ class NDPOpenCommand extends NDPCommand
     bool isReceiver;
 }
 
+class NDPAcceptCommand extends NDPCommand
+{
+}
 
 
 class NDPSendCommand extends NDPCommand
 {
 }
 
+class NDPAvailableInfo extends NDPCommand
+{
+    L3Address localAddr;
+    L3Address remoteAddr;
+    int localPort;
+    int remotePort;
+    int newSocketId;
+}
 
 class NDPConnectInfo extends NDPCommand
 {

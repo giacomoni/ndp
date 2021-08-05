@@ -1,14 +1,20 @@
-../out/clang-debug/src/application/ndpapp/NdpBasicClientApp.o: \
-  application/ndpapp/NdpBasicClientApp.cc \
-  application/ndpapp/GenericAppMsgNdp_m.h \
-  /Volumes/LocalDataHD/av288/omnetpp-5.6.2/include/omnetpp.h \
+../out/clang-debug/src/application/ndpapp/NdpServerHostApp.o: \
+  application/ndpapp/NdpServerHostApp.cc \
+  application/ndpapp/NdpServerHostApp.h \
   ../../inet/src/inet/common/INETDefs.h \
   ../../inet/src/inet/common/precompiled_debug.h \
   ../../inet/src/inet/common/precompiled.h \
+  /Volumes/LocalDataHD/av288/omnetpp-5.6.2/include/omnetpp.h \
   ../../inet/src/inet/opp_defines.h ../../inet/src/inet/features.h \
   ../../inet/src/inet/common/Compat.h \
   ../../inet/src/inet/common/InitStages.h \
-  application/ndpapp/NdpBasicClientApp.h application/ndpapp/NdpAppBase.h \
+  ../../inet/src/inet/applications/base/ApplicationBase.h \
+  ../../inet/src/inet/common/lifecycle/ModuleOperations.h \
+  ../../inet/src/inet/common/lifecycle/LifecycleOperation.h \
+  ../../inet/src/inet/common/lifecycle/OperationalBase.h \
+  ../../inet/src/inet/common/lifecycle/ILifecycle.h \
+  ../../inet/src/inet/common/socket/SocketMap.h \
+  ../../inet/src/inet/common/socket/ISocket.h \
   application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h \
   application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
   ../../inet/src/inet/networklayer/common/L3Address.h \
@@ -34,30 +40,27 @@
   ../../inet/src/inet/common/packet/Message.h \
   ../../inet/src/inet/common/packet/tag/TagSet.h \
   ../../inet/src/inet/common/packet/Packet.h \
-  ../../inet/src/inet/common/socket/ISocket.h \
-  ../../inet/src/inet/applications/base/ApplicationBase.h \
-  ../../inet/src/inet/common/lifecycle/ModuleOperations.h \
-  ../../inet/src/inet/common/lifecycle/LifecycleOperation.h \
-  ../../inet/src/inet/common/lifecycle/OperationalBase.h \
-  ../../inet/src/inet/common/lifecycle/ILifecycle.h \
-  ../../inet/src/inet/common/lifecycle/NodeStatus.h \
+  ../../inet/src/inet/common/INETUtils.h \
   ../../inet/src/inet/common/ModuleAccess.h \
   ../../inet/src/inet/networklayer/contract/IInterfaceTable.h \
   ../../inet/src/inet/networklayer/common/InterfaceEntry.h \
   ../../inet/src/inet/common/Simsignals.h \
   ../../inet/src/inet/common/Simsignals_m.h \
   ../../inet/src/inet/common/INETDefs_m.h \
-  ../../inet/src/inet/networklayer/common/InterfaceToken.h
+  ../../inet/src/inet/networklayer/common/InterfaceToken.h \
+  ../../inet/src/inet/networklayer/common/L3AddressResolver.h \
+  ../../inet/src/inet/networklayer/contract/IRoutingTable.h \
+  ../../inet/src/inet/networklayer/contract/IRoute.h
 
-application/ndpapp/GenericAppMsgNdp_m.h:
-
-/Volumes/LocalDataHD/av288/omnetpp-5.6.2/include/omnetpp.h:
+application/ndpapp/NdpServerHostApp.h:
 
 ../../inet/src/inet/common/INETDefs.h:
 
 ../../inet/src/inet/common/precompiled_debug.h:
 
 ../../inet/src/inet/common/precompiled.h:
+
+/Volumes/LocalDataHD/av288/omnetpp-5.6.2/include/omnetpp.h:
 
 ../../inet/src/inet/opp_defines.h:
 
@@ -67,9 +70,19 @@ application/ndpapp/GenericAppMsgNdp_m.h:
 
 ../../inet/src/inet/common/InitStages.h:
 
-application/ndpapp/NdpBasicClientApp.h:
+../../inet/src/inet/applications/base/ApplicationBase.h:
 
-application/ndpapp/NdpAppBase.h:
+../../inet/src/inet/common/lifecycle/ModuleOperations.h:
+
+../../inet/src/inet/common/lifecycle/LifecycleOperation.h:
+
+../../inet/src/inet/common/lifecycle/OperationalBase.h:
+
+../../inet/src/inet/common/lifecycle/ILifecycle.h:
+
+../../inet/src/inet/common/socket/SocketMap.h:
+
+../../inet/src/inet/common/socket/ISocket.h:
 
 application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h:
 
@@ -121,19 +134,7 @@ application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
 
 ../../inet/src/inet/common/packet/Packet.h:
 
-../../inet/src/inet/common/socket/ISocket.h:
-
-../../inet/src/inet/applications/base/ApplicationBase.h:
-
-../../inet/src/inet/common/lifecycle/ModuleOperations.h:
-
-../../inet/src/inet/common/lifecycle/LifecycleOperation.h:
-
-../../inet/src/inet/common/lifecycle/OperationalBase.h:
-
-../../inet/src/inet/common/lifecycle/ILifecycle.h:
-
-../../inet/src/inet/common/lifecycle/NodeStatus.h:
+../../inet/src/inet/common/INETUtils.h:
 
 ../../inet/src/inet/common/ModuleAccess.h:
 
@@ -148,3 +149,9 @@ application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
 ../../inet/src/inet/common/INETDefs_m.h:
 
 ../../inet/src/inet/networklayer/common/InterfaceToken.h:
+
+../../inet/src/inet/networklayer/common/L3AddressResolver.h:
+
+../../inet/src/inet/networklayer/contract/IRoutingTable.h:
+
+../../inet/src/inet/networklayer/contract/IRoute.h:

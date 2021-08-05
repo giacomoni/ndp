@@ -1,4 +1,20 @@
-
+//
+// Copyright (C) 2004 Andras Varga
+// Copyright (C) 2010-2011 Zoltan Bojthe
+//
+// This program is free software; you can redistribute it and/or
+// modify it under the terms of the GNU Lesser General Public License
+// as published by the Free Software Foundation; either version 2
+// of the License, or (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU Lesser General Public License for more details.
+//
+// You should have received a copy of the GNU Lesser General Public License
+// along with this program; if not, see <http://www.gnu.org/licenses/>.
+//
 
 #ifndef __INET_NDP_H
 #define __INET_NDP_H
@@ -7,37 +23,28 @@
 #include <set>
 
 #include "inet/common/INETDefs.h"
-
-#include "inet/common/lifecycle/ILifecycle.h"
+#include "inet/common/lifecycle/ModuleOperations.h"
+#include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
-#include "../contract/ndp/NDPCommand_m.h"
-//#include "../../FatTreeNDP/CentralScheduler.h"
+#include "inet/transportlayer/base/TransportProtocolBase.h"
+#include "inet/transportlayer/contract/tcp/TcpCommand_m.h"
+#include "ndp_common/NdpHeader.h"
 
 namespace inet {
-
 namespace ndp {
 
 // Forward declarations:
 class NDPConnection;
-class NDPSegment;
 class NDPSendQueue;
 class NDPReceiveQueue;
 
-class INET_API Ndp : public cSimpleModule, public ILifecycle
+class INET_API Ndp : public TransportProtocolBase
 {
   public:
-    struct AppConnKey    // XXX this class is redundant since connId is already globally unique
-    {
-        int appGateIndex;
-        int connId;
 
-        inline bool operator<(const AppConnKey& b) const
-        {
-            if (appGateIndex != b.appGateIndex)
-                return appGateIndex < b.appGateIndex;
-            else
-                return connId < b.connId;
-        }
+    enum PortRange {
+        EPHEMERAL_PORTRANGE_START = 1024,
+        EPHEMERAL_PORTRANGE_END   = 5000
     };
 
     struct SockPair
@@ -46,7 +53,6 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
         L3Address remoteAddr;
         int localPort;    // -1: unspec
         int remotePort;    // -1: unspec
-
 
         inline bool operator<(const SockPair& b) const
         {
@@ -60,50 +66,29 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
                 return localPort < b.localPort;
         }
     };
-
-    // ^^^^^^^^^^^^^^^^^ Multicast
     struct SockPairMulticast
-    {
-        L3Address localAddr;
-//        L3Address remoteAddr;
-        int localPort;    // -1: unspec
-//        int remotePort;    // -1: unspec
-
-         int multicastGid;    // multicast group id
-
-        inline bool operator<(const SockPairMulticast& b) const
         {
-            if (localAddr != b.localAddr)
-                return localAddr < b.localAddr;
-//            else if (localAddr != b.localAddr)
-//                return localAddr < b.localAddr;
-//            else if (remotePort != b.remotePort)
-//                return remotePort < b.remotePort;
-            else
-                return localPort < b.localPort;
-        }
-    };
+            L3Address localAddr;
+    //        L3Address remoteAddr;
+            int localPort;    // -1: unspec
+    //        int remotePort;    // -1: unspec
 
+             int multicastGid;    // multicast group id
 
-
-    cMessage *requestTimerMsg = nullptr;
-
-
-    // MOH
+            inline bool operator<(const SockPairMulticast& b) const
+            {
+                if (localAddr != b.localAddr)
+                    return localAddr < b.localAddr;
+    //            else if (localAddr != b.localAddr)
+    //                return localAddr < b.localAddr;
+    //            else if (remotePort != b.remotePort)
+    //                return remotePort < b.remotePort;
+                else
+                    return localPort < b.localPort;
+            }
+        };
     std::map<int, int> appGateIndexTimeOutMap;  // moh: contains num of timeouts for each app
     bool test = true;
-
-//    struct connRequests
-//    {
-////        int appGateIndex;
-//        int connId;
-//        int numQueuedRequests;
-//    };
-//    typedef std::map<connRequests,NDPConnection *> ConnRequestMap;
-//    ConnRequestMap conniRequestMap;
-
-//    std::map<int,int> connRequestMap;
-
     std::map< int,  NDPConnection * > requestCONNMap;
     int connIndex = 0;
 
@@ -112,48 +97,30 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
    int times=0;
    bool nap=false;
 
-
-
-
   protected:
-    typedef std::map<AppConnKey, NDPConnection *> NdpAppConnMap;
+    typedef std::map<int /*socketId*/, NDPConnection *> NdpAppConnMap;
     typedef std::map<SockPair, NDPConnection *> NdpConnMap;
 
     NdpAppConnMap ndpAppConnMap;
     NdpConnMap ndpConnMap;
     cOutVector requestTimerStamps;
 
-    ushort lastEphemeralPort = (ushort)-1;
+    ushort lastEphemeralPort = static_cast<ushort>(-1);
     std::multiset<ushort> usedEphemeralPorts;
 
-
-
-
-
-
   protected:
-    /** Factory method; may be overriden for customizing NDP */
-    virtual NDPConnection *createConnection(int appGateIndex, int connId);
+    /** Factory method; may be overriden for customizing Tcp */
+    virtual NDPConnection *createConnection(int socketId);
 
     // utility methods
-    virtual NDPConnection *findConnForSegment(NDPSegment *ndpseg, L3Address srcAddr, L3Address destAddr);
-
-
-
-    virtual NDPConnection *findConnForApp(int appGateIndex, int connId);
-
-    virtual void segmentArrivalWhileClosed(NDPSegment *ndpseg, L3Address src, L3Address dest);
-    virtual void removeConnection(NDPConnection *conn);
-    virtual void updateDisplayString();
+    virtual NDPConnection *findConnForSegment(const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr);
+    virtual NDPConnection *findConnForApp(int socketId);
+    virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual void refreshDisplay() const override; //was updateDisplayString()
 
   public:
-    static bool testing;    // switches between tcpEV and testingEV
-    static bool logverbose;    // if !testing, turns on more verbose logging
-
-    bool recordStatistics = false;    // output vectors on/off
-    bool isOperational = false;    // lifecycle: node is up/down
-
     bool useDataNotification = false;
+    int msl;
 
   public:
     Ndp() {}
@@ -162,8 +129,12 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
   protected:
     virtual void initialize(int stage) override;
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
-    virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
+
+    virtual void handleSelfMessage(cMessage *message) override;
+    virtual void handleUpperCommand(cMessage *message) override;
+    virtual void handleUpperPacket(Packet *packet) override;
+    virtual void handleLowerPacket(Packet *packet) override;
 
   public:
     /**
@@ -172,12 +143,20 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
      */
     virtual void addSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
 
+    virtual void removeConnection(NDPConnection *conn); //new
+    virtual void sendFromConn(cMessage *msg, const char *gatename, int gateindex = -1); //new
+
     /**
      * To be called from NDPConnection when socket pair (key for NDPConnMap) changes
      * (e.g. becomes fully qualified).
      */
     virtual void updateSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
 
+    /**
+     * Update conn's socket pair, and register newConn (which'll keep LISTENing).
+     * Also, conn will get a new socketId (and newConn will live on with its old socketId).
+     */
+    virtual void addForkedConnection(NDPConnection *conn, NDPConnection *newConn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
 
     /**
      * To be called from NDPConnection: reserves an ephemeral port for the connection.
@@ -190,18 +169,22 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
     virtual NDPSendQueue *createSendQueue();
 
     /**
-     * To be called from NDPConnection: create a new receive queue.
+     * To be called from TcpConnection: create a new receive queue.
      */
     virtual NDPReceiveQueue *createReceiveQueue();
 
     // ILifeCycle:
-    virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override;
+    virtual void handleStartOperation(LifecycleOperation *operation) override;
+    virtual void handleStopOperation(LifecycleOperation *operation) override;
+    virtual void handleCrashOperation(LifecycleOperation *operation) override;
 
     // called at shutdown/crash
     virtual void reset();
 
-    virtual void  requestTimer();
+    int getMsl() { return msl; }
 
+    //Added
+    virtual void  requestTimer();
     virtual void  cancelRequestTimer();
     virtual bool   getNapState();
     virtual bool allPullQueuesEmpty();
@@ -210,13 +193,9 @@ class INET_API Ndp : public cSimpleModule, public ILifecycle
     virtual void  sendFirstRequest();
     virtual void  process_REQUEST_TIMER();
     virtual void  printConnRequestMap();
-
-
-
 };
 
-} // namespace ndp
-
+} // namespace tcp
 } // namespace inet
 
 #endif // ifndef __INET_NDP_H

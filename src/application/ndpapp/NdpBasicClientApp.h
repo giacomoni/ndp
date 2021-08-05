@@ -12,7 +12,7 @@ namespace inet {
 /**
  * An example request-reply based client application.
  */
-class INET_API NdpBasicClientApp : public NdpAppBase, public ILifecycle
+class INET_API NdpBasicClientApp : public NdpAppBase
 {
   protected:
     cMessage *timeoutMsg = nullptr;
@@ -34,8 +34,8 @@ class INET_API NdpBasicClientApp : public NdpAppBase, public ILifecycle
     cMessage *requestRexmitTimer = nullptr;        // (Added) for retransmitting request
 
 
-     virtual void sendWriteRequest();
-     virtual void sendData();
+    virtual void sendWriteRequest();
+    virtual void sendData();
 
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 //    virtual void  startRequestRexmitTimer(); // Added
@@ -43,12 +43,17 @@ class INET_API NdpBasicClientApp : public NdpAppBase, public ILifecycle
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void initialize(int stage) override;
     virtual void handleTimer(cMessage *msg) override;
-    virtual void socketEstablished(int connId, void *yourPtr) override;
-    virtual void socketDataArrived(int connId, void *yourPtr, cPacket *msg, bool urgent) override;
-    virtual void socketClosed(int connId, void *yourPtr) override;
-    virtual void socketFailure(int connId, void *yourPtr, int code) override;
-    virtual bool isNodeUp();
-    virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override;
+
+    virtual void socketEstablished(NDPSocket *socket) override;
+    virtual void socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) override;
+    virtual void socketClosed(NDPSocket *socket) override;
+    virtual void socketFailure(NDPSocket *socket, int code) override;
+
+    virtual void handleStartOperation(LifecycleOperation *operation) override;
+    virtual void handleStopOperation(LifecycleOperation *operation) override;
+    virtual void handleCrashOperation(LifecycleOperation *operation) override;
+
+    virtual void close() override;
 
   public:
     NdpBasicClientApp() {}

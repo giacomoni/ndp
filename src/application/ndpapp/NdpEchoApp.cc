@@ -1,20 +1,23 @@
 
+#include "inet/applications/common/SocketTag_m.h"
 #include "NdpEchoApp.h"
 //#include "inet/common/RawPacket.h"
-#include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/ProtocolTag_m.h"
 #include "inet/common/lifecycle/ModuleOperations.h"
+#include "inet/common/packet/Packet_m.h"
+#include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 
 namespace inet {
 
 Define_Module(NdpEchoApp);
 
-simsignal_t NdpEchoApp::rcvdPkSignal = registerSignal("rcvdPk");
-simsignal_t NdpEchoApp::sentPkSignal = registerSignal("sentPk");
+//simsignal_t NdpEchoApp::rcvdPkSignal = registerSignal("rcvdPk");
+//simsignal_t NdpEchoApp::sentPkSignal = registerSignal("sentPk");
 
 void NdpEchoApp::initialize(int stage)
 {
-    cSimpleModule::initialize(stage);
+    NdpServerHostApp::initialize(stage);
 
     if (stage == INITSTAGE_LOCAL) {
         delay = par("echoDelay");
@@ -23,141 +26,86 @@ void NdpEchoApp::initialize(int stage)
         bytesRcvd = bytesSent = 0;
         WATCH(bytesRcvd);
         WATCH(bytesSent);
-
-        socket.setOutputGate(gate("ndpOut"));
-
-        nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
-    }
-    else if (stage == INITSTAGE_APPLICATION_LAYER) {
-        if (isNodeUp())
-            startListening();
     }
 }
 
-bool NdpEchoApp::isNodeUp()
-{
-    return !nodeStatus || nodeStatus->getState() == NodeStatus::UP;
-}
-
-void NdpEchoApp::startListening()
-{
-    const char *localAddress = par("localAddress");
-    int localPort = par("localPort");
-    socket.renewSocket();
-    socket.bind(localAddress[0] ? L3Address(localAddress) : L3Address(), localPort);
-    socket.listen();
-}
-
-void NdpEchoApp::stopListening()
-{
-    socket.close();
-}
-
-void NdpEchoApp::sendDown(cMessage *msg)
+void NdpEchoApp::sendDown(Packet *msg)
 {
     if (msg->isPacket()) {
-        bytesSent += ((cPacket *)msg)->getByteLength();
-        emit(sentPkSignal, (cPacket *)msg);
+        Packet *pk = static_cast<Packet *>(msg);
+        bytesSent += pk->getByteLength();
+        emit(packetSentSignal, pk);
     }
 
-    send(msg, "ndpOut");
+    msg->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::tcp);
+    msg->getTag<SocketReq>();
+    send(msg, "socketOut");
 }
 
-void NdpEchoApp::handleMessage(cMessage *msg)
+void NdpEchoApp::refreshDisplay() const
 {
-    if (!isNodeUp())
-        throw cRuntimeError("Application is not running");
-    if (msg->isSelfMessage()) {
-        sendDown(msg);
-    }
-    else if (msg->getKind() == NDP_I_PEER_CLOSED) {
-        // we'll close too
-        msg->setName("close");
-        msg->setKind(NDP_C_CLOSE);
+    ApplicationBase::refreshDisplay();
 
-        if (delay == 0)
-            sendDown(msg);
-        else
-            scheduleAt(simTime() + delay, msg); // send after a delay
-    }
-    else if (msg->getKind() == NDP_I_DATA || msg->getKind() == NDP_I_URGENT_DATA) {
-        cPacket *pkt = check_and_cast<cPacket *>(msg);
-        emit(rcvdPkSignal, pkt);
-        bytesRcvd += pkt->getByteLength();
-
-        if (echoFactor == 0) {
-            delete pkt;
-        }
-        else {
-            // reverse direction, modify length, and send it back
-            pkt->setKind(NDP_C_SEND);
-            NDPCommand *ind = check_and_cast<NDPCommand *>(pkt->removeControlInfo());
-            NDPSendCommand *cmd = new NDPSendCommand();
-            cmd->setConnId(ind->getConnId());
-            pkt->setControlInfo(cmd);
-            delete ind;
-
-            long byteLen = pkt->getByteLength() * echoFactor;
-
-            if (byteLen < 1)
-                byteLen = 1;
-
-            pkt->setByteLength(byteLen);
-
-            RawPacket *baMsg = dynamic_cast<RawPacket *>(pkt);
-
-            // if (dataTransferMode == NDP_TRANSFER_BYTESTREAM)
-            if (baMsg) {
-                ByteArray& outdata = baMsg->getByteArray();
-                ByteArray indata = outdata;
-                outdata.setDataArraySize(byteLen);
-
-                for (long i = 0; i < byteLen; i++)
-                    outdata.setData(i, indata.getData(i / echoFactor));
-            }
-
-            if (delay == 0)
-                sendDown(pkt);
-            else
-                scheduleAt(simTime() + delay, pkt); // send after a delay
-        }
-    }
-    else {
-        // some indication -- ignore
-        delete msg;
-    }
-
-    if (hasGUI()) {
-        char buf[80];
-        sprintf(buf, "rcvd: %ld bytes\nsent: %ld bytes", bytesRcvd, bytesSent);
-        getDisplayString().setTagArg("t", 0, buf);
-    }
+    char buf[160];
+    sprintf(buf, "threads: %d\nrcvd: %ld bytes\nsent: %ld bytes", socketMap.size(), bytesRcvd, bytesSent);
+    getDisplayString().setTagArg("t", 0, buf);
 }
 
-bool NdpEchoApp::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback)
-{
-    Enter_Method_Silent();
-    if (dynamic_cast<ModuleStartOperation *>(operation)) {
-        if (operation->getCurrentStage() == ModuleStartOperation::STAGE_APPLICATION_LAYER)
-            startListening();
-    }
-    else if (dynamic_cast<ModuleStopOperation *>(operation)) {
-        if (operation->getCurrentStage() == ModuleStopOperation::STAGE_APPLICATION_LAYER)
-            // TODO: wait until socket is closed
-            stopListening();
-    }
-    else if (dynamic_cast<ModuleCrashOperation *>(operation))
-        ;
-    else
-        throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName());
-    return true;
-}
 
 void NdpEchoApp::finish()
 {
+    NdpServerHostApp::finish();
+
     recordScalar("bytesRcvd", bytesRcvd);
     recordScalar("bytesSent", bytesSent);
 }
 
-} // namespace inet
+void NdpEchoAppThread::established()
+{
+}
 
+void NdpEchoAppThread::dataArrived(Packet *rcvdPkt, bool urgent)
+{
+    echoAppModule->emit(packetReceivedSignal, rcvdPkt);
+    int64_t rcvdBytes = rcvdPkt->getByteLength();
+    echoAppModule->bytesRcvd += rcvdBytes;
+
+    if (echoAppModule->echoFactor > 0 && sock->getState() == NDPSocket::CONNECTED) {
+        Packet *outPkt = new Packet(rcvdPkt->getName(), NDP_C_SEND);
+        // reverse direction, modify length, and send it back
+        int socketId = rcvdPkt->getTag<SocketInd>()->getSocketId();
+        outPkt->addTag<SocketReq>()->setSocketId(socketId);
+
+        long outByteLen = rcvdBytes * echoAppModule->echoFactor;
+
+        if (outByteLen < 1)
+            outByteLen = 1;
+
+        int64_t len = 0;
+        for ( ; len + rcvdBytes <= outByteLen; len += rcvdBytes) {
+            outPkt->insertAtBack(rcvdPkt->peekDataAt(B(0), B(rcvdBytes)));
+        }
+        if (len < outByteLen)
+            outPkt->insertAtBack(rcvdPkt->peekDataAt(B(0), B(outByteLen - len)));
+
+        ASSERT(outPkt->getByteLength() == outByteLen);
+
+        if (echoAppModule->delay == 0)
+            echoAppModule->sendDown(outPkt);
+        else
+            scheduleAt(simTime() + echoAppModule->delay, outPkt); // send after a delay
+    }
+    delete rcvdPkt;
+}
+
+  /*
+   * Called when a timer (scheduled via scheduleAt()) expires. To be redefined.
+   */
+void NdpEchoAppThread::timerExpired(cMessage *timer)
+{
+    Packet *pkt = check_and_cast<Packet *>(timer);
+    pkt->setContextPointer(nullptr);
+    echoAppModule->sendDown(pkt);
+}
+
+} // namespace inet

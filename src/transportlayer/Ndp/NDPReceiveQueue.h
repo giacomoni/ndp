@@ -2,8 +2,15 @@
 #ifndef __INET_NDPRECEIVEQUEUE_H
 #define __INET_NDPRECEIVEQUEUE_H
 
-#include "../../transportlayer/Ndp/NDPConnection.h"
+#include <list>
+#include <string>
+
 #include "inet/common/INETDefs.h"
+#include "inet/common/packet/ChunkQueue.h"
+#include "inet/common/packet/ReorderBuffer.h"
+#include "inet/common/packet/chunk/SequenceChunk.h"
+#include "NDPConnection.h"
+#include "ndp_common/NdpHeader.h"
 
 
 namespace inet {
@@ -12,21 +19,21 @@ class NDPCommand;
 
 namespace ndp {
 
-class NDPSegment;
+class NdpHeader;
 
 /**
  * Abstract base class for NDP receive queues. This class represents
  * data received by NDP but not yet passed up to the application.
- * The class also accomodates for selective retransmission, i.e.
+ * The class also accommodates for selective retransmission, i.e.
  * also acts as a segment buffer.
  *
  * This class goes hand-in-hand with NDPSendQueue.
  *
- * This class is polymorphic because depending on where and how you
+ * This class is poly-morphic because depending on where and how you
  * use the NDP model you might have different ideas about "sending data"
  * on a simulated connection: you might want to transmit real bytes,
  * "dummy" (byte count only), cMessage objects, etc; see discussion
- * at NDPSendQueue. Different subclasses can be written to accomodate
+ * at NDPSendQueue. Different subclasses can be written to accommodate
  * different needs.
  *
  * @see NDPSendQueue
@@ -34,19 +41,32 @@ class NDPSegment;
 class INET_API NDPReceiveQueue : public cObject
 {
   protected:
-    NDPConnection *conn;    // the connection that owns this queue
+    NDPConnection *conn = nullptr;    // the connection that owns this queue
+    uint32 rcv_nxt = 0;
+    ReorderBuffer reorderBuffer;
+
+  protected:
+      uint32_t offsetToSeq(B offs) const { return (uint32_t)offs.get(); }
+
+      B seqToOffset(uint32_t seq) const
+      {
+          B expOffs = reorderBuffer.getExpectedOffset();
+          uint32_t expSeq = offsetToSeq(expOffs);
+          return B((seqGE(seq, expSeq)) ? B(expOffs).get() + (seq - expSeq) : B(expOffs).get() - (expSeq - seq));
+      }
 
   public:
     /**
      * Ctor.
      */
-    NDPReceiveQueue() { conn = nullptr; }
+    NDPReceiveQueue();
 
     /**
      * Virtual dtor.
      */
     virtual ~NDPReceiveQueue() {}
 
+    virtual ReorderBuffer& getReorderBuffer() { return reorderBuffer; }
     /**
      * Set the connection that owns this queue.
      */
@@ -55,8 +75,9 @@ class INET_API NDPReceiveQueue : public cObject
     /**
      * Set initial receive sequence number.
      */
-    virtual void init(uint32 startSeq) = 0;
+    virtual void init(uint32 startSeq);
 
+    virtual std::string str() const override;
     /**
      * Called when a NDP segment arrives, it should extract the payload
      * from the segment and store it in the receive queue. The segment

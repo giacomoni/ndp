@@ -2,7 +2,7 @@
 #define __INET_NDPCONNECTION_H
 
 #include "../../transportlayer/Ndp/Ndp.h"
-#include "inet/ndp/ndptransportlayer/Ndp/ndp_common/NDPSegment.h"
+#include "ndp_common/NdpHeader.h"
 #include "inet/common/INETDefs.h"
 
 #include "inet/networklayer/common/L3Address.h"
@@ -14,7 +14,7 @@ class NDPOpenCommand;
 
 namespace ndp {
 
-class NDPSegment;
+class NdpHeader;
 class NDPSendQueue;
 //class NDPSACKRexmitQueue;
 class NDPReceiveQueue;
@@ -49,9 +49,11 @@ enum NDPEventCode {
     NDP_E_SEND,
     NDP_E_CLOSE,
     NDP_E_ABORT,
+    NDP_E_DESTROY,
     NDP_E_STATUS,
     NDP_E_QUEUE_BYTES_LIMIT,
     NDP_E_READ,
+    NDP_E_SETOPTION,
 
     // TPDU types
     NDP_E_RCV_DATA,
@@ -109,14 +111,15 @@ enum NDPEventCode {
  * into NDPAlgorithm subclasses which can have their own state blocks,
  * subclassed from NDPStateVariables. See NDPAlgorithm::createStateVariables().
  */
-class INET_API NDPStateVariables: public cObject {
+class INET_API NdpStateVariables: public cObject {
 public:
-    NDPStateVariables();
+    NdpStateVariables();
     virtual std::string info() const override;
     virtual std::string detailedInfo() const override;
 
 public:
     bool active;    // set if the connection was initiated by an active open
+    bool fork;
 
     unsigned int request_id;
     unsigned int internal_request_id;
@@ -169,19 +172,23 @@ public:
 class INET_API NDPConnection {
 public:
 
-    struct PakcetsToSend {
+    struct PacketsToSend {
         unsigned int pktId;
         cPacket *msg;
     };
-    typedef std::list<PakcetsToSend> PakcetsList;
-//    PakcetsList sentPakcetsList;
-    PakcetsList receivedPacketsList;
-    PakcetsList retransmitQueue; // TODO for nack
+    typedef std::list<PacketsToSend> PacketsList;
+//    PacketsList sentPacketsList;
+    PacketsList receivedPacketsList;
+    PacketsList retransmitQueue; // TODO for nack
 
 
-    // connection identification by apps: appgateIndex+connId
-    int appGateIndex = -1;    // application gate index
-    int connId = -1;    // identifies connection within the app
+    // connection identification by apps: socketId
+    int socketId = -1;    // identifies connection within the app
+    int getSocketId() const { return socketId; }
+    void setSocketId(int newSocketId) { ASSERT(socketId == -1); socketId = newSocketId; }
+
+    int listeningSocketId = -1;    // identifies listening connection within the app
+    int getListeningSocketId() const { return listeningSocketId; }
 
     // socket pair
     L3Address localAddr;
@@ -196,11 +203,13 @@ protected:
     cFSM fsm;
 
     // variables associated with NDP state
-    NDPStateVariables *state = nullptr;
+    NdpStateVariables *state = nullptr;
 
     // NDP queues
     NDPSendQueue *sendQueue = nullptr;
+    NDPSendQueue *getSendQueue() const { return sendQueue; }
     NDPReceiveQueue *receiveQueue = nullptr;
+    NDPReceiveQueue *getReceiveQueue() const { return receiveQueue; }
 
 
 public:
@@ -210,10 +219,10 @@ public:
     virtual void  setConnFinished() ;
 
 protected:
-     cQueue pullQueue;
+    cQueue pullQueue;
     // NDP behavior in data transfer state
-     NDPAlgorithm *ndpAlgorithm = nullptr;
-
+    NDPAlgorithm *ndpAlgorithm = nullptr;
+    NDPAlgorithm *getNdpAlgorithm() const { return ndpAlgorithm; }
     // timers
     cMessage *requestInternalTimer = nullptr;
 
@@ -246,21 +255,18 @@ protected:
      * Process incoming NDP segment. Returns a specific event code (e.g. NDP_E_RCV_SYN)
      * which will drive the state machine.
      */
-    virtual NDPEventCode process_RCV_SEGMENT(NDPSegment *NDPseg, L3Address src,
-            L3Address dest);
-    virtual NDPEventCode processSegmentInListen(NDPSegment *NDPseg, L3Address src,
-            L3Address dest);
+    virtual NDPEventCode process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual NDPEventCode processSegmentInListen(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
 
 
 
-    virtual NDPEventCode processSegment1stThru8th(NDPSegment *NDPseg);
+    virtual NDPEventCode processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader>& ndpseg);
 
     //@}
 
     /** @name Processing of NDP options. Invoked from readHeaderOptions(). Return value indicates whether the option was valid. */
     //@{
-    virtual bool processMSSOption(NDPSegment *NDPseg,
-            const NDPOptionMaxSegmentSize& option);
+    virtual bool processMSSOption(const Ptr<const NdpHeader>& ndpseg, const NdpOptionMaxSegmentSize& option);
 
 
     //@}
@@ -287,15 +293,17 @@ protected:
 
 
     /** Utility: readHeaderOptions (Currently only EOL, NOP, MSS, WS, SACK_PERMITTED, SACK and TS are implemented) */
-    virtual void readHeaderOptions(NDPSegment *NDPseg);
+    virtual void readHeaderOptions(const Ptr<const NdpHeader>& ndpseg);
     /** Utility: writeHeaderOptions (Currently only EOL, NOP, MSS, WS, SACK_PERMITTED, SACK and TS are implemented) */
-    virtual NDPSegment writeHeaderOptions(NDPSegment *NDPseg);
+    virtual NdpHeader writeHeaderOptions(const Ptr<NdpHeader>& ndpseg);
 
-    virtual uint32 getTSval(NDPSegment *NDPseg) const;
+    virtual uint32 getTSval(const Ptr<const NdpHeader>& ndpseg) const;
 
     /** Utility: get TSecr from segments TS header option */
-    virtual uint32 getTSecr(NDPSegment *NDPseg) const;
+    virtual uint32 getTSecr(const Ptr<const NdpHeader>& ndpseg) const;
 
+    /** Utility: returns true if the connection is not yet accepted by the application */
+    virtual bool isToBeAccepted() const { return listeningSocketId != -1; }
 public:
 
 
@@ -307,8 +315,8 @@ public:
 
 
     virtual void ackArrivedFreeBuffer(unsigned int ackNum); // MOH: HAS BEEN ADDED
-    virtual void   getBufferedPkt(unsigned int seqNum , std::list<PakcetsToSend>::iterator& iter );
-    virtual void   getFirstBufferedPkt(std::list<PakcetsToSend>::iterator& iter );
+    virtual void getBufferedPkt(unsigned int seqNum , std::list<PacketsToSend>::iterator& iter );
+    virtual void getFirstBufferedPkt(std::list<PacketsToSend>::iterator& iter );
 
 
     virtual void generatePacketsList();
@@ -336,13 +344,13 @@ public:
 
 
     /** Utility: adds control info to segment and sends it to IP */
-    virtual void sendToIP(NDPSegment *NDPseg);
+    virtual void sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg);
 
     /**
      * Utility: This factory method gets invoked throughout the NDP model to
      * create a NDPSegment. Override it if you need to subclass NDPSegment.
      */
-    virtual NDPSegment *createNDPSegment(const char *name);
+    virtual NdpHeader *createNDPSegment(const char *name);
 
     virtual void startRequestRexmitTimer(); // MOH
     virtual void  addRequestToPullsQueue();
@@ -365,7 +373,7 @@ protected:
     }
 
     /** Utility: send IP packet */
-    static void sendToIP(NDPSegment *NDPseg, L3Address src, L3Address dest);
+    virtual void sendToIP(Packet *pkt, const Ptr<NdpHeader>& ndpseg, L3Address src, L3Address dest);
 
     /** Utility: sends packet to application */
     virtual void sendToApp(cMessage *msg);
@@ -376,11 +384,14 @@ protected:
     /** Utility: sends NDP_I_ESTABLISHED indication with NDPConnectInfo to application */
     virtual void sendEstabIndicationToApp();
 
+    /** Utility: sends data or data notification to application */
+    virtual void sendAvailableDataToApp();
+
 public:
     /** Utility: prints local/remote addr/port and app gate index/connId */
     virtual void printConnBrief() const;
     /** Utility: prints important header fields */
-    static void printSegmentBrief(NDPSegment *NDPseg);
+    static void printSegmentBrief(Packet *packet, const Ptr<const NdpHeader>& ndpseg);
     /** Utility: returns name of NDP_S_xxx constants */
     static const char *stateName(int state);
     /** Utility: returns name of NDP_E_xxx constants */
@@ -393,31 +404,28 @@ public:
 
 
 public:
+    NDPConnection() {}
+    NDPConnection(const NDPConnection& other) {}    //FIXME kludge
+    void initialize() {}
+
     /**
      * The "normal" constructor.
      */
-    NDPConnection(Ndp *mod, int appGateIndex, int connId);
-
-    /**
-     * Note: this default ctor is NOT used to create live connections, only
-     * temporary ones so that NDPMain can invoke their segmentArrivalWhileClosed().
-     */
-    NDPConnection();
+    void initConnection(Ndp *mod, int socketId);
 
     /**
      * Destructor.
      */
     virtual ~NDPConnection();
 
-    virtual void segmentArrivalWhileClosed(NDPSegment *NDPseg, L3Address src,
-            L3Address dest);
+    virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
 
     /** @name Various getters **/
     //@{
     int getFsmState() const {
         return fsm.getState();
     }
-    NDPStateVariables *getState() {
+    NdpStateVariables *getState() {
         return state;
     }
     NDPSendQueue *getSendQueue() {
@@ -436,8 +444,7 @@ public:
 
     virtual bool processTimer(cMessage *msg);
 
-    virtual bool processNDPSegment(NDPSegment *NDPSeg, L3Address srcAddr,
-            L3Address destAddr);
+    virtual bool processNDPSegment(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr);
 
     virtual bool processAppCommand(cMessage *msg);
 

@@ -183,12 +183,15 @@ EXECUTE_ON_STARTUP(
     if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("inet::NDPCommandCode"));
     e->insert(NDP_C_OPEN_ACTIVE, "NDP_C_OPEN_ACTIVE");
     e->insert(NDP_C_OPEN_PASSIVE, "NDP_C_OPEN_PASSIVE");
+    e->insert(NDP_C_ACCEPT, "NDP_C_ACCEPT");
     e->insert(NDP_C_SEND, "NDP_C_SEND");
     e->insert(NDP_C_CLOSE, "NDP_C_CLOSE");
     e->insert(NDP_C_ABORT, "NDP_C_ABORT");
     e->insert(NDP_C_STATUS, "NDP_C_STATUS");
     e->insert(NDP_C_QUEUE_BYTES_LIMIT, "NDP_C_QUEUE_BYTES_LIMIT");
     e->insert(NDP_C_READ, "NDP_C_READ");
+    e->insert(NDP_C_DESTROY, "NDP_C_DESTROY");
+    e->insert(NDP_SETOPTION, "NDP_SETOPTION");
 )
 
 EXECUTE_ON_STARTUP(
@@ -196,6 +199,7 @@ EXECUTE_ON_STARTUP(
     if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("inet::NDPStatusInd"));
     e->insert(NDP_I_DATA, "NDP_I_DATA");
     e->insert(NDP_I_URGENT_DATA, "NDP_I_URGENT_DATA");
+    e->insert(NDP_I_AVAILABLE, "NDP_I_AVAILABLE");
     e->insert(NDP_I_ESTABLISHED, "NDP_I_ESTABLISHED");
     e->insert(NDP_I_PEER_CLOSED, "NDP_I_PEER_CLOSED");
     e->insert(NDP_I_CLOSED, "NDP_I_CLOSED");
@@ -1295,6 +1299,257 @@ void *NDPOpenCommandDescriptor::getFieldStructValuePointer(void *object, int fie
     }
 }
 
+Register_Class(NDPAcceptCommand)
+
+NDPAcceptCommand::NDPAcceptCommand() : ::inet::NDPCommand()
+{
+}
+
+NDPAcceptCommand::NDPAcceptCommand(const NDPAcceptCommand& other) : ::inet::NDPCommand(other)
+{
+    copy(other);
+}
+
+NDPAcceptCommand::~NDPAcceptCommand()
+{
+}
+
+NDPAcceptCommand& NDPAcceptCommand::operator=(const NDPAcceptCommand& other)
+{
+    if (this==&other) return *this;
+    ::inet::NDPCommand::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void NDPAcceptCommand::copy(const NDPAcceptCommand& other)
+{
+}
+
+void NDPAcceptCommand::parsimPack(omnetpp::cCommBuffer *b) const
+{
+    ::inet::NDPCommand::parsimPack(b);
+}
+
+void NDPAcceptCommand::parsimUnpack(omnetpp::cCommBuffer *b)
+{
+    ::inet::NDPCommand::parsimUnpack(b);
+}
+
+class NDPAcceptCommandDescriptor : public omnetpp::cClassDescriptor
+{
+  private:
+    mutable const char **propertynames;
+  public:
+    NDPAcceptCommandDescriptor();
+    virtual ~NDPAcceptCommandDescriptor();
+
+    virtual bool doesSupport(omnetpp::cObject *obj) const override;
+    virtual const char **getPropertyNames() const override;
+    virtual const char *getProperty(const char *propertyname) const override;
+    virtual int getFieldCount() const override;
+    virtual const char *getFieldName(int field) const override;
+    virtual int findField(const char *fieldName) const override;
+    virtual unsigned int getFieldTypeFlags(int field) const override;
+    virtual const char *getFieldTypeString(int field) const override;
+    virtual const char **getFieldPropertyNames(int field) const override;
+    virtual const char *getFieldProperty(int field, const char *propertyname) const override;
+    virtual int getFieldArraySize(void *object, int field) const override;
+
+    virtual const char *getFieldDynamicTypeString(void *object, int field, int i) const override;
+    virtual std::string getFieldValueAsString(void *object, int field, int i) const override;
+    virtual bool setFieldValueAsString(void *object, int field, int i, const char *value) const override;
+
+    virtual const char *getFieldStructName(int field) const override;
+    virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
+};
+
+Register_ClassDescriptor(NDPAcceptCommandDescriptor)
+
+NDPAcceptCommandDescriptor::NDPAcceptCommandDescriptor() : omnetpp::cClassDescriptor("inet::NDPAcceptCommand", "inet::NDPCommand")
+{
+    propertynames = nullptr;
+}
+
+NDPAcceptCommandDescriptor::~NDPAcceptCommandDescriptor()
+{
+    delete[] propertynames;
+}
+
+bool NDPAcceptCommandDescriptor::doesSupport(omnetpp::cObject *obj) const
+{
+    return dynamic_cast<NDPAcceptCommand *>(obj)!=nullptr;
+}
+
+const char **NDPAcceptCommandDescriptor::getPropertyNames() const
+{
+    if (!propertynames) {
+        static const char *names[] = {  nullptr };
+        omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+        const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
+        propertynames = mergeLists(basenames, names);
+    }
+    return propertynames;
+}
+
+const char *NDPAcceptCommandDescriptor::getProperty(const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : nullptr;
+}
+
+int NDPAcceptCommandDescriptor::getFieldCount() const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 0+basedesc->getFieldCount() : 0;
+}
+
+unsigned int NDPAcceptCommandDescriptor::getFieldTypeFlags(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeFlags(field);
+        field -= basedesc->getFieldCount();
+    }
+    return 0;
+}
+
+const char *NDPAcceptCommandDescriptor::getFieldName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldName(field);
+        field -= basedesc->getFieldCount();
+    }
+    return nullptr;
+}
+
+int NDPAcceptCommandDescriptor::findField(const char *fieldName) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->findField(fieldName) : -1;
+}
+
+const char *NDPAcceptCommandDescriptor::getFieldTypeString(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeString(field);
+        field -= basedesc->getFieldCount();
+    }
+    return nullptr;
+}
+
+const char **NDPAcceptCommandDescriptor::getFieldPropertyNames(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldPropertyNames(field);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+const char *NDPAcceptCommandDescriptor::getFieldProperty(int field, const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldProperty(field, propertyname);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+int NDPAcceptCommandDescriptor::getFieldArraySize(void *object, int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldArraySize(object, field);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAcceptCommand *pp = (NDPAcceptCommand *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+const char *NDPAcceptCommandDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldDynamicTypeString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAcceptCommand *pp = (NDPAcceptCommand *)object; (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+std::string NDPAcceptCommandDescriptor::getFieldValueAsString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldValueAsString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAcceptCommand *pp = (NDPAcceptCommand *)object; (void)pp;
+    switch (field) {
+        default: return "";
+    }
+}
+
+bool NDPAcceptCommandDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->setFieldValueAsString(object,field,i,value);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAcceptCommand *pp = (NDPAcceptCommand *)object; (void)pp;
+    switch (field) {
+        default: return false;
+    }
+}
+
+const char *NDPAcceptCommandDescriptor::getFieldStructName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructName(field);
+        field -= basedesc->getFieldCount();
+    }
+    return nullptr;
+}
+
+void *NDPAcceptCommandDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructValuePointer(object, field, i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAcceptCommand *pp = (NDPAcceptCommand *)object; (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
 Register_Class(NDPSendCommand)
 
 NDPSendCommand::NDPSendCommand() : ::inet::NDPCommand()
@@ -1542,6 +1797,366 @@ void *NDPSendCommandDescriptor::getFieldStructValuePointer(void *object, int fie
     }
     NDPSendCommand *pp = (NDPSendCommand *)object; (void)pp;
     switch (field) {
+        default: return nullptr;
+    }
+}
+
+Register_Class(NDPAvailableInfo)
+
+NDPAvailableInfo::NDPAvailableInfo() : ::inet::NDPCommand()
+{
+    this->localPort = 0;
+    this->remotePort = 0;
+    this->newSocketId = 0;
+}
+
+NDPAvailableInfo::NDPAvailableInfo(const NDPAvailableInfo& other) : ::inet::NDPCommand(other)
+{
+    copy(other);
+}
+
+NDPAvailableInfo::~NDPAvailableInfo()
+{
+}
+
+NDPAvailableInfo& NDPAvailableInfo::operator=(const NDPAvailableInfo& other)
+{
+    if (this==&other) return *this;
+    ::inet::NDPCommand::operator=(other);
+    copy(other);
+    return *this;
+}
+
+void NDPAvailableInfo::copy(const NDPAvailableInfo& other)
+{
+    this->localAddr = other.localAddr;
+    this->remoteAddr = other.remoteAddr;
+    this->localPort = other.localPort;
+    this->remotePort = other.remotePort;
+    this->newSocketId = other.newSocketId;
+}
+
+void NDPAvailableInfo::parsimPack(omnetpp::cCommBuffer *b) const
+{
+    ::inet::NDPCommand::parsimPack(b);
+    doParsimPacking(b,this->localAddr);
+    doParsimPacking(b,this->remoteAddr);
+    doParsimPacking(b,this->localPort);
+    doParsimPacking(b,this->remotePort);
+    doParsimPacking(b,this->newSocketId);
+}
+
+void NDPAvailableInfo::parsimUnpack(omnetpp::cCommBuffer *b)
+{
+    ::inet::NDPCommand::parsimUnpack(b);
+    doParsimUnpacking(b,this->localAddr);
+    doParsimUnpacking(b,this->remoteAddr);
+    doParsimUnpacking(b,this->localPort);
+    doParsimUnpacking(b,this->remotePort);
+    doParsimUnpacking(b,this->newSocketId);
+}
+
+L3Address& NDPAvailableInfo::getLocalAddr()
+{
+    return this->localAddr;
+}
+
+void NDPAvailableInfo::setLocalAddr(const L3Address& localAddr)
+{
+    this->localAddr = localAddr;
+}
+
+L3Address& NDPAvailableInfo::getRemoteAddr()
+{
+    return this->remoteAddr;
+}
+
+void NDPAvailableInfo::setRemoteAddr(const L3Address& remoteAddr)
+{
+    this->remoteAddr = remoteAddr;
+}
+
+int NDPAvailableInfo::getLocalPort() const
+{
+    return this->localPort;
+}
+
+void NDPAvailableInfo::setLocalPort(int localPort)
+{
+    this->localPort = localPort;
+}
+
+int NDPAvailableInfo::getRemotePort() const
+{
+    return this->remotePort;
+}
+
+void NDPAvailableInfo::setRemotePort(int remotePort)
+{
+    this->remotePort = remotePort;
+}
+
+int NDPAvailableInfo::getNewSocketId() const
+{
+    return this->newSocketId;
+}
+
+void NDPAvailableInfo::setNewSocketId(int newSocketId)
+{
+    this->newSocketId = newSocketId;
+}
+
+class NDPAvailableInfoDescriptor : public omnetpp::cClassDescriptor
+{
+  private:
+    mutable const char **propertynames;
+  public:
+    NDPAvailableInfoDescriptor();
+    virtual ~NDPAvailableInfoDescriptor();
+
+    virtual bool doesSupport(omnetpp::cObject *obj) const override;
+    virtual const char **getPropertyNames() const override;
+    virtual const char *getProperty(const char *propertyname) const override;
+    virtual int getFieldCount() const override;
+    virtual const char *getFieldName(int field) const override;
+    virtual int findField(const char *fieldName) const override;
+    virtual unsigned int getFieldTypeFlags(int field) const override;
+    virtual const char *getFieldTypeString(int field) const override;
+    virtual const char **getFieldPropertyNames(int field) const override;
+    virtual const char *getFieldProperty(int field, const char *propertyname) const override;
+    virtual int getFieldArraySize(void *object, int field) const override;
+
+    virtual const char *getFieldDynamicTypeString(void *object, int field, int i) const override;
+    virtual std::string getFieldValueAsString(void *object, int field, int i) const override;
+    virtual bool setFieldValueAsString(void *object, int field, int i, const char *value) const override;
+
+    virtual const char *getFieldStructName(int field) const override;
+    virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
+};
+
+Register_ClassDescriptor(NDPAvailableInfoDescriptor)
+
+NDPAvailableInfoDescriptor::NDPAvailableInfoDescriptor() : omnetpp::cClassDescriptor("inet::NDPAvailableInfo", "inet::NDPCommand")
+{
+    propertynames = nullptr;
+}
+
+NDPAvailableInfoDescriptor::~NDPAvailableInfoDescriptor()
+{
+    delete[] propertynames;
+}
+
+bool NDPAvailableInfoDescriptor::doesSupport(omnetpp::cObject *obj) const
+{
+    return dynamic_cast<NDPAvailableInfo *>(obj)!=nullptr;
+}
+
+const char **NDPAvailableInfoDescriptor::getPropertyNames() const
+{
+    if (!propertynames) {
+        static const char *names[] = {  nullptr };
+        omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+        const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
+        propertynames = mergeLists(basenames, names);
+    }
+    return propertynames;
+}
+
+const char *NDPAvailableInfoDescriptor::getProperty(const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? basedesc->getProperty(propertyname) : nullptr;
+}
+
+int NDPAvailableInfoDescriptor::getFieldCount() const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    return basedesc ? 5+basedesc->getFieldCount() : 5;
+}
+
+unsigned int NDPAvailableInfoDescriptor::getFieldTypeFlags(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeFlags(field);
+        field -= basedesc->getFieldCount();
+    }
+    static unsigned int fieldTypeFlags[] = {
+        FD_ISCOMPOUND,
+        FD_ISCOMPOUND,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+        FD_ISEDITABLE,
+    };
+    return (field>=0 && field<5) ? fieldTypeFlags[field] : 0;
+}
+
+const char *NDPAvailableInfoDescriptor::getFieldName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldName(field);
+        field -= basedesc->getFieldCount();
+    }
+    static const char *fieldNames[] = {
+        "localAddr",
+        "remoteAddr",
+        "localPort",
+        "remotePort",
+        "newSocketId",
+    };
+    return (field>=0 && field<5) ? fieldNames[field] : nullptr;
+}
+
+int NDPAvailableInfoDescriptor::findField(const char *fieldName) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    int base = basedesc ? basedesc->getFieldCount() : 0;
+    if (fieldName[0]=='l' && strcmp(fieldName, "localAddr")==0) return base+0;
+    if (fieldName[0]=='r' && strcmp(fieldName, "remoteAddr")==0) return base+1;
+    if (fieldName[0]=='l' && strcmp(fieldName, "localPort")==0) return base+2;
+    if (fieldName[0]=='r' && strcmp(fieldName, "remotePort")==0) return base+3;
+    if (fieldName[0]=='n' && strcmp(fieldName, "newSocketId")==0) return base+4;
+    return basedesc ? basedesc->findField(fieldName) : -1;
+}
+
+const char *NDPAvailableInfoDescriptor::getFieldTypeString(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldTypeString(field);
+        field -= basedesc->getFieldCount();
+    }
+    static const char *fieldTypeStrings[] = {
+        "L3Address",
+        "L3Address",
+        "int",
+        "int",
+        "int",
+    };
+    return (field>=0 && field<5) ? fieldTypeStrings[field] : nullptr;
+}
+
+const char **NDPAvailableInfoDescriptor::getFieldPropertyNames(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldPropertyNames(field);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+const char *NDPAvailableInfoDescriptor::getFieldProperty(int field, const char *propertyname) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldProperty(field, propertyname);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+int NDPAvailableInfoDescriptor::getFieldArraySize(void *object, int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldArraySize(object, field);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAvailableInfo *pp = (NDPAvailableInfo *)object; (void)pp;
+    switch (field) {
+        default: return 0;
+    }
+}
+
+const char *NDPAvailableInfoDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldDynamicTypeString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAvailableInfo *pp = (NDPAvailableInfo *)object; (void)pp;
+    switch (field) {
+        default: return nullptr;
+    }
+}
+
+std::string NDPAvailableInfoDescriptor::getFieldValueAsString(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldValueAsString(object,field,i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAvailableInfo *pp = (NDPAvailableInfo *)object; (void)pp;
+    switch (field) {
+        case 0: {std::stringstream out; out << pp->getLocalAddr(); return out.str();}
+        case 1: {std::stringstream out; out << pp->getRemoteAddr(); return out.str();}
+        case 2: return long2string(pp->getLocalPort());
+        case 3: return long2string(pp->getRemotePort());
+        case 4: return long2string(pp->getNewSocketId());
+        default: return "";
+    }
+}
+
+bool NDPAvailableInfoDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->setFieldValueAsString(object,field,i,value);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAvailableInfo *pp = (NDPAvailableInfo *)object; (void)pp;
+    switch (field) {
+        case 2: pp->setLocalPort(string2long(value)); return true;
+        case 3: pp->setRemotePort(string2long(value)); return true;
+        case 4: pp->setNewSocketId(string2long(value)); return true;
+        default: return false;
+    }
+}
+
+const char *NDPAvailableInfoDescriptor::getFieldStructName(int field) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructName(field);
+        field -= basedesc->getFieldCount();
+    }
+    switch (field) {
+        case 0: return omnetpp::opp_typename(typeid(L3Address));
+        case 1: return omnetpp::opp_typename(typeid(L3Address));
+        default: return nullptr;
+    };
+}
+
+void *NDPAvailableInfoDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+{
+    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
+    if (basedesc) {
+        if (field < basedesc->getFieldCount())
+            return basedesc->getFieldStructValuePointer(object, field, i);
+        field -= basedesc->getFieldCount();
+    }
+    NDPAvailableInfo *pp = (NDPAvailableInfo *)object; (void)pp;
+    switch (field) {
+        case 0: return (void *)(&pp->getLocalAddr()); break;
+        case 1: return (void *)(&pp->getRemoteAddr()); break;
         default: return nullptr;
     }
 }

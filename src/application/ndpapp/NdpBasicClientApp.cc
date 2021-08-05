@@ -22,11 +22,8 @@ NdpBasicClientApp::~NdpBasicClientApp() {
 }
 
 void NdpBasicClientApp::initialize(int stage) {
-
     NdpAppBase::initialize(stage);
-
     if (stage == INITSTAGE_LOCAL) {
-         //  WATCH(numRequestsToSend);
         bytesRcvd = 0;
         packetsRcvd=0;
         WATCH(bytesRcvd);
@@ -34,54 +31,34 @@ void NdpBasicClientApp::initialize(int stage) {
 
         startTime = par("startTime");
         stopTime = par("stopTime");
-        if (stopTime >= SIMTIME_ZERO&& stopTime < startTime)
-        throw cRuntimeError("Invalid startTime/stopTime parameters");
-    }
-    else if (stage == INITSTAGE_APPLICATION_LAYER) {
+        if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
+            throw cRuntimeError("Invalid startTime/stopTime parameters");
         timeoutMsg = new cMessage("timer");
-        nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
-        if (isNodeUp()) {
-            timeoutMsg->setKind(MSGKIND_CONNECT);
-            scheduleAt(startTime, timeoutMsg);
-        }
     }
 }
 
-bool NdpBasicClientApp::isNodeUp() {
-    return !nodeStatus || nodeStatus->getState() == NodeStatus::UP;
-}
-
-
-void NdpBasicClientApp::handleTimer(cMessage *msg) {
-    /////// Added MOH send requests based on a timer
-    switch (msg->getKind()) {
-
-    case MSGKIND_CONNECT:
-        connect();    // active OPEN
-        break;
-
-    case MSGKIND_SEND:   // not used now MHO see  NdpBasicClientApp::socketEstablished
-//        sendRequest();
-        break;
-
-    default:
-        throw cRuntimeError("Invalid timer msg: kind=%d", msg->getKind());
+void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
+{
+    simtime_t now = simTime();
+    simtime_t start = std::max(startTime, now);
+    if (timeoutMsg && ((stopTime < SIMTIME_ZERO) || (start < stopTime) || (start == stopTime && startTime == stopTime))) {
+        timeoutMsg->setKind(MSGKIND_CONNECT);
+        scheduleAt(start, timeoutMsg);
     }
 }
 
-
-void NdpBasicClientApp::socketEstablished(int connId, void *ptr) {
-    NdpAppBase::socketEstablished(connId, ptr);
-//    sendData();
-//      if (opcode == 2)  sendWriteRequest();   // 1 read, 2 write
+void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
+{
+    cancelEvent(timeoutMsg);
+    if (socket.getState() == NDPSocket::CONNECTED || socket.getState() == NDPSocket::CONNECTING || socket.getState() == NDPSocket::PEER_CLOSED)
+        close();
 }
 
-
-void NdpBasicClientApp::sendData() {
-//    cPacket *msg = nullptr;
-//    msg = new cPacket("APP-DATA");
-//    msg->setByteLength(sendBytes);
-//    socket.send(msg);
+void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
+{
+    cancelEvent(timeoutMsg);
+    if (operation->getRootModule() != getContainingNode(this))
+        socket.destroy();
 }
 
 void NdpBasicClientApp::sendWriteRequest() {
@@ -104,37 +81,28 @@ void NdpBasicClientApp::sendWriteRequest() {
     sendPacket(msg);
 }
 
+void NdpBasicClientApp::handleTimer(cMessage *msg) {
+    /////// Added MOH send requests based on a timer
+    switch (msg->getKind()) {
 
-bool NdpBasicClientApp::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) {
-    Enter_Method_Silent();
-    if (dynamic_cast<ModuleStartOperation *>(operation)) {
-        if (operation->getCurrentStage() == ModuleStartOperation::STAGE_APPLICATION_LAYER) {
-            simtime_t now = simTime();
-            simtime_t start = std::max(startTime, now);
-            if (timeoutMsg && ((stopTime < SIMTIME_ZERO) || (start < stopTime) || (start == stopTime && startTime == stopTime))) {
-                timeoutMsg->setKind(MSGKIND_CONNECT);
-                scheduleAt(start, timeoutMsg);
-            }
-        }
+    case MSGKIND_CONNECT:
+        connect();    // active OPEN
+        break;
+
+    case MSGKIND_SEND:   // not used now MHO see  NdpBasicClientApp::socketEstablished
+//        sendRequest();
+        break;
+
+    default:
+        throw cRuntimeError("Invalid timer msg: kind=%d", msg->getKind());
     }
-    else if (dynamic_cast<ModuleStopOperation *>(operation)) {
-        if (operation->getCurrentStage() == ModuleStopOperation::STAGE_APPLICATION_LAYER) {
-            cancelEvent(timeoutMsg);
-            if (socket.getState() == NDPSocket::CONNECTED || socket.getState() == NDPSocket::CONNECTING || socket.getState() == NDPSocket::PEER_CLOSED)
-            close();
-            // TODO: wait until socket is closed
-        }
-    }
-    else if (dynamic_cast<ModuleCrashOperation *>(operation)) {
-        if (operation->getCurrentStage() == ModuleCrashOperation::STAGE_CRASH)
-        cancelEvent(timeoutMsg);
-    }
-    else
-    throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName());
-    return true;
 }
 
-
+void NdpBasicClientApp::socketEstablished(NDPSocket *socket) {
+    NdpAppBase::socketEstablished(socket);
+//    sendData();
+//      if (opcode == 2)  sendWriteRequest();   // 1 read, 2 write
+}
 
 void NdpBasicClientApp::rescheduleOrDeleteTimer(simtime_t d,
         short int msgKind) {
@@ -150,7 +118,7 @@ void NdpBasicClientApp::rescheduleOrDeleteTimer(simtime_t d,
     }
 }
 
-void NdpBasicClientApp::socketDataArrived(int connId, void *ptr, cPacket *msg, bool urgent) {
+void NdpBasicClientApp::socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) {
 //    if (msg->getKind() == NDP_I_DATA) {
 //        std::cout << "reply arrived to the client  " << std::endl;
 //        packetsRcvd++;
@@ -164,12 +132,17 @@ void NdpBasicClientApp::socketDataArrived(int connId, void *ptr, cPacket *msg, b
 
  }
 
-void NdpBasicClientApp::socketClosed(int connId, void *ptr) {
-    NdpAppBase::socketClosed(connId, ptr);
+void NdpBasicClientApp::close()
+{
+    NdpAppBase::close();
+    cancelEvent(timeoutMsg);
+}
+void NdpBasicClientApp::socketClosed(NDPSocket *socket) {
+    NdpAppBase::socketClosed(socket);
 }
 
-void NdpBasicClientApp::socketFailure(int connId, void *ptr, int code) {
-    NdpAppBase::socketFailure(connId, ptr, code);
+void NdpBasicClientApp::socketFailure(NDPSocket *socket, int code) {
+    NdpAppBase::socketFailure(socket, code);
 
     // reconnect after a delay
     if (timeoutMsg) {

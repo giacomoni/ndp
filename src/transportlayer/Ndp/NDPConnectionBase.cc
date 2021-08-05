@@ -1,13 +1,13 @@
 #include <string.h>
 #include <assert.h>
 
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
-#include "../../transportlayer/Ndp/Ndp.h"
-#include "../../transportlayer/Ndp/NDPAlgorithm.h"
-#include "../../transportlayer/Ndp/NDPReceiveQueue.h"
-#include "../../transportlayer/Ndp/NDPSendQueue.h"
-#include "inet/ndp/ndptransportlayer/contract/ndp/NDPCommand_m.h"
-#include "inet/ndp/ndptransportlayer/Ndp/NDPConnection.h"
+#include "ndp_common/NDPHeader.h"
+#include "Ndp.h"
+#include "NDPAlgorithm.h"
+#include "NDPReceiveQueue.h"
+#include "NDPSendQueue.h"
+#include "../contract/ndp/NDPCommand_m.h"
+#include "NDPConnection.h"
 
 
 using namespace std;
@@ -51,7 +51,7 @@ NDPStateVariables::NDPStateVariables() {
     syn_rexmit_timeout = 0;
 }
 
-std::string NDPStateVariables::info() const {
+std::string NDPStateVariables::str() const {
     std::stringstream out;
     return out.str();
 }
@@ -65,19 +65,13 @@ std::string NDPStateVariables::detailedInfo() const {
     return out.str();
 }
 
-NDPConnection::NDPConnection() {
+NDPConnection::initConnection(Ndp *_mod, int _socketId) {
+    Enter_Method_Silent();
 
-}
-
-
-NDPConnection::NDPConnection(Ndp *_mod, int _appGateIndex, int _connId) {
     ndpMain = _mod;
-    appGateIndex = _appGateIndex;
-    connId = _connId;
+    socketId = _socketId;
 
-    char fsmname[24];
-    sprintf(fsmname, "fsm-%d", connId);
-    fsm.setName(fsmname);
+    fsm.setName(getName());
     fsm.setState(NDP_S_INIT);
 
     // queues and algorithm will be created on active or passive open
@@ -93,24 +87,11 @@ NDPConnection::NDPConnection(Ndp *_mod, int _appGateIndex, int _connId) {
     connEstabTimer->setContextPointer(this);
     finWait2Timer->setContextPointer(this);
     synRexmitTimer->setContextPointer(this);
-
-    // statistics
-    if (getNDPMain()->recordStatistics) {
-//        sndWndVector = new cOutVector("send window");
-    }
-
-
 }
 
 NDPConnection::~NDPConnection() {
 
     std::list<PakcetsToSend>::iterator iter;  // received iterator
-//    iter = sentPakcetsList.begin();
-//    while (!sentPakcetsList.empty()) {
-//        delete sentPakcetsList.front().msg;
-//        iter++;
-//        sentPakcetsList.pop_front();
-//    }
 
     while (!retransmitQueue.empty()) {
               std::cout << " destructor NDPConnection " << iter->pktId << " msgName "  << iter->msg->getFullName() << "\n";
@@ -142,10 +123,16 @@ NDPConnection::~NDPConnection() {
         delete cancelEvent(synRexmitTimer);
     if (requestInternalTimer)
         delete cancelEvent(requestInternalTimer);
+}
 
-    // statistics
-
-//    delete sndSacksVector;
+void NDPConnection::handleMessage(cMessage *msg)
+{
+    if (msg->isSelfMessage()) {
+        if (!processTimer(msg))
+            ndpMain->removeConnection(this);
+    }
+    else
+        throw cRuntimeError("model error: TcpConnection allows only self messages");
 }
 
 bool NDPConnection::processTimer(cMessage *msg) {
@@ -185,16 +172,22 @@ bool NDPConnection::processTimer(cMessage *msg) {
 
 
 
-bool NDPConnection::processNDPSegment(NDPSegment *ndpseg, L3Address segSrcAddr, L3Address segDestAddr) {
+bool NDPConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address segSrcAddr, L3Address segDestAddr)
+{
+    Enter_Method_Silent();
+
     printConnBrief();
-    NDPEventCode event = process_RCV_SEGMENT(ndpseg, segSrcAddr, segDestAddr);
+    NDPEventCode event = process_RCV_SEGMENT(packet, ndpseg, segSrcAddr, segDestAddr);
     // then state transitions
     return performStateTransition(event);
 }
 
  bool NDPConnection::processAppCommand(cMessage *msg) {
+    Enter_Method_Silent();
+
     printConnBrief();
-    NDPCommand *ndpCommand = (NDPCommand *) (msg->removeControlInfo());
+
+    NDPCommand *ndpCommand = check_and_cast_nullable<NDPCommand *>(msg->removeControlInfo());
     NDPEventCode event = preanalyseAppCommandEvent(msg->getKind());
     EV_INFO << "App command eventName: " << eventName(event) << "\n";
 //     std::cout << "App command: " << eventName(event) << std::endl;
@@ -627,6 +620,5 @@ void NDPConnection::stateEntered(int state, int oldState, NDPEventCode event) {
 }
 
 } // namespace NDP
-
 } // namespace inet
 

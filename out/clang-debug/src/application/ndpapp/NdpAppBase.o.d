@@ -16,14 +16,32 @@
   ../../inet/src/inet/networklayer/contract/clns/ClnsAddress.h \
   ../../inet/src/inet/networklayer/contract/ipv4/Ipv4Address.h \
   ../../inet/src/inet/networklayer/contract/ipv6/Ipv6Address.h \
-  application/ndpapp/../../transportlayer/Ndp/Ndp.h \
+  ../../inet/src/inet/common/packet/ChunkQueue.h \
+  ../../inet/src/inet/common/packet/chunk/BitsChunk.h \
+  ../../inet/src/inet/common/packet/chunk/Chunk.h \
+  ../../inet/src/inet/common/MemoryInputStream.h \
+  ../../inet/src/inet/common/Units.h \
+  ../../inet/src/inet/common/INETMath.h \
+  ../../inet/src/inet/common/MemoryOutputStream.h \
+  ../../inet/src/inet/common/Ptr.h \
+  ../../inet/src/inet/common/IntrusivePtr.h \
+  ../../inet/src/inet/common/packet/tag/RegionTagSet.h \
+  ../../inet/src/inet/common/TemporarySharedPtr.h \
+  ../../inet/src/inet/common/packet/chunk/BytesChunk.h \
+  ../../inet/src/inet/common/packet/chunk/EmptyChunk.h \
+  ../../inet/src/inet/common/packet/Message.h \
+  ../../inet/src/inet/common/packet/tag/TagSet.h \
+  ../../inet/src/inet/common/packet/Packet.h \
+  ../../inet/src/inet/common/socket/ISocket.h \
+  ../../inet/src/inet/applications/base/ApplicationBase.h \
+  ../../inet/src/inet/common/lifecycle/ModuleOperations.h \
+  ../../inet/src/inet/common/lifecycle/LifecycleOperation.h \
+  ../../inet/src/inet/common/lifecycle/OperationalBase.h \
   ../../inet/src/inet/common/lifecycle/ILifecycle.h \
-  application/ndpapp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h \
   ../../inet/src/inet/networklayer/common/L3AddressResolver.h \
   ../../inet/src/inet/networklayer/contract/IRoutingTable.h \
   ../../inet/src/inet/networklayer/contract/IRoute.h \
   ../../inet/src/inet/networklayer/common/InterfaceEntry.h \
-  ../../inet/src/inet/common/packet/tag/TagSet.h \
   ../../inet/src/inet/common/Simsignals.h \
   ../../inet/src/inet/common/Simsignals_m.h \
   ../../inet/src/inet/common/INETDefs_m.h \
@@ -65,11 +83,49 @@ application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
 
 ../../inet/src/inet/networklayer/contract/ipv6/Ipv6Address.h:
 
-application/ndpapp/../../transportlayer/Ndp/Ndp.h:
+../../inet/src/inet/common/packet/ChunkQueue.h:
+
+../../inet/src/inet/common/packet/chunk/BitsChunk.h:
+
+../../inet/src/inet/common/packet/chunk/Chunk.h:
+
+../../inet/src/inet/common/MemoryInputStream.h:
+
+../../inet/src/inet/common/Units.h:
+
+../../inet/src/inet/common/INETMath.h:
+
+../../inet/src/inet/common/MemoryOutputStream.h:
+
+../../inet/src/inet/common/Ptr.h:
+
+../../inet/src/inet/common/IntrusivePtr.h:
+
+../../inet/src/inet/common/packet/tag/RegionTagSet.h:
+
+../../inet/src/inet/common/TemporarySharedPtr.h:
+
+../../inet/src/inet/common/packet/chunk/BytesChunk.h:
+
+../../inet/src/inet/common/packet/chunk/EmptyChunk.h:
+
+../../inet/src/inet/common/packet/Message.h:
+
+../../inet/src/inet/common/packet/tag/TagSet.h:
+
+../../inet/src/inet/common/packet/Packet.h:
+
+../../inet/src/inet/common/socket/ISocket.h:
+
+../../inet/src/inet/applications/base/ApplicationBase.h:
+
+../../inet/src/inet/common/lifecycle/ModuleOperations.h:
+
+../../inet/src/inet/common/lifecycle/LifecycleOperation.h:
+
+../../inet/src/inet/common/lifecycle/OperationalBase.h:
 
 ../../inet/src/inet/common/lifecycle/ILifecycle.h:
-
-application/ndpapp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h:
 
 ../../inet/src/inet/networklayer/common/L3AddressResolver.h:
 
@@ -78,8 +134,6 @@ application/ndpapp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h:
 ../../inet/src/inet/networklayer/contract/IRoute.h:
 
 ../../inet/src/inet/networklayer/common/InterfaceEntry.h:
-
-../../inet/src/inet/common/packet/tag/TagSet.h:
 
 ../../inet/src/inet/common/Simsignals.h:
 

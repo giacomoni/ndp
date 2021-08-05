@@ -1,5 +1,5 @@
 //
-// Generated file, do not edit! Created by nedtool 5.6 from transportlayer/Ndp/ndp_common/NDPSegment.msg.
+// Generated file, do not edit! Created by nedtool 5.6 from transportlayer/Ndp/ndp_common/NdpHeader.msg.
 //
 
 // Disable warnings about unused variables, empty switch stmts, etc:
@@ -26,7 +26,8 @@
 
 #include <iostream>
 #include <sstream>
-#include "NDPSegment_m.h"
+#include <memory>
+#include "NdpHeader_m.h"
 
 namespace omnetpp {
 
@@ -67,7 +68,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::list<T,A>& l)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         l.push_back(T());
         doParsimUnpacking(buffer, l.back());
     }
@@ -87,7 +88,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::set<T,Tr,A>& s)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         T x;
         doParsimUnpacking(buffer, x);
         s.insert(x);
@@ -110,7 +111,7 @@ void doParsimUnpacking(omnetpp::cCommBuffer *buffer, std::map<K,V,Tr,A>& m)
 {
     int n;
     doParsimUnpacking(buffer, n);
-    for (int i=0; i<n; i++) {
+    for (int i = 0; i < n; i++) {
         K k; V v;
         doParsimUnpacking(buffer, k);
         doParsimUnpacking(buffer, v);
@@ -148,12 +149,40 @@ void doParsimUnpacking(omnetpp::cCommBuffer *, T& t)
 
 }  // namespace omnetpp
 
+namespace {
+template <class T> inline
+typename std::enable_if<std::is_polymorphic<T>::value && std::is_base_of<omnetpp::cObject,T>::value, void *>::type
+toVoidPtr(T* t)
+{
+    return (void *)(static_cast<const omnetpp::cObject *>(t));
+}
+
+template <class T> inline
+typename std::enable_if<std::is_polymorphic<T>::value && !std::is_base_of<omnetpp::cObject,T>::value, void *>::type
+toVoidPtr(T* t)
+{
+    return (void *)dynamic_cast<const void *>(t);
+}
+
+template <class T> inline
+typename std::enable_if<!std::is_polymorphic<T>::value, void *>::type
+toVoidPtr(T* t)
+{
+    return (void *)static_cast<const void *>(t);
+}
+
+}
+
 namespace inet {
 namespace ndp {
 
 // forward
 template<typename T, typename A>
 std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec);
+
+// Template rule to generate operator<< for shared_ptr<T>
+template<typename T>
+inline std::ostream& operator<<(std::ostream& out,const std::shared_ptr<T>& t) { return out << t.get(); }
 
 // Template rule which fires if a struct or class doesn't have operator<<
 template<typename T>
@@ -172,270 +201,22 @@ inline std::ostream& operator<<(std::ostream& out, const std::vector<T,A>& vec)
         out << *it;
     }
     out.put('}');
-    
+
     char buf[32];
     sprintf(buf, " (size=%u)", (unsigned int)vec.size());
     out.write(buf, strlen(buf));
     return out;
 }
 
-NDPPayloadMessage::NDPPayloadMessage()
-{
-    this->endSequenceNo = 0;
-    this->msg = nullptr;
-}
-
-void __doPacking(omnetpp::cCommBuffer *b, const NDPPayloadMessage& a)
-{
-    doParsimPacking(b,a.endSequenceNo);
-    doParsimPacking(b,a.msg);
-}
-
-void __doUnpacking(omnetpp::cCommBuffer *b, NDPPayloadMessage& a)
-{
-    doParsimUnpacking(b,a.endSequenceNo);
-    doParsimUnpacking(b,a.msg);
-}
-
-class NDPPayloadMessageDescriptor : public omnetpp::cClassDescriptor
-{
-  private:
-    mutable const char **propertynames;
-  public:
-    NDPPayloadMessageDescriptor();
-    virtual ~NDPPayloadMessageDescriptor();
-
-    virtual bool doesSupport(omnetpp::cObject *obj) const override;
-    virtual const char **getPropertyNames() const override;
-    virtual const char *getProperty(const char *propertyname) const override;
-    virtual int getFieldCount() const override;
-    virtual const char *getFieldName(int field) const override;
-    virtual int findField(const char *fieldName) const override;
-    virtual unsigned int getFieldTypeFlags(int field) const override;
-    virtual const char *getFieldTypeString(int field) const override;
-    virtual const char **getFieldPropertyNames(int field) const override;
-    virtual const char *getFieldProperty(int field, const char *propertyname) const override;
-    virtual int getFieldArraySize(void *object, int field) const override;
-
-    virtual const char *getFieldDynamicTypeString(void *object, int field, int i) const override;
-    virtual std::string getFieldValueAsString(void *object, int field, int i) const override;
-    virtual bool setFieldValueAsString(void *object, int field, int i, const char *value) const override;
-
-    virtual const char *getFieldStructName(int field) const override;
-    virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
-};
-
-Register_ClassDescriptor(NDPPayloadMessageDescriptor)
-
-NDPPayloadMessageDescriptor::NDPPayloadMessageDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPPayloadMessage", "")
-{
-    propertynames = nullptr;
-}
-
-NDPPayloadMessageDescriptor::~NDPPayloadMessageDescriptor()
-{
-    delete[] propertynames;
-}
-
-bool NDPPayloadMessageDescriptor::doesSupport(omnetpp::cObject *obj) const
-{
-    return dynamic_cast<NDPPayloadMessage *>(obj)!=nullptr;
-}
-
-const char **NDPPayloadMessageDescriptor::getPropertyNames() const
-{
-    if (!propertynames) {
-        static const char *names[] = {  nullptr };
-        omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-        const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
-        propertynames = mergeLists(basenames, names);
-    }
-    return propertynames;
-}
-
-const char *NDPPayloadMessageDescriptor::getProperty(const char *propertyname) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? basedesc->getProperty(propertyname) : nullptr;
-}
-
-int NDPPayloadMessageDescriptor::getFieldCount() const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 2+basedesc->getFieldCount() : 2;
-}
-
-unsigned int NDPPayloadMessageDescriptor::getFieldTypeFlags(int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldTypeFlags(field);
-        field -= basedesc->getFieldCount();
-    }
-    static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-        FD_ISCOMPOUND,
-    };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
-}
-
-const char *NDPPayloadMessageDescriptor::getFieldName(int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldName(field);
-        field -= basedesc->getFieldCount();
-    }
-    static const char *fieldNames[] = {
-        "endSequenceNo",
-        "msg",
-    };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
-}
-
-int NDPPayloadMessageDescriptor::findField(const char *fieldName) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='e' && strcmp(fieldName, "endSequenceNo")==0) return base+0;
-    if (fieldName[0]=='m' && strcmp(fieldName, "msg")==0) return base+1;
-    return basedesc ? basedesc->findField(fieldName) : -1;
-}
-
-const char *NDPPayloadMessageDescriptor::getFieldTypeString(int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldTypeString(field);
-        field -= basedesc->getFieldCount();
-    }
-    static const char *fieldTypeStrings[] = {
-        "unsigned int",
-        "cPacketPtr",
-    };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
-}
-
-const char **NDPPayloadMessageDescriptor::getFieldPropertyNames(int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldPropertyNames(field);
-        field -= basedesc->getFieldCount();
-    }
-    switch (field) {
-        default: return nullptr;
-    }
-}
-
-const char *NDPPayloadMessageDescriptor::getFieldProperty(int field, const char *propertyname) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldProperty(field, propertyname);
-        field -= basedesc->getFieldCount();
-    }
-    switch (field) {
-        default: return nullptr;
-    }
-}
-
-int NDPPayloadMessageDescriptor::getFieldArraySize(void *object, int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldArraySize(object, field);
-        field -= basedesc->getFieldCount();
-    }
-    NDPPayloadMessage *pp = (NDPPayloadMessage *)object; (void)pp;
-    switch (field) {
-        default: return 0;
-    }
-}
-
-const char *NDPPayloadMessageDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldDynamicTypeString(object,field,i);
-        field -= basedesc->getFieldCount();
-    }
-    NDPPayloadMessage *pp = (NDPPayloadMessage *)object; (void)pp;
-    switch (field) {
-        default: return nullptr;
-    }
-}
-
-std::string NDPPayloadMessageDescriptor::getFieldValueAsString(void *object, int field, int i) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldValueAsString(object,field,i);
-        field -= basedesc->getFieldCount();
-    }
-    NDPPayloadMessage *pp = (NDPPayloadMessage *)object; (void)pp;
-    switch (field) {
-        case 0: return ulong2string(pp->endSequenceNo);
-        case 1: {std::stringstream out; out << pp->msg; return out.str();}
-        default: return "";
-    }
-}
-
-bool NDPPayloadMessageDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->setFieldValueAsString(object,field,i,value);
-        field -= basedesc->getFieldCount();
-    }
-    NDPPayloadMessage *pp = (NDPPayloadMessage *)object; (void)pp;
-    switch (field) {
-        case 0: pp->endSequenceNo = string2ulong(value); return true;
-        default: return false;
-    }
-}
-
-const char *NDPPayloadMessageDescriptor::getFieldStructName(int field) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldStructName(field);
-        field -= basedesc->getFieldCount();
-    }
-    switch (field) {
-        case 1: return omnetpp::opp_typename(typeid(cPacketPtr));
-        default: return nullptr;
-    };
-}
-
-void *NDPPayloadMessageDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
-{
-    omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    if (basedesc) {
-        if (field < basedesc->getFieldCount())
-            return basedesc->getFieldStructValuePointer(object, field, i);
-        field -= basedesc->getFieldCount();
-    }
-    NDPPayloadMessage *pp = (NDPPayloadMessage *)object; (void)pp;
-    switch (field) {
-        case 1: return (void *)(&pp->msg); break;
-        default: return nullptr;
-    }
-}
+EXECUTE_ON_STARTUP(
+    omnetpp::cEnum *e = omnetpp::cEnum::find("inet::ndp::NdpConstants");
+    if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("inet::ndp::NdpConstants"));
+    e->insert(NDP_MAX_SACK_ENTRIES, "NDP_MAX_SACK_ENTRIES");
+)
 
 EXECUTE_ON_STARTUP(
-    omnetpp::cEnum *e = omnetpp::cEnum::find("inet::ndp::NDPOptionNumbers");
-    if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("inet::ndp::NDPOptionNumbers"));
+    omnetpp::cEnum *e = omnetpp::cEnum::find("inet::ndp::NdpOptionNumbers");
+    if (!e) omnetpp::enums.getInstance()->add(e = new omnetpp::cEnum("inet::ndp::NdpOptionNumbers"));
     e->insert(NDPOPTION_END_OF_OPTION_LIST, "NDPOPTION_END_OF_OPTION_LIST");
     e->insert(NDPOPTION_NO_OPERATION, "NDPOPTION_NO_OPERATION");
     e->insert(NDPOPTION_MAXIMUM_SEGMENT_SIZE, "NDPOPTION_MAXIMUM_SEGMENT_SIZE");
@@ -449,8 +230,6 @@ Register_Class(SackItem)
 
 SackItem::SackItem() : ::omnetpp::cObject()
 {
-    this->start_var = 0;
-    this->end_var = 0;
 }
 
 SackItem::SackItem(const SackItem& other) : ::omnetpp::cObject(other)
@@ -464,7 +243,7 @@ SackItem::~SackItem()
 
 SackItem& SackItem::operator=(const SackItem& other)
 {
-    if (this==&other) return *this;
+    if (this == &other) return *this;
     ::omnetpp::cObject::operator=(other);
     copy(other);
     return *this;
@@ -472,46 +251,50 @@ SackItem& SackItem::operator=(const SackItem& other)
 
 void SackItem::copy(const SackItem& other)
 {
-    this->start_var = other.start_var;
-    this->end_var = other.end_var;
+    this->start = other.start;
+    this->end = other.end;
 }
 
 void SackItem::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    doParsimPacking(b,this->start_var);
-    doParsimPacking(b,this->end_var);
+    doParsimPacking(b,this->start);
+    doParsimPacking(b,this->end);
 }
 
 void SackItem::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    doParsimUnpacking(b,this->start_var);
-    doParsimUnpacking(b,this->end_var);
+    doParsimUnpacking(b,this->start);
+    doParsimUnpacking(b,this->end);
 }
 
 unsigned int SackItem::getStart() const
 {
-    return this->start_var;
+    return this->start;
 }
 
 void SackItem::setStart(unsigned int start)
 {
-    this->start_var = start;
+    this->start = start;
 }
 
 unsigned int SackItem::getEnd() const
 {
-    return this->end_var;
+    return this->end;
 }
 
 void SackItem::setEnd(unsigned int end)
 {
-    this->end_var = end;
+    this->end = end;
 }
 
 class SackItemDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_start,
+        FIELD_end,
+    };
   public:
     SackItemDescriptor();
     virtual ~SackItemDescriptor();
@@ -538,7 +321,7 @@ class SackItemDescriptor : public omnetpp::cClassDescriptor
 
 Register_ClassDescriptor(SackItemDescriptor)
 
-SackItemDescriptor::SackItemDescriptor() : omnetpp::cClassDescriptor("inet::ndp::SackItem", "omnetpp::cObject")
+SackItemDescriptor::SackItemDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::SackItem)), "omnetpp::cObject")
 {
     propertynames = nullptr;
 }
@@ -556,7 +339,7 @@ bool SackItemDescriptor::doesSupport(omnetpp::cObject *obj) const
 const char **SackItemDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
-        static const char *names[] = { "fieldNameSuffix",  nullptr };
+        static const char *names[] = {  nullptr };
         omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
         const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
         propertynames = mergeLists(basenames, names);
@@ -566,7 +349,6 @@ const char **SackItemDescriptor::getPropertyNames() const
 
 const char *SackItemDescriptor::getProperty(const char *propertyname) const
 {
-    if (!strcmp(propertyname,"fieldNameSuffix")) return "_var";
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
@@ -586,10 +368,10 @@ unsigned int SackItemDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
+        FD_ISEDITABLE,    // FIELD_start
+        FD_ISEDITABLE,    // FIELD_end
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
 
 const char *SackItemDescriptor::getFieldName(int field) const
@@ -604,15 +386,15 @@ const char *SackItemDescriptor::getFieldName(int field) const
         "start",
         "end",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldNames[field] : nullptr;
 }
 
 int SackItemDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "start")==0) return base+0;
-    if (fieldName[0]=='e' && strcmp(fieldName, "end")==0) return base+1;
+    if (fieldName[0] == 's' && strcmp(fieldName, "start") == 0) return base+0;
+    if (fieldName[0] == 'e' && strcmp(fieldName, "end") == 0) return base+1;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -625,10 +407,10 @@ const char *SackItemDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "unsigned int",
-        "unsigned int",
+        "unsigned int",    // FIELD_start
+        "unsigned int",    // FIELD_end
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **SackItemDescriptor::getFieldPropertyNames(int field) const
@@ -695,8 +477,8 @@ std::string SackItemDescriptor::getFieldValueAsString(void *object, int field, i
     }
     SackItem *pp = (SackItem *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getStart());
-        case 1: return ulong2string(pp->getEnd());
+        case FIELD_start: return ulong2string(pp->getStart());
+        case FIELD_end: return ulong2string(pp->getEnd());
         default: return "";
     }
 }
@@ -711,8 +493,8 @@ bool SackItemDescriptor::setFieldValueAsString(void *object, int field, int i, c
     }
     SackItem *pp = (SackItem *)object; (void)pp;
     switch (field) {
-        case 0: pp->setStart(string2ulong(value)); return true;
-        case 1: pp->setEnd(string2ulong(value)); return true;
+        case FIELD_start: pp->setStart(string2ulong(value)); return true;
+        case FIELD_end: pp->setEnd(string2ulong(value)); return true;
         default: return false;
     }
 }
@@ -744,37 +526,39 @@ void *SackItemDescriptor::getFieldStructValuePointer(void *object, int field, in
     }
 }
 
-Sack_Base::Sack_Base() : ::inet::ndp::SackItem()
+Register_Class(Sack)
+
+Sack::Sack() : ::inet::ndp::SackItem()
 {
 }
 
-Sack_Base::Sack_Base(const Sack_Base& other) : ::inet::ndp::SackItem(other)
+Sack::Sack(const Sack& other) : ::inet::ndp::SackItem(other)
 {
     copy(other);
 }
 
-Sack_Base::~Sack_Base()
+Sack::~Sack()
 {
 }
 
-Sack_Base& Sack_Base::operator=(const Sack_Base& other)
+Sack& Sack::operator=(const Sack& other)
 {
-    if (this==&other) return *this;
+    if (this == &other) return *this;
     ::inet::ndp::SackItem::operator=(other);
     copy(other);
     return *this;
 }
 
-void Sack_Base::copy(const Sack_Base& other)
+void Sack::copy(const Sack& other)
 {
 }
 
-void Sack_Base::parsimPack(omnetpp::cCommBuffer *b) const
+void Sack::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::inet::ndp::SackItem::parsimPack(b);
 }
 
-void Sack_Base::parsimUnpack(omnetpp::cCommBuffer *b)
+void Sack::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::inet::ndp::SackItem::parsimUnpack(b);
 }
@@ -783,6 +567,8 @@ class SackDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+    };
   public:
     SackDescriptor();
     virtual ~SackDescriptor();
@@ -809,7 +595,7 @@ class SackDescriptor : public omnetpp::cClassDescriptor
 
 Register_ClassDescriptor(SackDescriptor)
 
-SackDescriptor::SackDescriptor() : omnetpp::cClassDescriptor("inet::ndp::Sack", "inet::ndp::SackItem")
+SackDescriptor::SackDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::Sack)), "inet::ndp::SackItem")
 {
     propertynames = nullptr;
 }
@@ -821,13 +607,13 @@ SackDescriptor::~SackDescriptor()
 
 bool SackDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<Sack_Base *>(obj)!=nullptr;
+    return dynamic_cast<Sack *>(obj)!=nullptr;
 }
 
 const char **SackDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
-        static const char *names[] = { "customize",  nullptr };
+        static const char *names[] = {  nullptr };
         omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
         const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
         propertynames = mergeLists(basenames, names);
@@ -837,7 +623,6 @@ const char **SackDescriptor::getPropertyNames() const
 
 const char *SackDescriptor::getProperty(const char *propertyname) const
 {
-    if (!strcmp(propertyname,"customize")) return "true";
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
@@ -921,7 +706,7 @@ int SackDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    Sack_Base *pp = (Sack_Base *)object; (void)pp;
+    Sack *pp = (Sack *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
@@ -935,7 +720,7 @@ const char *SackDescriptor::getFieldDynamicTypeString(void *object, int field, i
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    Sack_Base *pp = (Sack_Base *)object; (void)pp;
+    Sack *pp = (Sack *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
@@ -949,7 +734,7 @@ std::string SackDescriptor::getFieldValueAsString(void *object, int field, int i
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    Sack_Base *pp = (Sack_Base *)object; (void)pp;
+    Sack *pp = (Sack *)object; (void)pp;
     switch (field) {
         default: return "";
     }
@@ -963,7 +748,7 @@ bool SackDescriptor::setFieldValueAsString(void *object, int field, int i, const
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    Sack_Base *pp = (Sack_Base *)object; (void)pp;
+    Sack *pp = (Sack *)object; (void)pp;
     switch (field) {
         default: return false;
     }
@@ -988,82 +773,84 @@ void *SackDescriptor::getFieldStructValuePointer(void *object, int field, int i)
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    Sack_Base *pp = (Sack_Base *)object; (void)pp;
+    Sack *pp = (Sack *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOption)
+Register_Class(NdpOption)
 
-NDPOption::NDPOption() : ::omnetpp::cObject()
+NdpOption::NdpOption() : ::omnetpp::cObject()
 {
-    this->kind = -1;
-    this->length = 1;
 }
 
-NDPOption::NDPOption(const NDPOption& other) : ::omnetpp::cObject(other)
+NdpOption::NdpOption(const NdpOption& other) : ::omnetpp::cObject(other)
 {
     copy(other);
 }
 
-NDPOption::~NDPOption()
+NdpOption::~NdpOption()
 {
 }
 
-NDPOption& NDPOption::operator=(const NDPOption& other)
+NdpOption& NdpOption::operator=(const NdpOption& other)
 {
-    if (this==&other) return *this;
+    if (this == &other) return *this;
     ::omnetpp::cObject::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOption::copy(const NDPOption& other)
+void NdpOption::copy(const NdpOption& other)
 {
     this->kind = other.kind;
     this->length = other.length;
 }
 
-void NDPOption::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOption::parsimPack(omnetpp::cCommBuffer *b) const
 {
     doParsimPacking(b,this->kind);
     doParsimPacking(b,this->length);
 }
 
-void NDPOption::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOption::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     doParsimUnpacking(b,this->kind);
     doParsimUnpacking(b,this->length);
 }
 
-unsigned short NDPOption::getKind() const
+inet::ndp::NdpOptionNumbers NdpOption::getKind() const
 {
     return this->kind;
 }
 
-void NDPOption::setKind(unsigned short kind)
+void NdpOption::setKind(inet::ndp::NdpOptionNumbers kind)
 {
     this->kind = kind;
 }
 
-unsigned short NDPOption::getLength() const
+unsigned short NdpOption::getLength() const
 {
     return this->length;
 }
 
-void NDPOption::setLength(unsigned short length)
+void NdpOption::setLength(unsigned short length)
 {
     this->length = length;
 }
 
-class NDPOptionDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_kind,
+        FIELD_length,
+    };
   public:
-    NDPOptionDescriptor();
-    virtual ~NDPOptionDescriptor();
+    NdpOptionDescriptor();
+    virtual ~NdpOptionDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -1085,27 +872,27 @@ class NDPOptionDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionDescriptor)
+Register_ClassDescriptor(NdpOptionDescriptor)
 
-NDPOptionDescriptor::NDPOptionDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOption", "omnetpp::cObject")
+NdpOptionDescriptor::NdpOptionDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOption)), "omnetpp::cObject")
 {
     propertynames = nullptr;
 }
 
-NDPOptionDescriptor::~NDPOptionDescriptor()
+NdpOptionDescriptor::~NdpOptionDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOption *>(obj)!=nullptr;
+    return dynamic_cast<NdpOption *>(obj)!=nullptr;
 }
 
-const char **NDPOptionDescriptor::getPropertyNames() const
+const char **NdpOptionDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
-        static const char *names[] = {  nullptr };
+        static const char *names[] = { "packetData",  nullptr };
         omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
         const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
         propertynames = mergeLists(basenames, names);
@@ -1113,19 +900,20 @@ const char **NDPOptionDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionDescriptor::getProperty(const char *propertyname) const
 {
+    if (!strcmp(propertyname, "packetData")) return "";
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionDescriptor::getFieldCount() const
+int NdpOptionDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 2+basedesc->getFieldCount() : 2;
 }
 
-unsigned int NDPOptionDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1134,13 +922,13 @@ unsigned int NDPOptionDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
+        0,    // FIELD_kind
+        FD_ISEDITABLE,    // FIELD_length
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionDescriptor::getFieldName(int field) const
+const char *NdpOptionDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1152,19 +940,19 @@ const char *NDPOptionDescriptor::getFieldName(int field) const
         "kind",
         "length",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionDescriptor::findField(const char *fieldName) const
+int NdpOptionDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='k' && strcmp(fieldName, "kind")==0) return base+0;
-    if (fieldName[0]=='l' && strcmp(fieldName, "length")==0) return base+1;
+    if (fieldName[0] == 'k' && strcmp(fieldName, "kind") == 0) return base+0;
+    if (fieldName[0] == 'l' && strcmp(fieldName, "length") == 0) return base+1;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1173,13 +961,13 @@ const char *NDPOptionDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "unsigned short",
-        "unsigned short",
+        "inet::ndp::NdpOptionNumbers",    // FIELD_kind
+        "unsigned short",    // FIELD_length
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1188,7 +976,7 @@ const char **NDPOptionDescriptor::getFieldPropertyNames(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 0: {
+        case FIELD_kind: {
             static const char *names[] = { "enum",  nullptr };
             return names;
         }
@@ -1196,7 +984,7 @@ const char **NDPOptionDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *NDPOptionDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1205,14 +993,14 @@ const char *NDPOptionDescriptor::getFieldProperty(int field, const char *propert
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 0:
-            if (!strcmp(propertyname,"enum")) return "inet::ndp::NDPOptionNumbers";
+        case FIELD_kind:
+            if (!strcmp(propertyname, "enum")) return "inet::ndp::NdpOptionNumbers";
             return nullptr;
         default: return nullptr;
     }
 }
 
-int NDPOptionDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1220,13 +1008,13 @@ int NDPOptionDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOption *pp = (NDPOption *)object; (void)pp;
+    NdpOption *pp = (NdpOption *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1234,13 +1022,13 @@ const char *NDPOptionDescriptor::getFieldDynamicTypeString(void *object, int fie
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOption *pp = (NDPOption *)object; (void)pp;
+    NdpOption *pp = (NdpOption *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1248,15 +1036,15 @@ std::string NDPOptionDescriptor::getFieldValueAsString(void *object, int field, 
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOption *pp = (NDPOption *)object; (void)pp;
+    NdpOption *pp = (NdpOption *)object; (void)pp;
     switch (field) {
-        case 0: return enum2string(pp->getKind(), "inet::ndp::NDPOptionNumbers");
-        case 1: return ulong2string(pp->getLength());
+        case FIELD_kind: return enum2string(pp->getKind(), "inet::ndp::NdpOptionNumbers");
+        case FIELD_length: return ulong2string(pp->getLength());
         default: return "";
     }
 }
 
-bool NDPOptionDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1264,15 +1052,14 @@ bool NDPOptionDescriptor::setFieldValueAsString(void *object, int field, int i, 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOption *pp = (NDPOption *)object; (void)pp;
+    NdpOption *pp = (NdpOption *)object; (void)pp;
     switch (field) {
-        case 0: pp->setKind((inet::ndp::NDPOptionNumbers)string2enum(value, "inet::ndp::NDPOptionNumbers")); return true;
-        case 1: pp->setLength(string2ulong(value)); return true;
+        case FIELD_length: pp->setLength(string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPOptionDescriptor::getFieldStructName(int field) const
+const char *NdpOptionDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1285,7 +1072,7 @@ const char *NDPOptionDescriptor::getFieldStructName(int field) const
     };
 }
 
-void *NDPOptionDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1293,58 +1080,60 @@ void *NDPOptionDescriptor::getFieldStructValuePointer(void *object, int field, i
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOption *pp = (NDPOption *)object; (void)pp;
+    NdpOption *pp = (NdpOption *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionEnd)
+Register_Class(NdpOptionEnd)
 
-NDPOptionEnd::NDPOptionEnd() : ::inet::ndp::NDPOption()
+NdpOptionEnd::NdpOptionEnd() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_END_OF_OPTION_LIST);
     this->setLength(1);
 }
 
-NDPOptionEnd::NDPOptionEnd(const NDPOptionEnd& other) : ::inet::ndp::NDPOption(other)
+NdpOptionEnd::NdpOptionEnd(const NdpOptionEnd& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionEnd::~NDPOptionEnd()
+NdpOptionEnd::~NdpOptionEnd()
 {
 }
 
-NDPOptionEnd& NDPOptionEnd::operator=(const NDPOptionEnd& other)
+NdpOptionEnd& NdpOptionEnd::operator=(const NdpOptionEnd& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionEnd::copy(const NDPOptionEnd& other)
+void NdpOptionEnd::copy(const NdpOptionEnd& other)
 {
 }
 
-void NDPOptionEnd::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionEnd::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
 }
 
-void NDPOptionEnd::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionEnd::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
 }
 
-class NDPOptionEndDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionEndDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+    };
   public:
-    NDPOptionEndDescriptor();
-    virtual ~NDPOptionEndDescriptor();
+    NdpOptionEndDescriptor();
+    virtual ~NdpOptionEndDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -1366,24 +1155,24 @@ class NDPOptionEndDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionEndDescriptor)
+Register_ClassDescriptor(NdpOptionEndDescriptor)
 
-NDPOptionEndDescriptor::NDPOptionEndDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionEnd", "inet::ndp::NDPOption")
+NdpOptionEndDescriptor::NdpOptionEndDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionEnd)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionEndDescriptor::~NDPOptionEndDescriptor()
+NdpOptionEndDescriptor::~NdpOptionEndDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionEndDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionEndDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionEnd *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionEnd *>(obj)!=nullptr;
 }
 
-const char **NDPOptionEndDescriptor::getPropertyNames() const
+const char **NdpOptionEndDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -1394,19 +1183,19 @@ const char **NDPOptionEndDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionEndDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionEndDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionEndDescriptor::getFieldCount() const
+int NdpOptionEndDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 0+basedesc->getFieldCount() : 0;
 }
 
-unsigned int NDPOptionEndDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionEndDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1417,7 +1206,7 @@ unsigned int NDPOptionEndDescriptor::getFieldTypeFlags(int field) const
     return 0;
 }
 
-const char *NDPOptionEndDescriptor::getFieldName(int field) const
+const char *NdpOptionEndDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1428,13 +1217,13 @@ const char *NDPOptionEndDescriptor::getFieldName(int field) const
     return nullptr;
 }
 
-int NDPOptionEndDescriptor::findField(const char *fieldName) const
+int NdpOptionEndDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionEndDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionEndDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1445,7 +1234,7 @@ const char *NDPOptionEndDescriptor::getFieldTypeString(int field) const
     return nullptr;
 }
 
-const char **NDPOptionEndDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionEndDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1458,7 +1247,7 @@ const char **NDPOptionEndDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *NDPOptionEndDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionEndDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1471,7 +1260,7 @@ const char *NDPOptionEndDescriptor::getFieldProperty(int field, const char *prop
     }
 }
 
-int NDPOptionEndDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionEndDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1479,13 +1268,13 @@ int NDPOptionEndDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionEnd *pp = (NDPOptionEnd *)object; (void)pp;
+    NdpOptionEnd *pp = (NdpOptionEnd *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionEndDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionEndDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1493,13 +1282,13 @@ const char *NDPOptionEndDescriptor::getFieldDynamicTypeString(void *object, int 
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionEnd *pp = (NDPOptionEnd *)object; (void)pp;
+    NdpOptionEnd *pp = (NdpOptionEnd *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionEndDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionEndDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1507,13 +1296,13 @@ std::string NDPOptionEndDescriptor::getFieldValueAsString(void *object, int fiel
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionEnd *pp = (NDPOptionEnd *)object; (void)pp;
+    NdpOptionEnd *pp = (NdpOptionEnd *)object; (void)pp;
     switch (field) {
         default: return "";
     }
 }
 
-bool NDPOptionEndDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionEndDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1521,13 +1310,13 @@ bool NDPOptionEndDescriptor::setFieldValueAsString(void *object, int field, int 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionEnd *pp = (NDPOptionEnd *)object; (void)pp;
+    NdpOptionEnd *pp = (NdpOptionEnd *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *NDPOptionEndDescriptor::getFieldStructName(int field) const
+const char *NdpOptionEndDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1538,7 +1327,7 @@ const char *NDPOptionEndDescriptor::getFieldStructName(int field) const
     return nullptr;
 }
 
-void *NDPOptionEndDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionEndDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1546,58 +1335,60 @@ void *NDPOptionEndDescriptor::getFieldStructValuePointer(void *object, int field
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionEnd *pp = (NDPOptionEnd *)object; (void)pp;
+    NdpOptionEnd *pp = (NdpOptionEnd *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionNop)
+Register_Class(NdpOptionNop)
 
-NDPOptionNop::NDPOptionNop() : ::inet::ndp::NDPOption()
+NdpOptionNop::NdpOptionNop() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_NO_OPERATION);
     this->setLength(1);
 }
 
-NDPOptionNop::NDPOptionNop(const NDPOptionNop& other) : ::inet::ndp::NDPOption(other)
+NdpOptionNop::NdpOptionNop(const NdpOptionNop& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionNop::~NDPOptionNop()
+NdpOptionNop::~NdpOptionNop()
 {
 }
 
-NDPOptionNop& NDPOptionNop::operator=(const NDPOptionNop& other)
+NdpOptionNop& NdpOptionNop::operator=(const NdpOptionNop& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionNop::copy(const NDPOptionNop& other)
+void NdpOptionNop::copy(const NdpOptionNop& other)
 {
 }
 
-void NDPOptionNop::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionNop::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
 }
 
-void NDPOptionNop::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionNop::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
 }
 
-class NDPOptionNopDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionNopDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+    };
   public:
-    NDPOptionNopDescriptor();
-    virtual ~NDPOptionNopDescriptor();
+    NdpOptionNopDescriptor();
+    virtual ~NdpOptionNopDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -1619,24 +1410,24 @@ class NDPOptionNopDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionNopDescriptor)
+Register_ClassDescriptor(NdpOptionNopDescriptor)
 
-NDPOptionNopDescriptor::NDPOptionNopDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionNop", "inet::ndp::NDPOption")
+NdpOptionNopDescriptor::NdpOptionNopDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionNop)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionNopDescriptor::~NDPOptionNopDescriptor()
+NdpOptionNopDescriptor::~NdpOptionNopDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionNopDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionNopDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionNop *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionNop *>(obj)!=nullptr;
 }
 
-const char **NDPOptionNopDescriptor::getPropertyNames() const
+const char **NdpOptionNopDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -1647,19 +1438,19 @@ const char **NDPOptionNopDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionNopDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionNopDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionNopDescriptor::getFieldCount() const
+int NdpOptionNopDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 0+basedesc->getFieldCount() : 0;
 }
 
-unsigned int NDPOptionNopDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionNopDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1670,7 +1461,7 @@ unsigned int NDPOptionNopDescriptor::getFieldTypeFlags(int field) const
     return 0;
 }
 
-const char *NDPOptionNopDescriptor::getFieldName(int field) const
+const char *NdpOptionNopDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1681,13 +1472,13 @@ const char *NDPOptionNopDescriptor::getFieldName(int field) const
     return nullptr;
 }
 
-int NDPOptionNopDescriptor::findField(const char *fieldName) const
+int NdpOptionNopDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionNopDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionNopDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1698,7 +1489,7 @@ const char *NDPOptionNopDescriptor::getFieldTypeString(int field) const
     return nullptr;
 }
 
-const char **NDPOptionNopDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionNopDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1711,7 +1502,7 @@ const char **NDPOptionNopDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *NDPOptionNopDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionNopDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1724,7 +1515,7 @@ const char *NDPOptionNopDescriptor::getFieldProperty(int field, const char *prop
     }
 }
 
-int NDPOptionNopDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionNopDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1732,13 +1523,13 @@ int NDPOptionNopDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionNop *pp = (NDPOptionNop *)object; (void)pp;
+    NdpOptionNop *pp = (NdpOptionNop *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionNopDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionNopDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1746,13 +1537,13 @@ const char *NDPOptionNopDescriptor::getFieldDynamicTypeString(void *object, int 
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionNop *pp = (NDPOptionNop *)object; (void)pp;
+    NdpOptionNop *pp = (NdpOptionNop *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionNopDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionNopDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1760,13 +1551,13 @@ std::string NDPOptionNopDescriptor::getFieldValueAsString(void *object, int fiel
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionNop *pp = (NDPOptionNop *)object; (void)pp;
+    NdpOptionNop *pp = (NdpOptionNop *)object; (void)pp;
     switch (field) {
         default: return "";
     }
 }
 
-bool NDPOptionNopDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionNopDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1774,13 +1565,13 @@ bool NDPOptionNopDescriptor::setFieldValueAsString(void *object, int field, int 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionNop *pp = (NDPOptionNop *)object; (void)pp;
+    NdpOptionNop *pp = (NdpOptionNop *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *NDPOptionNopDescriptor::getFieldStructName(int field) const
+const char *NdpOptionNopDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1791,7 +1582,7 @@ const char *NDPOptionNopDescriptor::getFieldStructName(int field) const
     return nullptr;
 }
 
-void *NDPOptionNopDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionNopDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1799,73 +1590,75 @@ void *NDPOptionNopDescriptor::getFieldStructValuePointer(void *object, int field
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionNop *pp = (NDPOptionNop *)object; (void)pp;
+    NdpOptionNop *pp = (NdpOptionNop *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionMaxSegmentSize)
+Register_Class(NdpOptionMaxSegmentSize)
 
-NDPOptionMaxSegmentSize::NDPOptionMaxSegmentSize() : ::inet::ndp::NDPOption()
+NdpOptionMaxSegmentSize::NdpOptionMaxSegmentSize() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_MAXIMUM_SEGMENT_SIZE);
     this->setLength(4);
 
-    this->maxSegmentSize = 0;
 }
 
-NDPOptionMaxSegmentSize::NDPOptionMaxSegmentSize(const NDPOptionMaxSegmentSize& other) : ::inet::ndp::NDPOption(other)
+NdpOptionMaxSegmentSize::NdpOptionMaxSegmentSize(const NdpOptionMaxSegmentSize& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionMaxSegmentSize::~NDPOptionMaxSegmentSize()
+NdpOptionMaxSegmentSize::~NdpOptionMaxSegmentSize()
 {
 }
 
-NDPOptionMaxSegmentSize& NDPOptionMaxSegmentSize::operator=(const NDPOptionMaxSegmentSize& other)
+NdpOptionMaxSegmentSize& NdpOptionMaxSegmentSize::operator=(const NdpOptionMaxSegmentSize& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionMaxSegmentSize::copy(const NDPOptionMaxSegmentSize& other)
+void NdpOptionMaxSegmentSize::copy(const NdpOptionMaxSegmentSize& other)
 {
     this->maxSegmentSize = other.maxSegmentSize;
 }
 
-void NDPOptionMaxSegmentSize::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionMaxSegmentSize::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
     doParsimPacking(b,this->maxSegmentSize);
 }
 
-void NDPOptionMaxSegmentSize::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionMaxSegmentSize::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
     doParsimUnpacking(b,this->maxSegmentSize);
 }
 
-uint16_t NDPOptionMaxSegmentSize::getMaxSegmentSize() const
+uint16_t NdpOptionMaxSegmentSize::getMaxSegmentSize() const
 {
     return this->maxSegmentSize;
 }
 
-void NDPOptionMaxSegmentSize::setMaxSegmentSize(uint16_t maxSegmentSize)
+void NdpOptionMaxSegmentSize::setMaxSegmentSize(uint16_t maxSegmentSize)
 {
     this->maxSegmentSize = maxSegmentSize;
 }
 
-class NDPOptionMaxSegmentSizeDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionMaxSegmentSizeDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_maxSegmentSize,
+    };
   public:
-    NDPOptionMaxSegmentSizeDescriptor();
-    virtual ~NDPOptionMaxSegmentSizeDescriptor();
+    NdpOptionMaxSegmentSizeDescriptor();
+    virtual ~NdpOptionMaxSegmentSizeDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -1887,24 +1680,24 @@ class NDPOptionMaxSegmentSizeDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionMaxSegmentSizeDescriptor)
+Register_ClassDescriptor(NdpOptionMaxSegmentSizeDescriptor)
 
-NDPOptionMaxSegmentSizeDescriptor::NDPOptionMaxSegmentSizeDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionMaxSegmentSize", "inet::ndp::NDPOption")
+NdpOptionMaxSegmentSizeDescriptor::NdpOptionMaxSegmentSizeDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionMaxSegmentSize)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionMaxSegmentSizeDescriptor::~NDPOptionMaxSegmentSizeDescriptor()
+NdpOptionMaxSegmentSizeDescriptor::~NdpOptionMaxSegmentSizeDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionMaxSegmentSizeDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionMaxSegmentSizeDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionMaxSegmentSize *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionMaxSegmentSize *>(obj)!=nullptr;
 }
 
-const char **NDPOptionMaxSegmentSizeDescriptor::getPropertyNames() const
+const char **NdpOptionMaxSegmentSizeDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -1915,19 +1708,19 @@ const char **NDPOptionMaxSegmentSizeDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionMaxSegmentSizeDescriptor::getFieldCount() const
+int NdpOptionMaxSegmentSizeDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int NDPOptionMaxSegmentSizeDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionMaxSegmentSizeDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1936,12 +1729,12 @@ unsigned int NDPOptionMaxSegmentSizeDescriptor::getFieldTypeFlags(int field) con
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
+        FD_ISEDITABLE,    // FIELD_maxSegmentSize
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getFieldName(int field) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1952,18 +1745,18 @@ const char *NDPOptionMaxSegmentSizeDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "maxSegmentSize",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionMaxSegmentSizeDescriptor::findField(const char *fieldName) const
+int NdpOptionMaxSegmentSizeDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='m' && strcmp(fieldName, "maxSegmentSize")==0) return base+0;
+    if (fieldName[0] == 'm' && strcmp(fieldName, "maxSegmentSize") == 0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1972,12 +1765,12 @@ const char *NDPOptionMaxSegmentSizeDescriptor::getFieldTypeString(int field) con
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "uint16_t",
+        "uint16_t",    // FIELD_maxSegmentSize
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionMaxSegmentSizeDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionMaxSegmentSizeDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -1990,7 +1783,7 @@ const char **NDPOptionMaxSegmentSizeDescriptor::getFieldPropertyNames(int field)
     }
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2003,7 +1796,7 @@ const char *NDPOptionMaxSegmentSizeDescriptor::getFieldProperty(int field, const
     }
 }
 
-int NDPOptionMaxSegmentSizeDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionMaxSegmentSizeDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2011,13 +1804,13 @@ int NDPOptionMaxSegmentSizeDescriptor::getFieldArraySize(void *object, int field
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionMaxSegmentSize *pp = (NDPOptionMaxSegmentSize *)object; (void)pp;
+    NdpOptionMaxSegmentSize *pp = (NdpOptionMaxSegmentSize *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2025,13 +1818,13 @@ const char *NDPOptionMaxSegmentSizeDescriptor::getFieldDynamicTypeString(void *o
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionMaxSegmentSize *pp = (NDPOptionMaxSegmentSize *)object; (void)pp;
+    NdpOptionMaxSegmentSize *pp = (NdpOptionMaxSegmentSize *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionMaxSegmentSizeDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionMaxSegmentSizeDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2039,14 +1832,14 @@ std::string NDPOptionMaxSegmentSizeDescriptor::getFieldValueAsString(void *objec
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionMaxSegmentSize *pp = (NDPOptionMaxSegmentSize *)object; (void)pp;
+    NdpOptionMaxSegmentSize *pp = (NdpOptionMaxSegmentSize *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getMaxSegmentSize());
+        case FIELD_maxSegmentSize: return ulong2string(pp->getMaxSegmentSize());
         default: return "";
     }
 }
 
-bool NDPOptionMaxSegmentSizeDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionMaxSegmentSizeDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2054,14 +1847,14 @@ bool NDPOptionMaxSegmentSizeDescriptor::setFieldValueAsString(void *object, int 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionMaxSegmentSize *pp = (NDPOptionMaxSegmentSize *)object; (void)pp;
+    NdpOptionMaxSegmentSize *pp = (NdpOptionMaxSegmentSize *)object; (void)pp;
     switch (field) {
-        case 0: pp->setMaxSegmentSize(string2ulong(value)); return true;
+        case FIELD_maxSegmentSize: pp->setMaxSegmentSize(string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPOptionMaxSegmentSizeDescriptor::getFieldStructName(int field) const
+const char *NdpOptionMaxSegmentSizeDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2074,7 +1867,7 @@ const char *NDPOptionMaxSegmentSizeDescriptor::getFieldStructName(int field) con
     };
 }
 
-void *NDPOptionMaxSegmentSizeDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionMaxSegmentSizeDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2082,73 +1875,75 @@ void *NDPOptionMaxSegmentSizeDescriptor::getFieldStructValuePointer(void *object
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionMaxSegmentSize *pp = (NDPOptionMaxSegmentSize *)object; (void)pp;
+    NdpOptionMaxSegmentSize *pp = (NdpOptionMaxSegmentSize *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionWindowScale)
+Register_Class(NdpOptionWindowScale)
 
-NDPOptionWindowScale::NDPOptionWindowScale() : ::inet::ndp::NDPOption()
+NdpOptionWindowScale::NdpOptionWindowScale() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_WINDOW_SCALE);
     this->setLength(3);
 
-    this->windowScale = 0;
 }
 
-NDPOptionWindowScale::NDPOptionWindowScale(const NDPOptionWindowScale& other) : ::inet::ndp::NDPOption(other)
+NdpOptionWindowScale::NdpOptionWindowScale(const NdpOptionWindowScale& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionWindowScale::~NDPOptionWindowScale()
+NdpOptionWindowScale::~NdpOptionWindowScale()
 {
 }
 
-NDPOptionWindowScale& NDPOptionWindowScale::operator=(const NDPOptionWindowScale& other)
+NdpOptionWindowScale& NdpOptionWindowScale::operator=(const NdpOptionWindowScale& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionWindowScale::copy(const NDPOptionWindowScale& other)
+void NdpOptionWindowScale::copy(const NdpOptionWindowScale& other)
 {
     this->windowScale = other.windowScale;
 }
 
-void NDPOptionWindowScale::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionWindowScale::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
     doParsimPacking(b,this->windowScale);
 }
 
-void NDPOptionWindowScale::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionWindowScale::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
     doParsimUnpacking(b,this->windowScale);
 }
 
-unsigned short NDPOptionWindowScale::getWindowScale() const
+unsigned short NdpOptionWindowScale::getWindowScale() const
 {
     return this->windowScale;
 }
 
-void NDPOptionWindowScale::setWindowScale(unsigned short windowScale)
+void NdpOptionWindowScale::setWindowScale(unsigned short windowScale)
 {
     this->windowScale = windowScale;
 }
 
-class NDPOptionWindowScaleDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionWindowScaleDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_windowScale,
+    };
   public:
-    NDPOptionWindowScaleDescriptor();
-    virtual ~NDPOptionWindowScaleDescriptor();
+    NdpOptionWindowScaleDescriptor();
+    virtual ~NdpOptionWindowScaleDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -2170,24 +1965,24 @@ class NDPOptionWindowScaleDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionWindowScaleDescriptor)
+Register_ClassDescriptor(NdpOptionWindowScaleDescriptor)
 
-NDPOptionWindowScaleDescriptor::NDPOptionWindowScaleDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionWindowScale", "inet::ndp::NDPOption")
+NdpOptionWindowScaleDescriptor::NdpOptionWindowScaleDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionWindowScale)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionWindowScaleDescriptor::~NDPOptionWindowScaleDescriptor()
+NdpOptionWindowScaleDescriptor::~NdpOptionWindowScaleDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionWindowScaleDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionWindowScaleDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionWindowScale *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionWindowScale *>(obj)!=nullptr;
 }
 
-const char **NDPOptionWindowScaleDescriptor::getPropertyNames() const
+const char **NdpOptionWindowScaleDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -2198,19 +1993,19 @@ const char **NDPOptionWindowScaleDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionWindowScaleDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionWindowScaleDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionWindowScaleDescriptor::getFieldCount() const
+int NdpOptionWindowScaleDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int NDPOptionWindowScaleDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionWindowScaleDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2219,12 +2014,12 @@ unsigned int NDPOptionWindowScaleDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
+        FD_ISEDITABLE,    // FIELD_windowScale
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionWindowScaleDescriptor::getFieldName(int field) const
+const char *NdpOptionWindowScaleDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2235,18 +2030,18 @@ const char *NDPOptionWindowScaleDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "windowScale",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionWindowScaleDescriptor::findField(const char *fieldName) const
+int NdpOptionWindowScaleDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='w' && strcmp(fieldName, "windowScale")==0) return base+0;
+    if (fieldName[0] == 'w' && strcmp(fieldName, "windowScale") == 0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionWindowScaleDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionWindowScaleDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2255,12 +2050,12 @@ const char *NDPOptionWindowScaleDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "unsigned short",
+        "unsigned short",    // FIELD_windowScale
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionWindowScaleDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionWindowScaleDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2273,7 +2068,7 @@ const char **NDPOptionWindowScaleDescriptor::getFieldPropertyNames(int field) co
     }
 }
 
-const char *NDPOptionWindowScaleDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionWindowScaleDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2286,7 +2081,7 @@ const char *NDPOptionWindowScaleDescriptor::getFieldProperty(int field, const ch
     }
 }
 
-int NDPOptionWindowScaleDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionWindowScaleDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2294,13 +2089,13 @@ int NDPOptionWindowScaleDescriptor::getFieldArraySize(void *object, int field) c
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionWindowScale *pp = (NDPOptionWindowScale *)object; (void)pp;
+    NdpOptionWindowScale *pp = (NdpOptionWindowScale *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionWindowScaleDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionWindowScaleDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2308,13 +2103,13 @@ const char *NDPOptionWindowScaleDescriptor::getFieldDynamicTypeString(void *obje
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionWindowScale *pp = (NDPOptionWindowScale *)object; (void)pp;
+    NdpOptionWindowScale *pp = (NdpOptionWindowScale *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionWindowScaleDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionWindowScaleDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2322,14 +2117,14 @@ std::string NDPOptionWindowScaleDescriptor::getFieldValueAsString(void *object, 
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionWindowScale *pp = (NDPOptionWindowScale *)object; (void)pp;
+    NdpOptionWindowScale *pp = (NdpOptionWindowScale *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getWindowScale());
+        case FIELD_windowScale: return ulong2string(pp->getWindowScale());
         default: return "";
     }
 }
 
-bool NDPOptionWindowScaleDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionWindowScaleDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2337,14 +2132,14 @@ bool NDPOptionWindowScaleDescriptor::setFieldValueAsString(void *object, int fie
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionWindowScale *pp = (NDPOptionWindowScale *)object; (void)pp;
+    NdpOptionWindowScale *pp = (NdpOptionWindowScale *)object; (void)pp;
     switch (field) {
-        case 0: pp->setWindowScale(string2ulong(value)); return true;
+        case FIELD_windowScale: pp->setWindowScale(string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPOptionWindowScaleDescriptor::getFieldStructName(int field) const
+const char *NdpOptionWindowScaleDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2357,7 +2152,7 @@ const char *NDPOptionWindowScaleDescriptor::getFieldStructName(int field) const
     };
 }
 
-void *NDPOptionWindowScaleDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionWindowScaleDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2365,58 +2160,60 @@ void *NDPOptionWindowScaleDescriptor::getFieldStructValuePointer(void *object, i
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionWindowScale *pp = (NDPOptionWindowScale *)object; (void)pp;
+    NdpOptionWindowScale *pp = (NdpOptionWindowScale *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionSackPermitted)
+Register_Class(NdpOptionSackPermitted)
 
-NDPOptionSackPermitted::NDPOptionSackPermitted() : ::inet::ndp::NDPOption()
+NdpOptionSackPermitted::NdpOptionSackPermitted() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_SACK_PERMITTED);
     this->setLength(2);
 }
 
-NDPOptionSackPermitted::NDPOptionSackPermitted(const NDPOptionSackPermitted& other) : ::inet::ndp::NDPOption(other)
+NdpOptionSackPermitted::NdpOptionSackPermitted(const NdpOptionSackPermitted& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionSackPermitted::~NDPOptionSackPermitted()
+NdpOptionSackPermitted::~NdpOptionSackPermitted()
 {
 }
 
-NDPOptionSackPermitted& NDPOptionSackPermitted::operator=(const NDPOptionSackPermitted& other)
+NdpOptionSackPermitted& NdpOptionSackPermitted::operator=(const NdpOptionSackPermitted& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionSackPermitted::copy(const NDPOptionSackPermitted& other)
+void NdpOptionSackPermitted::copy(const NdpOptionSackPermitted& other)
 {
 }
 
-void NDPOptionSackPermitted::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionSackPermitted::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
 }
 
-void NDPOptionSackPermitted::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionSackPermitted::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
 }
 
-class NDPOptionSackPermittedDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionSackPermittedDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+    };
   public:
-    NDPOptionSackPermittedDescriptor();
-    virtual ~NDPOptionSackPermittedDescriptor();
+    NdpOptionSackPermittedDescriptor();
+    virtual ~NdpOptionSackPermittedDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -2438,24 +2235,24 @@ class NDPOptionSackPermittedDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionSackPermittedDescriptor)
+Register_ClassDescriptor(NdpOptionSackPermittedDescriptor)
 
-NDPOptionSackPermittedDescriptor::NDPOptionSackPermittedDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionSackPermitted", "inet::ndp::NDPOption")
+NdpOptionSackPermittedDescriptor::NdpOptionSackPermittedDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionSackPermitted)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionSackPermittedDescriptor::~NDPOptionSackPermittedDescriptor()
+NdpOptionSackPermittedDescriptor::~NdpOptionSackPermittedDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionSackPermittedDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionSackPermittedDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionSackPermitted *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionSackPermitted *>(obj)!=nullptr;
 }
 
-const char **NDPOptionSackPermittedDescriptor::getPropertyNames() const
+const char **NdpOptionSackPermittedDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -2466,19 +2263,19 @@ const char **NDPOptionSackPermittedDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionSackPermittedDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionSackPermittedDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionSackPermittedDescriptor::getFieldCount() const
+int NdpOptionSackPermittedDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 0+basedesc->getFieldCount() : 0;
 }
 
-unsigned int NDPOptionSackPermittedDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionSackPermittedDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2489,7 +2286,7 @@ unsigned int NDPOptionSackPermittedDescriptor::getFieldTypeFlags(int field) cons
     return 0;
 }
 
-const char *NDPOptionSackPermittedDescriptor::getFieldName(int field) const
+const char *NdpOptionSackPermittedDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2500,13 +2297,13 @@ const char *NDPOptionSackPermittedDescriptor::getFieldName(int field) const
     return nullptr;
 }
 
-int NDPOptionSackPermittedDescriptor::findField(const char *fieldName) const
+int NdpOptionSackPermittedDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionSackPermittedDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionSackPermittedDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2517,7 +2314,7 @@ const char *NDPOptionSackPermittedDescriptor::getFieldTypeString(int field) cons
     return nullptr;
 }
 
-const char **NDPOptionSackPermittedDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionSackPermittedDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2530,7 +2327,7 @@ const char **NDPOptionSackPermittedDescriptor::getFieldPropertyNames(int field) 
     }
 }
 
-const char *NDPOptionSackPermittedDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionSackPermittedDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2543,7 +2340,7 @@ const char *NDPOptionSackPermittedDescriptor::getFieldProperty(int field, const 
     }
 }
 
-int NDPOptionSackPermittedDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionSackPermittedDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2551,13 +2348,13 @@ int NDPOptionSackPermittedDescriptor::getFieldArraySize(void *object, int field)
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSackPermitted *pp = (NDPOptionSackPermitted *)object; (void)pp;
+    NdpOptionSackPermitted *pp = (NdpOptionSackPermitted *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionSackPermittedDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionSackPermittedDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2565,13 +2362,13 @@ const char *NDPOptionSackPermittedDescriptor::getFieldDynamicTypeString(void *ob
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSackPermitted *pp = (NDPOptionSackPermitted *)object; (void)pp;
+    NdpOptionSackPermitted *pp = (NdpOptionSackPermitted *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionSackPermittedDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionSackPermittedDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2579,13 +2376,13 @@ std::string NDPOptionSackPermittedDescriptor::getFieldValueAsString(void *object
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSackPermitted *pp = (NDPOptionSackPermitted *)object; (void)pp;
+    NdpOptionSackPermitted *pp = (NdpOptionSackPermitted *)object; (void)pp;
     switch (field) {
         default: return "";
     }
 }
 
-bool NDPOptionSackPermittedDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionSackPermittedDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2593,13 +2390,13 @@ bool NDPOptionSackPermittedDescriptor::setFieldValueAsString(void *object, int f
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSackPermitted *pp = (NDPOptionSackPermitted *)object; (void)pp;
+    NdpOptionSackPermitted *pp = (NdpOptionSackPermitted *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *NDPOptionSackPermittedDescriptor::getFieldStructName(int field) const
+const char *NdpOptionSackPermittedDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2610,7 +2407,7 @@ const char *NDPOptionSackPermittedDescriptor::getFieldStructName(int field) cons
     return nullptr;
 }
 
-void *NDPOptionSackPermittedDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionSackPermittedDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2618,107 +2415,143 @@ void *NDPOptionSackPermittedDescriptor::getFieldStructValuePointer(void *object,
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSackPermitted *pp = (NDPOptionSackPermitted *)object; (void)pp;
+    NdpOptionSackPermitted *pp = (NdpOptionSackPermitted *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionSack)
+Register_Class(NdpOptionSack)
 
-NDPOptionSack::NDPOptionSack() : ::inet::ndp::NDPOption()
+NdpOptionSack::NdpOptionSack() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_SACK);
     this->setLength(2);
 
-    sackItem_arraysize = 0;
-    this->sackItem = 0;
 }
 
-NDPOptionSack::NDPOptionSack(const NDPOptionSack& other) : ::inet::ndp::NDPOption(other)
+NdpOptionSack::NdpOptionSack(const NdpOptionSack& other) : ::inet::ndp::NdpOption(other)
 {
-    sackItem_arraysize = 0;
-    this->sackItem = 0;
     copy(other);
 }
 
-NDPOptionSack::~NDPOptionSack()
+NdpOptionSack::~NdpOptionSack()
 {
     delete [] this->sackItem;
 }
 
-NDPOptionSack& NDPOptionSack::operator=(const NDPOptionSack& other)
+NdpOptionSack& NdpOptionSack::operator=(const NdpOptionSack& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionSack::copy(const NDPOptionSack& other)
+void NdpOptionSack::copy(const NdpOptionSack& other)
 {
     delete [] this->sackItem;
     this->sackItem = (other.sackItem_arraysize==0) ? nullptr : new SackItem[other.sackItem_arraysize];
     sackItem_arraysize = other.sackItem_arraysize;
-    for (unsigned int i=0; i<sackItem_arraysize; i++)
+    for (size_t i = 0; i < sackItem_arraysize; i++) {
         this->sackItem[i] = other.sackItem[i];
+    }
 }
 
-void NDPOptionSack::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionSack::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
     b->pack(sackItem_arraysize);
     doParsimArrayPacking(b,this->sackItem,sackItem_arraysize);
 }
 
-void NDPOptionSack::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionSack::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
     delete [] this->sackItem;
     b->unpack(sackItem_arraysize);
-    if (sackItem_arraysize==0) {
-        this->sackItem = 0;
+    if (sackItem_arraysize == 0) {
+        this->sackItem = nullptr;
     } else {
         this->sackItem = new SackItem[sackItem_arraysize];
         doParsimArrayUnpacking(b,this->sackItem,sackItem_arraysize);
     }
 }
 
-void NDPOptionSack::setSackItemArraySize(unsigned int size)
-{
-    SackItem *sackItem2 = (size==0) ? nullptr : new SackItem[size];
-    unsigned int sz = sackItem_arraysize < size ? sackItem_arraysize : size;
-    for (unsigned int i=0; i<sz; i++)
-        sackItem2[i] = this->sackItem[i];
-    sackItem_arraysize = size;
-    delete [] this->sackItem;
-    this->sackItem = sackItem2;
-}
-
-unsigned int NDPOptionSack::getSackItemArraySize() const
+size_t NdpOptionSack::getSackItemArraySize() const
 {
     return sackItem_arraysize;
 }
 
-SackItem& NDPOptionSack::getSackItem(unsigned int k)
+const SackItem& NdpOptionSack::getSackItem(size_t k) const
 {
-    if (k>=sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", sackItem_arraysize, k);
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size sackItem_arraysize indexed by %lu", (unsigned long)k);
     return this->sackItem[k];
 }
 
-void NDPOptionSack::setSackItem(unsigned int k, const SackItem& sackItem)
+void NdpOptionSack::setSackItemArraySize(size_t newSize)
 {
-    if (k>=sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", sackItem_arraysize, k);
+    SackItem *sackItem2 = (newSize==0) ? nullptr : new SackItem[newSize];
+    size_t minSize = sackItem_arraysize < newSize ? sackItem_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        sackItem2[i] = this->sackItem[i];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
+}
+
+void NdpOptionSack::setSackItem(size_t k, const SackItem& sackItem)
+{
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
     this->sackItem[k] = sackItem;
 }
 
-class NDPOptionSackDescriptor : public omnetpp::cClassDescriptor
+void NdpOptionSack::insertSackItem(size_t k, const SackItem& sackItem)
+{
+    if (k > sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    size_t newSize = sackItem_arraysize + 1;
+    SackItem *sackItem2 = new SackItem[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        sackItem2[i] = this->sackItem[i];
+    sackItem2[k] = sackItem;
+    for (i = k + 1; i < newSize; i++)
+        sackItem2[i] = this->sackItem[i-1];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
+}
+
+void NdpOptionSack::insertSackItem(const SackItem& sackItem)
+{
+    insertSackItem(sackItem_arraysize, sackItem);
+}
+
+void NdpOptionSack::eraseSackItem(size_t k)
+{
+    if (k >= sackItem_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    size_t newSize = sackItem_arraysize - 1;
+    SackItem *sackItem2 = (newSize == 0) ? nullptr : new SackItem[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        sackItem2[i] = this->sackItem[i];
+    for (i = k; i < newSize; i++)
+        sackItem2[i] = this->sackItem[i+1];
+    delete [] this->sackItem;
+    this->sackItem = sackItem2;
+    sackItem_arraysize = newSize;
+}
+
+class NdpOptionSackDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_sackItem,
+    };
   public:
-    NDPOptionSackDescriptor();
-    virtual ~NDPOptionSackDescriptor();
+    NdpOptionSackDescriptor();
+    virtual ~NdpOptionSackDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -2740,24 +2573,24 @@ class NDPOptionSackDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionSackDescriptor)
+Register_ClassDescriptor(NdpOptionSackDescriptor)
 
-NDPOptionSackDescriptor::NDPOptionSackDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionSack", "inet::ndp::NDPOption")
+NdpOptionSackDescriptor::NdpOptionSackDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionSack)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionSackDescriptor::~NDPOptionSackDescriptor()
+NdpOptionSackDescriptor::~NdpOptionSackDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionSackDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionSackDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionSack *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionSack *>(obj)!=nullptr;
 }
 
-const char **NDPOptionSackDescriptor::getPropertyNames() const
+const char **NdpOptionSackDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -2768,19 +2601,19 @@ const char **NDPOptionSackDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionSackDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionSackDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionSackDescriptor::getFieldCount() const
+int NdpOptionSackDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int NDPOptionSackDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionSackDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2789,12 +2622,12 @@ unsigned int NDPOptionSackDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISARRAY | FD_ISCOMPOUND | FD_ISCOBJECT,
+        FD_ISARRAY | FD_ISCOMPOUND | FD_ISCOBJECT,    // FIELD_sackItem
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionSackDescriptor::getFieldName(int field) const
+const char *NdpOptionSackDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2805,18 +2638,18 @@ const char *NDPOptionSackDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "sackItem",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionSackDescriptor::findField(const char *fieldName) const
+int NdpOptionSackDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "sackItem")==0) return base+0;
+    if (fieldName[0] == 's' && strcmp(fieldName, "sackItem") == 0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionSackDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionSackDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2825,12 +2658,12 @@ const char *NDPOptionSackDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "SackItem",
+        "inet::ndp::SackItem",    // FIELD_sackItem
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionSackDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionSackDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2843,7 +2676,7 @@ const char **NDPOptionSackDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *NDPOptionSackDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionSackDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2856,7 +2689,7 @@ const char *NDPOptionSackDescriptor::getFieldProperty(int field, const char *pro
     }
 }
 
-int NDPOptionSackDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionSackDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2864,14 +2697,14 @@ int NDPOptionSackDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSack *pp = (NDPOptionSack *)object; (void)pp;
+    NdpOptionSack *pp = (NdpOptionSack *)object; (void)pp;
     switch (field) {
-        case 0: return pp->getSackItemArraySize();
+        case FIELD_sackItem: return pp->getSackItemArraySize();
         default: return 0;
     }
 }
 
-const char *NDPOptionSackDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionSackDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2879,13 +2712,13 @@ const char *NDPOptionSackDescriptor::getFieldDynamicTypeString(void *object, int
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSack *pp = (NDPOptionSack *)object; (void)pp;
+    NdpOptionSack *pp = (NdpOptionSack *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionSackDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionSackDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2893,14 +2726,14 @@ std::string NDPOptionSackDescriptor::getFieldValueAsString(void *object, int fie
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSack *pp = (NDPOptionSack *)object; (void)pp;
+    NdpOptionSack *pp = (NdpOptionSack *)object; (void)pp;
     switch (field) {
-        case 0: {std::stringstream out; out << pp->getSackItem(i); return out.str();}
+        case FIELD_sackItem: {std::stringstream out; out << pp->getSackItem(i); return out.str();}
         default: return "";
     }
 }
 
-bool NDPOptionSackDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionSackDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2908,13 +2741,13 @@ bool NDPOptionSackDescriptor::setFieldValueAsString(void *object, int field, int
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSack *pp = (NDPOptionSack *)object; (void)pp;
+    NdpOptionSack *pp = (NdpOptionSack *)object; (void)pp;
     switch (field) {
         default: return false;
     }
 }
 
-const char *NDPOptionSackDescriptor::getFieldStructName(int field) const
+const char *NdpOptionSackDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2923,12 +2756,12 @@ const char *NDPOptionSackDescriptor::getFieldStructName(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 0: return omnetpp::opp_typename(typeid(SackItem));
+        case FIELD_sackItem: return omnetpp::opp_typename(typeid(SackItem));
         default: return nullptr;
     };
 }
 
-void *NDPOptionSackDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionSackDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -2936,88 +2769,90 @@ void *NDPOptionSackDescriptor::getFieldStructValuePointer(void *object, int fiel
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionSack *pp = (NDPOptionSack *)object; (void)pp;
+    NdpOptionSack *pp = (NdpOptionSack *)object; (void)pp;
     switch (field) {
-        case 0: return (void *)static_cast<omnetpp::cObject *>(&pp->getSackItem(i)); break;
+        case FIELD_sackItem: return toVoidPtr(&pp->getSackItem(i)); break;
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionTimestamp)
+Register_Class(NdpOptionTimestamp)
 
-NDPOptionTimestamp::NDPOptionTimestamp() : ::inet::ndp::NDPOption()
+NdpOptionTimestamp::NdpOptionTimestamp() : ::inet::ndp::NdpOption()
 {
     this->setKind(NDPOPTION_TIMESTAMP);
     this->setLength(10);
 
-    this->senderTimestamp = 0;
-    this->echoedTimestamp = 0;
 }
 
-NDPOptionTimestamp::NDPOptionTimestamp(const NDPOptionTimestamp& other) : ::inet::ndp::NDPOption(other)
+NdpOptionTimestamp::NdpOptionTimestamp(const NdpOptionTimestamp& other) : ::inet::ndp::NdpOption(other)
 {
     copy(other);
 }
 
-NDPOptionTimestamp::~NDPOptionTimestamp()
+NdpOptionTimestamp::~NdpOptionTimestamp()
 {
 }
 
-NDPOptionTimestamp& NDPOptionTimestamp::operator=(const NDPOptionTimestamp& other)
+NdpOptionTimestamp& NdpOptionTimestamp::operator=(const NdpOptionTimestamp& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionTimestamp::copy(const NDPOptionTimestamp& other)
+void NdpOptionTimestamp::copy(const NdpOptionTimestamp& other)
 {
     this->senderTimestamp = other.senderTimestamp;
     this->echoedTimestamp = other.echoedTimestamp;
 }
 
-void NDPOptionTimestamp::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionTimestamp::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
     doParsimPacking(b,this->senderTimestamp);
     doParsimPacking(b,this->echoedTimestamp);
 }
 
-void NDPOptionTimestamp::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionTimestamp::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
     doParsimUnpacking(b,this->senderTimestamp);
     doParsimUnpacking(b,this->echoedTimestamp);
 }
 
-uint32_t NDPOptionTimestamp::getSenderTimestamp() const
+uint32_t NdpOptionTimestamp::getSenderTimestamp() const
 {
     return this->senderTimestamp;
 }
 
-void NDPOptionTimestamp::setSenderTimestamp(uint32_t senderTimestamp)
+void NdpOptionTimestamp::setSenderTimestamp(uint32_t senderTimestamp)
 {
     this->senderTimestamp = senderTimestamp;
 }
 
-uint32_t NDPOptionTimestamp::getEchoedTimestamp() const
+uint32_t NdpOptionTimestamp::getEchoedTimestamp() const
 {
     return this->echoedTimestamp;
 }
 
-void NDPOptionTimestamp::setEchoedTimestamp(uint32_t echoedTimestamp)
+void NdpOptionTimestamp::setEchoedTimestamp(uint32_t echoedTimestamp)
 {
     this->echoedTimestamp = echoedTimestamp;
 }
 
-class NDPOptionTimestampDescriptor : public omnetpp::cClassDescriptor
+class NdpOptionTimestampDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_senderTimestamp,
+        FIELD_echoedTimestamp,
+    };
   public:
-    NDPOptionTimestampDescriptor();
-    virtual ~NDPOptionTimestampDescriptor();
+    NdpOptionTimestampDescriptor();
+    virtual ~NdpOptionTimestampDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -3039,24 +2874,24 @@ class NDPOptionTimestampDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionTimestampDescriptor)
+Register_ClassDescriptor(NdpOptionTimestampDescriptor)
 
-NDPOptionTimestampDescriptor::NDPOptionTimestampDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionTimestamp", "inet::ndp::NDPOption")
+NdpOptionTimestampDescriptor::NdpOptionTimestampDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionTimestamp)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionTimestampDescriptor::~NDPOptionTimestampDescriptor()
+NdpOptionTimestampDescriptor::~NdpOptionTimestampDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionTimestampDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionTimestampDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionTimestamp *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionTimestamp *>(obj)!=nullptr;
 }
 
-const char **NDPOptionTimestampDescriptor::getPropertyNames() const
+const char **NdpOptionTimestampDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -3067,19 +2902,19 @@ const char **NDPOptionTimestampDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionTimestampDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionTimestampDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionTimestampDescriptor::getFieldCount() const
+int NdpOptionTimestampDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 2+basedesc->getFieldCount() : 2;
 }
 
-unsigned int NDPOptionTimestampDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionTimestampDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3088,13 +2923,13 @@ unsigned int NDPOptionTimestampDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
+        FD_ISEDITABLE,    // FIELD_senderTimestamp
+        FD_ISEDITABLE,    // FIELD_echoedTimestamp
     };
-    return (field>=0 && field<2) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 2) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionTimestampDescriptor::getFieldName(int field) const
+const char *NdpOptionTimestampDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3106,19 +2941,19 @@ const char *NDPOptionTimestampDescriptor::getFieldName(int field) const
         "senderTimestamp",
         "echoedTimestamp",
     };
-    return (field>=0 && field<2) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionTimestampDescriptor::findField(const char *fieldName) const
+int NdpOptionTimestampDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "senderTimestamp")==0) return base+0;
-    if (fieldName[0]=='e' && strcmp(fieldName, "echoedTimestamp")==0) return base+1;
+    if (fieldName[0] == 's' && strcmp(fieldName, "senderTimestamp") == 0) return base+0;
+    if (fieldName[0] == 'e' && strcmp(fieldName, "echoedTimestamp") == 0) return base+1;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionTimestampDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionTimestampDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3127,13 +2962,13 @@ const char *NDPOptionTimestampDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "uint32_t",
-        "uint32_t",
+        "uint32_t",    // FIELD_senderTimestamp
+        "uint32_t",    // FIELD_echoedTimestamp
     };
-    return (field>=0 && field<2) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 2) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionTimestampDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionTimestampDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3146,7 +2981,7 @@ const char **NDPOptionTimestampDescriptor::getFieldPropertyNames(int field) cons
     }
 }
 
-const char *NDPOptionTimestampDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionTimestampDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3159,7 +2994,7 @@ const char *NDPOptionTimestampDescriptor::getFieldProperty(int field, const char
     }
 }
 
-int NDPOptionTimestampDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionTimestampDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3167,13 +3002,13 @@ int NDPOptionTimestampDescriptor::getFieldArraySize(void *object, int field) con
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionTimestamp *pp = (NDPOptionTimestamp *)object; (void)pp;
+    NdpOptionTimestamp *pp = (NdpOptionTimestamp *)object; (void)pp;
     switch (field) {
         default: return 0;
     }
 }
 
-const char *NDPOptionTimestampDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionTimestampDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3181,13 +3016,13 @@ const char *NDPOptionTimestampDescriptor::getFieldDynamicTypeString(void *object
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionTimestamp *pp = (NDPOptionTimestamp *)object; (void)pp;
+    NdpOptionTimestamp *pp = (NdpOptionTimestamp *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionTimestampDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionTimestampDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3195,15 +3030,15 @@ std::string NDPOptionTimestampDescriptor::getFieldValueAsString(void *object, in
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionTimestamp *pp = (NDPOptionTimestamp *)object; (void)pp;
+    NdpOptionTimestamp *pp = (NdpOptionTimestamp *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getSenderTimestamp());
-        case 1: return ulong2string(pp->getEchoedTimestamp());
+        case FIELD_senderTimestamp: return ulong2string(pp->getSenderTimestamp());
+        case FIELD_echoedTimestamp: return ulong2string(pp->getEchoedTimestamp());
         default: return "";
     }
 }
 
-bool NDPOptionTimestampDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionTimestampDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3211,15 +3046,15 @@ bool NDPOptionTimestampDescriptor::setFieldValueAsString(void *object, int field
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionTimestamp *pp = (NDPOptionTimestamp *)object; (void)pp;
+    NdpOptionTimestamp *pp = (NdpOptionTimestamp *)object; (void)pp;
     switch (field) {
-        case 0: pp->setSenderTimestamp(string2ulong(value)); return true;
-        case 1: pp->setEchoedTimestamp(string2ulong(value)); return true;
+        case FIELD_senderTimestamp: pp->setSenderTimestamp(string2ulong(value)); return true;
+        case FIELD_echoedTimestamp: pp->setEchoedTimestamp(string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPOptionTimestampDescriptor::getFieldStructName(int field) const
+const char *NdpOptionTimestampDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3232,7 +3067,7 @@ const char *NDPOptionTimestampDescriptor::getFieldStructName(int field) const
     };
 }
 
-void *NDPOptionTimestampDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionTimestampDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3240,108 +3075,144 @@ void *NDPOptionTimestampDescriptor::getFieldStructValuePointer(void *object, int
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionTimestamp *pp = (NDPOptionTimestamp *)object; (void)pp;
+    NdpOptionTimestamp *pp = (NdpOptionTimestamp *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-Register_Class(NDPOptionUnknown)
+Register_Class(NdpOptionUnknown)
 
-NDPOptionUnknown::NDPOptionUnknown() : ::inet::ndp::NDPOption()
+NdpOptionUnknown::NdpOptionUnknown() : ::inet::ndp::NdpOption()
 {
-    this->setKind(-1);
+    this->setKind(static_cast<NdpOptionNumbers>(-1));
 
-    bytes_arraysize = 0;
-    this->bytes = 0;
 }
 
-NDPOptionUnknown::NDPOptionUnknown(const NDPOptionUnknown& other) : ::inet::ndp::NDPOption(other)
+NdpOptionUnknown::NdpOptionUnknown(const NdpOptionUnknown& other) : ::inet::ndp::NdpOption(other)
 {
-    bytes_arraysize = 0;
-    this->bytes = 0;
     copy(other);
 }
 
-NDPOptionUnknown::~NDPOptionUnknown()
+NdpOptionUnknown::~NdpOptionUnknown()
 {
     delete [] this->bytes;
 }
 
-NDPOptionUnknown& NDPOptionUnknown::operator=(const NDPOptionUnknown& other)
+NdpOptionUnknown& NdpOptionUnknown::operator=(const NdpOptionUnknown& other)
 {
-    if (this==&other) return *this;
-    ::inet::ndp::NDPOption::operator=(other);
+    if (this == &other) return *this;
+    ::inet::ndp::NdpOption::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPOptionUnknown::copy(const NDPOptionUnknown& other)
+void NdpOptionUnknown::copy(const NdpOptionUnknown& other)
 {
     delete [] this->bytes;
     this->bytes = (other.bytes_arraysize==0) ? nullptr : new uint8_t[other.bytes_arraysize];
     bytes_arraysize = other.bytes_arraysize;
-    for (unsigned int i=0; i<bytes_arraysize; i++)
+    for (size_t i = 0; i < bytes_arraysize; i++) {
         this->bytes[i] = other.bytes[i];
+    }
 }
 
-void NDPOptionUnknown::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpOptionUnknown::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::inet::ndp::NDPOption::parsimPack(b);
+    ::inet::ndp::NdpOption::parsimPack(b);
     b->pack(bytes_arraysize);
     doParsimArrayPacking(b,this->bytes,bytes_arraysize);
 }
 
-void NDPOptionUnknown::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpOptionUnknown::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::inet::ndp::NDPOption::parsimUnpack(b);
+    ::inet::ndp::NdpOption::parsimUnpack(b);
     delete [] this->bytes;
     b->unpack(bytes_arraysize);
-    if (bytes_arraysize==0) {
-        this->bytes = 0;
+    if (bytes_arraysize == 0) {
+        this->bytes = nullptr;
     } else {
         this->bytes = new uint8_t[bytes_arraysize];
         doParsimArrayUnpacking(b,this->bytes,bytes_arraysize);
     }
 }
 
-void NDPOptionUnknown::setBytesArraySize(unsigned int size)
-{
-    uint8_t *bytes2 = (size==0) ? nullptr : new uint8_t[size];
-    unsigned int sz = bytes_arraysize < size ? bytes_arraysize : size;
-    for (unsigned int i=0; i<sz; i++)
-        bytes2[i] = this->bytes[i];
-    for (unsigned int i=sz; i<size; i++)
-        bytes2[i] = 0;
-    bytes_arraysize = size;
-    delete [] this->bytes;
-    this->bytes = bytes2;
-}
-
-unsigned int NDPOptionUnknown::getBytesArraySize() const
+size_t NdpOptionUnknown::getBytesArraySize() const
 {
     return bytes_arraysize;
 }
 
-uint8_t NDPOptionUnknown::getBytes(unsigned int k) const
+uint8_t NdpOptionUnknown::getBytes(size_t k) const
 {
-    if (k>=bytes_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", bytes_arraysize, k);
+    if (k >= bytes_arraysize) throw omnetpp::cRuntimeError("Array of size bytes_arraysize indexed by %lu", (unsigned long)k);
     return this->bytes[k];
 }
 
-void NDPOptionUnknown::setBytes(unsigned int k, uint8_t bytes)
+void NdpOptionUnknown::setBytesArraySize(size_t newSize)
 {
-    if (k>=bytes_arraysize) throw omnetpp::cRuntimeError("Array of size %d indexed by %d", bytes_arraysize, k);
+    uint8_t *bytes2 = (newSize==0) ? nullptr : new uint8_t[newSize];
+    size_t minSize = bytes_arraysize < newSize ? bytes_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        bytes2[i] = this->bytes[i];
+    for (size_t i = minSize; i < newSize; i++)
+        bytes2[i] = 0;
+    delete [] this->bytes;
+    this->bytes = bytes2;
+    bytes_arraysize = newSize;
+}
+
+void NdpOptionUnknown::setBytes(size_t k, uint8_t bytes)
+{
+    if (k >= bytes_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
     this->bytes[k] = bytes;
 }
 
-class NDPOptionUnknownDescriptor : public omnetpp::cClassDescriptor
+void NdpOptionUnknown::insertBytes(size_t k, uint8_t bytes)
+{
+    if (k > bytes_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    size_t newSize = bytes_arraysize + 1;
+    uint8_t *bytes2 = new uint8_t[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        bytes2[i] = this->bytes[i];
+    bytes2[k] = bytes;
+    for (i = k + 1; i < newSize; i++)
+        bytes2[i] = this->bytes[i-1];
+    delete [] this->bytes;
+    this->bytes = bytes2;
+    bytes_arraysize = newSize;
+}
+
+void NdpOptionUnknown::insertBytes(uint8_t bytes)
+{
+    insertBytes(bytes_arraysize, bytes);
+}
+
+void NdpOptionUnknown::eraseBytes(size_t k)
+{
+    if (k >= bytes_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    size_t newSize = bytes_arraysize - 1;
+    uint8_t *bytes2 = (newSize == 0) ? nullptr : new uint8_t[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        bytes2[i] = this->bytes[i];
+    for (i = k; i < newSize; i++)
+        bytes2[i] = this->bytes[i+1];
+    delete [] this->bytes;
+    this->bytes = bytes2;
+    bytes_arraysize = newSize;
+}
+
+class NdpOptionUnknownDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_bytes,
+    };
   public:
-    NDPOptionUnknownDescriptor();
-    virtual ~NDPOptionUnknownDescriptor();
+    NdpOptionUnknownDescriptor();
+    virtual ~NdpOptionUnknownDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -3363,24 +3234,24 @@ class NDPOptionUnknownDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPOptionUnknownDescriptor)
+Register_ClassDescriptor(NdpOptionUnknownDescriptor)
 
-NDPOptionUnknownDescriptor::NDPOptionUnknownDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPOptionUnknown", "inet::ndp::NDPOption")
+NdpOptionUnknownDescriptor::NdpOptionUnknownDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpOptionUnknown)), "inet::ndp::NdpOption")
 {
     propertynames = nullptr;
 }
 
-NDPOptionUnknownDescriptor::~NDPOptionUnknownDescriptor()
+NdpOptionUnknownDescriptor::~NdpOptionUnknownDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPOptionUnknownDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpOptionUnknownDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPOptionUnknown *>(obj)!=nullptr;
+    return dynamic_cast<NdpOptionUnknown *>(obj)!=nullptr;
 }
 
-const char **NDPOptionUnknownDescriptor::getPropertyNames() const
+const char **NdpOptionUnknownDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
         static const char *names[] = {  nullptr };
@@ -3391,19 +3262,19 @@ const char **NDPOptionUnknownDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPOptionUnknownDescriptor::getProperty(const char *propertyname) const
+const char *NdpOptionUnknownDescriptor::getProperty(const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPOptionUnknownDescriptor::getFieldCount() const
+int NdpOptionUnknownDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? 1+basedesc->getFieldCount() : 1;
 }
 
-unsigned int NDPOptionUnknownDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpOptionUnknownDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3412,12 +3283,12 @@ unsigned int NDPOptionUnknownDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISARRAY | FD_ISEDITABLE,
+        FD_ISARRAY | FD_ISEDITABLE,    // FIELD_bytes
     };
-    return (field>=0 && field<1) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 1) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPOptionUnknownDescriptor::getFieldName(int field) const
+const char *NdpOptionUnknownDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3428,18 +3299,18 @@ const char *NDPOptionUnknownDescriptor::getFieldName(int field) const
     static const char *fieldNames[] = {
         "bytes",
     };
-    return (field>=0 && field<1) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldNames[field] : nullptr;
 }
 
-int NDPOptionUnknownDescriptor::findField(const char *fieldName) const
+int NdpOptionUnknownDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='b' && strcmp(fieldName, "bytes")==0) return base+0;
+    if (fieldName[0] == 'b' && strcmp(fieldName, "bytes") == 0) return base+0;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPOptionUnknownDescriptor::getFieldTypeString(int field) const
+const char *NdpOptionUnknownDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3448,12 +3319,12 @@ const char *NDPOptionUnknownDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "uint8_t",
+        "uint8_t",    // FIELD_bytes
     };
-    return (field>=0 && field<1) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 1) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPOptionUnknownDescriptor::getFieldPropertyNames(int field) const
+const char **NdpOptionUnknownDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3466,7 +3337,7 @@ const char **NDPOptionUnknownDescriptor::getFieldPropertyNames(int field) const
     }
 }
 
-const char *NDPOptionUnknownDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpOptionUnknownDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3479,7 +3350,7 @@ const char *NDPOptionUnknownDescriptor::getFieldProperty(int field, const char *
     }
 }
 
-int NDPOptionUnknownDescriptor::getFieldArraySize(void *object, int field) const
+int NdpOptionUnknownDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3487,14 +3358,14 @@ int NDPOptionUnknownDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionUnknown *pp = (NDPOptionUnknown *)object; (void)pp;
+    NdpOptionUnknown *pp = (NdpOptionUnknown *)object; (void)pp;
     switch (field) {
-        case 0: return pp->getBytesArraySize();
+        case FIELD_bytes: return pp->getBytesArraySize();
         default: return 0;
     }
 }
 
-const char *NDPOptionUnknownDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpOptionUnknownDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3502,13 +3373,13 @@ const char *NDPOptionUnknownDescriptor::getFieldDynamicTypeString(void *object, 
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionUnknown *pp = (NDPOptionUnknown *)object; (void)pp;
+    NdpOptionUnknown *pp = (NdpOptionUnknown *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-std::string NDPOptionUnknownDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpOptionUnknownDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3516,14 +3387,14 @@ std::string NDPOptionUnknownDescriptor::getFieldValueAsString(void *object, int 
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionUnknown *pp = (NDPOptionUnknown *)object; (void)pp;
+    NdpOptionUnknown *pp = (NdpOptionUnknown *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getBytes(i));
+        case FIELD_bytes: return ulong2string(pp->getBytes(i));
         default: return "";
     }
 }
 
-bool NDPOptionUnknownDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpOptionUnknownDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3531,14 +3402,14 @@ bool NDPOptionUnknownDescriptor::setFieldValueAsString(void *object, int field, 
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionUnknown *pp = (NDPOptionUnknown *)object; (void)pp;
+    NdpOptionUnknown *pp = (NdpOptionUnknown *)object; (void)pp;
     switch (field) {
-        case 0: pp->setBytes(i,string2ulong(value)); return true;
+        case FIELD_bytes: pp->setBytes(i,string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPOptionUnknownDescriptor::getFieldStructName(int field) const
+const char *NdpOptionUnknownDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3551,7 +3422,7 @@ const char *NDPOptionUnknownDescriptor::getFieldStructName(int field) const
     };
 }
 
-void *NDPOptionUnknownDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpOptionUnknownDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -3559,407 +3430,513 @@ void *NDPOptionUnknownDescriptor::getFieldStructValuePointer(void *object, int f
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPOptionUnknown *pp = (NDPOptionUnknown *)object; (void)pp;
+    NdpOptionUnknown *pp = (NdpOptionUnknown *)object; (void)pp;
     switch (field) {
         default: return nullptr;
     }
 }
 
-NDPSegment_Base::NDPSegment_Base(const char *name, short kind) : ::omnetpp::cPacket(name,kind)
+Register_Class(NdpHeader)
+
+NdpHeader::NdpHeader() : ::inet::TransportHeaderBase()
 {
-    this->srcPort_var = 0;
-    this->destPort_var = 0;
-    this->ackNo_var = 0;
-    this->nackNo_var = 0;
-    this->isHeader_var = false;
-    this->isPullPacket_var = false;
-    this->isDataPacket_var = false;
-    this->isLongFlow_var = false;
-    this->priorityValue_var = 0;
-    this->numPacketsToSend_var = 0;
-    this->pullSequenceNumber_var = 0;
-    this->dataSequenceNumber_var = 0;
-    this->isLastPktToSend_var = false;
-    this->ackBit_var = false;
-    this->nackBit_var = false;
-    this->headerLength_var = NDP_HEADER_OCTETS;
-    this->urgBit_var = false;
-    this->pshBit_var = false;
-    this->rstBit_var = false;
-    this->synBit_var = false;
-    this->finBit_var = false;
-    this->window_var = 0;
-    this->urgentPointer_var = 0;
-    this->payloadLength_var = 0;
+    this->setChunkLength(NDP_MIN_HEADER_LENGTH);
+
 }
 
-NDPSegment_Base::NDPSegment_Base(const NDPSegment_Base& other) : ::omnetpp::cPacket(other)
+NdpHeader::NdpHeader(const NdpHeader& other) : ::inet::TransportHeaderBase(other)
 {
     copy(other);
 }
 
-NDPSegment_Base::~NDPSegment_Base()
+NdpHeader::~NdpHeader()
 {
+    for (size_t i = 0; i < headerOption_arraysize; i++)
+        delete this->headerOption[i];
+    delete [] this->headerOption;
 }
 
-NDPSegment_Base& NDPSegment_Base::operator=(const NDPSegment_Base& other)
+NdpHeader& NdpHeader::operator=(const NdpHeader& other)
 {
-    if (this==&other) return *this;
-    ::omnetpp::cPacket::operator=(other);
+    if (this == &other) return *this;
+    ::inet::TransportHeaderBase::operator=(other);
     copy(other);
     return *this;
 }
 
-void NDPSegment_Base::copy(const NDPSegment_Base& other)
+void NdpHeader::copy(const NdpHeader& other)
 {
-    this->srcPort_var = other.srcPort_var;
-    this->destPort_var = other.destPort_var;
-    this->ackNo_var = other.ackNo_var;
-    this->nackNo_var = other.nackNo_var;
-    this->isHeader_var = other.isHeader_var;
-    this->isPullPacket_var = other.isPullPacket_var;
-    this->isDataPacket_var = other.isDataPacket_var;
-    this->isLongFlow_var = other.isLongFlow_var;
-    this->priorityValue_var = other.priorityValue_var;
-    this->numPacketsToSend_var = other.numPacketsToSend_var;
-    this->pullSequenceNumber_var = other.pullSequenceNumber_var;
-    this->dataSequenceNumber_var = other.dataSequenceNumber_var;
-    this->isLastPktToSend_var = other.isLastPktToSend_var;
-    this->ackBit_var = other.ackBit_var;
-    this->nackBit_var = other.nackBit_var;
-    this->headerLength_var = other.headerLength_var;
-    this->urgBit_var = other.urgBit_var;
-    this->pshBit_var = other.pshBit_var;
-    this->rstBit_var = other.rstBit_var;
-    this->synBit_var = other.synBit_var;
-    this->finBit_var = other.finBit_var;
-    this->window_var = other.window_var;
-    this->urgentPointer_var = other.urgentPointer_var;
-    this->payloadLength_var = other.payloadLength_var;
-    this->byteArray_var = other.byteArray_var;
+    this->srcPort = other.srcPort;
+    this->destPort = other.destPort;
+    this->ackNo = other.ackNo;
+    this->nackNo = other.nackNo;
+    this->isHeader_ = other.isHeader_;
+    this->isPullPacket_ = other.isPullPacket_;
+    this->isDataPacket_ = other.isDataPacket_;
+    this->isLongFlow_ = other.isLongFlow_;
+    this->priorityValue = other.priorityValue;
+    this->numPacketsToSend = other.numPacketsToSend;
+    this->pullSequenceNumber = other.pullSequenceNumber;
+    this->dataSequenceNumber = other.dataSequenceNumber;
+    this->isLastPktToSend_ = other.isLastPktToSend_;
+    this->ackBit = other.ackBit;
+    this->nackBit = other.nackBit;
+    this->headerLength = other.headerLength;
+    this->urgBit = other.urgBit;
+    this->pshBit = other.pshBit;
+    this->rstBit = other.rstBit;
+    this->synBit = other.synBit;
+    this->finBit = other.finBit;
+    this->window = other.window;
+    this->urgentPointer = other.urgentPointer;
+    for (size_t i = 0; i < headerOption_arraysize; i++)
+        delete this->headerOption[i];
+    delete [] this->headerOption;
+    this->headerOption = (other.headerOption_arraysize==0) ? nullptr : new NdpOption *[other.headerOption_arraysize];
+    headerOption_arraysize = other.headerOption_arraysize;
+    for (size_t i = 0; i < headerOption_arraysize; i++) {
+        this->headerOption[i] = other.headerOption[i];
+        if (this->headerOption[i] != nullptr) {
+            this->headerOption[i] = this->headerOption[i]->dup();
+        }
+    }
 }
 
-void NDPSegment_Base::parsimPack(omnetpp::cCommBuffer *b) const
+void NdpHeader::parsimPack(omnetpp::cCommBuffer *b) const
 {
-    ::omnetpp::cPacket::parsimPack(b);
-    doParsimPacking(b,this->srcPort_var);
-    doParsimPacking(b,this->destPort_var);
-    doParsimPacking(b,this->ackNo_var);
-    doParsimPacking(b,this->nackNo_var);
-    doParsimPacking(b,this->isHeader_var);
-    doParsimPacking(b,this->isPullPacket_var);
-    doParsimPacking(b,this->isDataPacket_var);
-    doParsimPacking(b,this->isLongFlow_var);
-    doParsimPacking(b,this->priorityValue_var);
-    doParsimPacking(b,this->numPacketsToSend_var);
-    doParsimPacking(b,this->pullSequenceNumber_var);
-    doParsimPacking(b,this->dataSequenceNumber_var);
-    doParsimPacking(b,this->isLastPktToSend_var);
-    doParsimPacking(b,this->ackBit_var);
-    doParsimPacking(b,this->nackBit_var);
-    doParsimPacking(b,this->headerLength_var);
-    doParsimPacking(b,this->urgBit_var);
-    doParsimPacking(b,this->pshBit_var);
-    doParsimPacking(b,this->rstBit_var);
-    doParsimPacking(b,this->synBit_var);
-    doParsimPacking(b,this->finBit_var);
-    doParsimPacking(b,this->window_var);
-    doParsimPacking(b,this->urgentPointer_var);
-    // field headerOption is abstract -- please do packing in customized class
-    doParsimPacking(b,this->payloadLength_var);
-    // field payload is abstract -- please do packing in customized class
-    doParsimPacking(b,this->byteArray_var);
+    ::inet::TransportHeaderBase::parsimPack(b);
+    doParsimPacking(b,this->srcPort);
+    doParsimPacking(b,this->destPort);
+    doParsimPacking(b,this->ackNo);
+    doParsimPacking(b,this->nackNo);
+    doParsimPacking(b,this->isHeader_);
+    doParsimPacking(b,this->isPullPacket_);
+    doParsimPacking(b,this->isDataPacket_);
+    doParsimPacking(b,this->isLongFlow_);
+    doParsimPacking(b,this->priorityValue);
+    doParsimPacking(b,this->numPacketsToSend);
+    doParsimPacking(b,this->pullSequenceNumber);
+    doParsimPacking(b,this->dataSequenceNumber);
+    doParsimPacking(b,this->isLastPktToSend_);
+    doParsimPacking(b,this->ackBit);
+    doParsimPacking(b,this->nackBit);
+    doParsimPacking(b,this->headerLength);
+    doParsimPacking(b,this->urgBit);
+    doParsimPacking(b,this->pshBit);
+    doParsimPacking(b,this->rstBit);
+    doParsimPacking(b,this->synBit);
+    doParsimPacking(b,this->finBit);
+    doParsimPacking(b,this->window);
+    doParsimPacking(b,this->urgentPointer);
+    b->pack(headerOption_arraysize);
+    doParsimArrayPacking(b,this->headerOption,headerOption_arraysize);
 }
 
-void NDPSegment_Base::parsimUnpack(omnetpp::cCommBuffer *b)
+void NdpHeader::parsimUnpack(omnetpp::cCommBuffer *b)
 {
-    ::omnetpp::cPacket::parsimUnpack(b);
-    doParsimUnpacking(b,this->srcPort_var);
-    doParsimUnpacking(b,this->destPort_var);
-    doParsimUnpacking(b,this->ackNo_var);
-    doParsimUnpacking(b,this->nackNo_var);
-    doParsimUnpacking(b,this->isHeader_var);
-    doParsimUnpacking(b,this->isPullPacket_var);
-    doParsimUnpacking(b,this->isDataPacket_var);
-    doParsimUnpacking(b,this->isLongFlow_var);
-    doParsimUnpacking(b,this->priorityValue_var);
-    doParsimUnpacking(b,this->numPacketsToSend_var);
-    doParsimUnpacking(b,this->pullSequenceNumber_var);
-    doParsimUnpacking(b,this->dataSequenceNumber_var);
-    doParsimUnpacking(b,this->isLastPktToSend_var);
-    doParsimUnpacking(b,this->ackBit_var);
-    doParsimUnpacking(b,this->nackBit_var);
-    doParsimUnpacking(b,this->headerLength_var);
-    doParsimUnpacking(b,this->urgBit_var);
-    doParsimUnpacking(b,this->pshBit_var);
-    doParsimUnpacking(b,this->rstBit_var);
-    doParsimUnpacking(b,this->synBit_var);
-    doParsimUnpacking(b,this->finBit_var);
-    doParsimUnpacking(b,this->window_var);
-    doParsimUnpacking(b,this->urgentPointer_var);
-    // field headerOption is abstract -- please do unpacking in customized class
-    doParsimUnpacking(b,this->payloadLength_var);
-    // field payload is abstract -- please do unpacking in customized class
-    doParsimUnpacking(b,this->byteArray_var);
+    ::inet::TransportHeaderBase::parsimUnpack(b);
+    doParsimUnpacking(b,this->srcPort);
+    doParsimUnpacking(b,this->destPort);
+    doParsimUnpacking(b,this->ackNo);
+    doParsimUnpacking(b,this->nackNo);
+    doParsimUnpacking(b,this->isHeader_);
+    doParsimUnpacking(b,this->isPullPacket_);
+    doParsimUnpacking(b,this->isDataPacket_);
+    doParsimUnpacking(b,this->isLongFlow_);
+    doParsimUnpacking(b,this->priorityValue);
+    doParsimUnpacking(b,this->numPacketsToSend);
+    doParsimUnpacking(b,this->pullSequenceNumber);
+    doParsimUnpacking(b,this->dataSequenceNumber);
+    doParsimUnpacking(b,this->isLastPktToSend_);
+    doParsimUnpacking(b,this->ackBit);
+    doParsimUnpacking(b,this->nackBit);
+    doParsimUnpacking(b,this->headerLength);
+    doParsimUnpacking(b,this->urgBit);
+    doParsimUnpacking(b,this->pshBit);
+    doParsimUnpacking(b,this->rstBit);
+    doParsimUnpacking(b,this->synBit);
+    doParsimUnpacking(b,this->finBit);
+    doParsimUnpacking(b,this->window);
+    doParsimUnpacking(b,this->urgentPointer);
+    delete [] this->headerOption;
+    b->unpack(headerOption_arraysize);
+    if (headerOption_arraysize == 0) {
+        this->headerOption = nullptr;
+    } else {
+        this->headerOption = new NdpOption *[headerOption_arraysize];
+        doParsimArrayUnpacking(b,this->headerOption,headerOption_arraysize);
+    }
 }
 
-unsigned short NDPSegment_Base::getSrcPort() const
+unsigned short NdpHeader::getSrcPort() const
 {
-    return this->srcPort_var;
+    return this->srcPort;
 }
 
-void NDPSegment_Base::setSrcPort(unsigned short srcPort)
+void NdpHeader::setSrcPort(unsigned short srcPort)
 {
-    this->srcPort_var = srcPort;
+    handleChange();
+    this->srcPort = srcPort;
 }
 
-unsigned short NDPSegment_Base::getDestPort() const
+unsigned short NdpHeader::getDestPort() const
 {
-    return this->destPort_var;
+    return this->destPort;
 }
 
-void NDPSegment_Base::setDestPort(unsigned short destPort)
+void NdpHeader::setDestPort(unsigned short destPort)
 {
-    this->destPort_var = destPort;
+    handleChange();
+    this->destPort = destPort;
 }
 
-unsigned int NDPSegment_Base::getAckNo() const
+unsigned int NdpHeader::getAckNo() const
 {
-    return this->ackNo_var;
+    return this->ackNo;
 }
 
-void NDPSegment_Base::setAckNo(unsigned int ackNo)
+void NdpHeader::setAckNo(unsigned int ackNo)
 {
-    this->ackNo_var = ackNo;
+    handleChange();
+    this->ackNo = ackNo;
 }
 
-unsigned int NDPSegment_Base::getNackNo() const
+unsigned int NdpHeader::getNackNo() const
 {
-    return this->nackNo_var;
+    return this->nackNo;
 }
 
-void NDPSegment_Base::setNackNo(unsigned int nackNo)
+void NdpHeader::setNackNo(unsigned int nackNo)
 {
-    this->nackNo_var = nackNo;
+    handleChange();
+    this->nackNo = nackNo;
 }
 
-bool NDPSegment_Base::getIsHeader() const
+bool NdpHeader::isHeader() const
 {
-    return this->isHeader_var;
+    return this->isHeader_;
 }
 
-void NDPSegment_Base::setIsHeader(bool isHeader)
+void NdpHeader::setIsHeader(bool isHeader)
 {
-    this->isHeader_var = isHeader;
+    handleChange();
+    this->isHeader_ = isHeader;
 }
 
-bool NDPSegment_Base::getIsPullPacket() const
+bool NdpHeader::isPullPacket() const
 {
-    return this->isPullPacket_var;
+    return this->isPullPacket_;
 }
 
-void NDPSegment_Base::setIsPullPacket(bool isPullPacket)
+void NdpHeader::setIsPullPacket(bool isPullPacket)
 {
-    this->isPullPacket_var = isPullPacket;
+    handleChange();
+    this->isPullPacket_ = isPullPacket;
 }
 
-bool NDPSegment_Base::getIsDataPacket() const
+bool NdpHeader::isDataPacket() const
 {
-    return this->isDataPacket_var;
+    return this->isDataPacket_;
 }
 
-void NDPSegment_Base::setIsDataPacket(bool isDataPacket)
+void NdpHeader::setIsDataPacket(bool isDataPacket)
 {
-    this->isDataPacket_var = isDataPacket;
+    handleChange();
+    this->isDataPacket_ = isDataPacket;
 }
 
-bool NDPSegment_Base::getIsLongFlow() const
+bool NdpHeader::isLongFlow() const
 {
-    return this->isLongFlow_var;
+    return this->isLongFlow_;
 }
 
-void NDPSegment_Base::setIsLongFlow(bool isLongFlow)
+void NdpHeader::setIsLongFlow(bool isLongFlow)
 {
-    this->isLongFlow_var = isLongFlow;
+    handleChange();
+    this->isLongFlow_ = isLongFlow;
 }
 
-unsigned int NDPSegment_Base::getPriorityValue() const
+unsigned int NdpHeader::getPriorityValue() const
 {
-    return this->priorityValue_var;
+    return this->priorityValue;
 }
 
-void NDPSegment_Base::setPriorityValue(unsigned int priorityValue)
+void NdpHeader::setPriorityValue(unsigned int priorityValue)
 {
-    this->priorityValue_var = priorityValue;
+    handleChange();
+    this->priorityValue = priorityValue;
 }
 
-unsigned int NDPSegment_Base::getNumPacketsToSend() const
+unsigned int NdpHeader::getNumPacketsToSend() const
 {
-    return this->numPacketsToSend_var;
+    return this->numPacketsToSend;
 }
 
-void NDPSegment_Base::setNumPacketsToSend(unsigned int numPacketsToSend)
+void NdpHeader::setNumPacketsToSend(unsigned int numPacketsToSend)
 {
-    this->numPacketsToSend_var = numPacketsToSend;
+    handleChange();
+    this->numPacketsToSend = numPacketsToSend;
 }
 
-unsigned int NDPSegment_Base::getPullSequenceNumber() const
+unsigned int NdpHeader::getPullSequenceNumber() const
 {
-    return this->pullSequenceNumber_var;
+    return this->pullSequenceNumber;
 }
 
-void NDPSegment_Base::setPullSequenceNumber(unsigned int pullSequenceNumber)
+void NdpHeader::setPullSequenceNumber(unsigned int pullSequenceNumber)
 {
-    this->pullSequenceNumber_var = pullSequenceNumber;
+    handleChange();
+    this->pullSequenceNumber = pullSequenceNumber;
 }
 
-unsigned int NDPSegment_Base::getDataSequenceNumber() const
+unsigned int NdpHeader::getDataSequenceNumber() const
 {
-    return this->dataSequenceNumber_var;
+    return this->dataSequenceNumber;
 }
 
-void NDPSegment_Base::setDataSequenceNumber(unsigned int dataSequenceNumber)
+void NdpHeader::setDataSequenceNumber(unsigned int dataSequenceNumber)
 {
-    this->dataSequenceNumber_var = dataSequenceNumber;
+    handleChange();
+    this->dataSequenceNumber = dataSequenceNumber;
 }
 
-bool NDPSegment_Base::getIsLastPktToSend() const
+bool NdpHeader::isLastPktToSend() const
 {
-    return this->isLastPktToSend_var;
+    return this->isLastPktToSend_;
 }
 
-void NDPSegment_Base::setIsLastPktToSend(bool isLastPktToSend)
+void NdpHeader::setIsLastPktToSend(bool isLastPktToSend)
 {
-    this->isLastPktToSend_var = isLastPktToSend;
+    handleChange();
+    this->isLastPktToSend_ = isLastPktToSend;
 }
 
-bool NDPSegment_Base::getAckBit() const
+bool NdpHeader::getAckBit() const
 {
-    return this->ackBit_var;
+    return this->ackBit;
 }
 
-void NDPSegment_Base::setAckBit(bool ackBit)
+void NdpHeader::setAckBit(bool ackBit)
 {
-    this->ackBit_var = ackBit;
+    handleChange();
+    this->ackBit = ackBit;
 }
 
-bool NDPSegment_Base::getNackBit() const
+bool NdpHeader::getNackBit() const
 {
-    return this->nackBit_var;
+    return this->nackBit;
 }
 
-void NDPSegment_Base::setNackBit(bool nackBit)
+void NdpHeader::setNackBit(bool nackBit)
 {
-    this->nackBit_var = nackBit;
+    handleChange();
+    this->nackBit = nackBit;
 }
 
-unsigned short NDPSegment_Base::getHeaderLength() const
+B NdpHeader::getHeaderLength() const
 {
-    return this->headerLength_var;
+    return this->headerLength;
 }
 
-void NDPSegment_Base::setHeaderLength(unsigned short headerLength)
+void NdpHeader::setHeaderLength(B headerLength)
 {
-    this->headerLength_var = headerLength;
+    handleChange();
+    this->headerLength = headerLength;
 }
 
-bool NDPSegment_Base::getUrgBit() const
+bool NdpHeader::getUrgBit() const
 {
-    return this->urgBit_var;
+    return this->urgBit;
 }
 
-void NDPSegment_Base::setUrgBit(bool urgBit)
+void NdpHeader::setUrgBit(bool urgBit)
 {
-    this->urgBit_var = urgBit;
+    handleChange();
+    this->urgBit = urgBit;
 }
 
-bool NDPSegment_Base::getPshBit() const
+bool NdpHeader::getPshBit() const
 {
-    return this->pshBit_var;
+    return this->pshBit;
 }
 
-void NDPSegment_Base::setPshBit(bool pshBit)
+void NdpHeader::setPshBit(bool pshBit)
 {
-    this->pshBit_var = pshBit;
+    handleChange();
+    this->pshBit = pshBit;
 }
 
-bool NDPSegment_Base::getRstBit() const
+bool NdpHeader::getRstBit() const
 {
-    return this->rstBit_var;
+    return this->rstBit;
 }
 
-void NDPSegment_Base::setRstBit(bool rstBit)
+void NdpHeader::setRstBit(bool rstBit)
 {
-    this->rstBit_var = rstBit;
+    handleChange();
+    this->rstBit = rstBit;
 }
 
-bool NDPSegment_Base::getSynBit() const
+bool NdpHeader::getSynBit() const
 {
-    return this->synBit_var;
+    return this->synBit;
 }
 
-void NDPSegment_Base::setSynBit(bool synBit)
+void NdpHeader::setSynBit(bool synBit)
 {
-    this->synBit_var = synBit;
+    handleChange();
+    this->synBit = synBit;
 }
 
-bool NDPSegment_Base::getFinBit() const
+bool NdpHeader::getFinBit() const
 {
-    return this->finBit_var;
+    return this->finBit;
 }
 
-void NDPSegment_Base::setFinBit(bool finBit)
+void NdpHeader::setFinBit(bool finBit)
 {
-    this->finBit_var = finBit;
+    handleChange();
+    this->finBit = finBit;
 }
 
-unsigned short NDPSegment_Base::getWindow() const
+unsigned short NdpHeader::getWindow() const
 {
-    return this->window_var;
+    return this->window;
 }
 
-void NDPSegment_Base::setWindow(unsigned short window)
+void NdpHeader::setWindow(unsigned short window)
 {
-    this->window_var = window;
+    handleChange();
+    this->window = window;
 }
 
-unsigned short NDPSegment_Base::getUrgentPointer() const
+unsigned short NdpHeader::getUrgentPointer() const
 {
-    return this->urgentPointer_var;
+    return this->urgentPointer;
 }
 
-void NDPSegment_Base::setUrgentPointer(unsigned short urgentPointer)
+void NdpHeader::setUrgentPointer(unsigned short urgentPointer)
 {
-    this->urgentPointer_var = urgentPointer;
+    handleChange();
+    this->urgentPointer = urgentPointer;
 }
 
-unsigned long NDPSegment_Base::getPayloadLength() const
+size_t NdpHeader::getHeaderOptionArraySize() const
 {
-    return this->payloadLength_var;
+    return headerOption_arraysize;
 }
 
-void NDPSegment_Base::setPayloadLength(unsigned long payloadLength)
+const NdpOption * NdpHeader::getHeaderOption(size_t k) const
 {
-    this->payloadLength_var = payloadLength;
+    if (k >= headerOption_arraysize) throw omnetpp::cRuntimeError("Array of size headerOption_arraysize indexed by %lu", (unsigned long)k);
+    return this->headerOption[k];
 }
 
-ByteArray& NDPSegment_Base::getByteArray()
+void NdpHeader::setHeaderOptionArraySize(size_t newSize)
 {
-    return this->byteArray_var;
+    handleChange();
+    NdpOption * *headerOption2 = (newSize==0) ? nullptr : new NdpOption *[newSize];
+    size_t minSize = headerOption_arraysize < newSize ? headerOption_arraysize : newSize;
+    for (size_t i = 0; i < minSize; i++)
+        headerOption2[i] = this->headerOption[i];
+    for (size_t i = minSize; i < newSize; i++)
+        headerOption2[i] = nullptr;
+    for (size_t i = newSize; i < headerOption_arraysize; i++)
+        delete headerOption[i];
+    delete [] this->headerOption;
+    this->headerOption = headerOption2;
+    headerOption_arraysize = newSize;
 }
 
-void NDPSegment_Base::setByteArray(const ByteArray& byteArray)
+void NdpHeader::setHeaderOption(size_t k, NdpOption * headerOption)
 {
-    this->byteArray_var = byteArray;
+    if (k >= headerOption_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    handleChange();
+    if (this->headerOption[k] != nullptr) throw omnetpp::cRuntimeError("setHeaderOption(): a value is already set, remove it first with dropHeaderOption()");
+    this->headerOption[k] = headerOption;
 }
 
-class NDPSegmentDescriptor : public omnetpp::cClassDescriptor
+NdpOption * NdpHeader::dropHeaderOption(size_t k)
+{
+    if (k >= headerOption_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    handleChange();
+    NdpOption * retval = this->headerOption[k];
+    this->headerOption[k] = nullptr;
+    return retval;
+}
+
+void NdpHeader::insertHeaderOption(size_t k, NdpOption * headerOption)
+{
+    handleChange();
+    if (k > headerOption_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    size_t newSize = headerOption_arraysize + 1;
+    NdpOption * *headerOption2 = new NdpOption *[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        headerOption2[i] = this->headerOption[i];
+    headerOption2[k] = headerOption;
+    for (i = k + 1; i < newSize; i++)
+        headerOption2[i] = this->headerOption[i-1];
+    delete [] this->headerOption;
+    this->headerOption = headerOption2;
+    headerOption_arraysize = newSize;
+}
+
+void NdpHeader::insertHeaderOption(NdpOption * headerOption)
+{
+    insertHeaderOption(headerOption_arraysize, headerOption);
+}
+
+void NdpHeader::eraseHeaderOption(size_t k)
+{
+    if (k >= headerOption_arraysize) throw omnetpp::cRuntimeError("Array of size  indexed by %lu", (unsigned long)k);
+    handleChange();
+    size_t newSize = headerOption_arraysize - 1;
+    NdpOption * *headerOption2 = (newSize == 0) ? nullptr : new NdpOption *[newSize];
+    size_t i;
+    for (i = 0; i < k; i++)
+        headerOption2[i] = this->headerOption[i];
+    for (i = k; i < newSize; i++)
+        headerOption2[i] = this->headerOption[i+1];
+    delete this->headerOption[k];
+    delete [] this->headerOption;
+    this->headerOption = headerOption2;
+    headerOption_arraysize = newSize;
+}
+
+class NdpHeaderDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
+    enum FieldConstants {
+        FIELD_srcPort,
+        FIELD_destPort,
+        FIELD_ackNo,
+        FIELD_nackNo,
+        FIELD_isHeader,
+        FIELD_isPullPacket,
+        FIELD_isDataPacket,
+        FIELD_isLongFlow,
+        FIELD_priorityValue,
+        FIELD_numPacketsToSend,
+        FIELD_pullSequenceNumber,
+        FIELD_dataSequenceNumber,
+        FIELD_isLastPktToSend,
+        FIELD_ackBit,
+        FIELD_nackBit,
+        FIELD_headerLength,
+        FIELD_urgBit,
+        FIELD_pshBit,
+        FIELD_rstBit,
+        FIELD_synBit,
+        FIELD_finBit,
+        FIELD_window,
+        FIELD_urgentPointer,
+        FIELD_headerOption,
+    };
   public:
-    NDPSegmentDescriptor();
-    virtual ~NDPSegmentDescriptor();
+    NdpHeaderDescriptor();
+    virtual ~NdpHeaderDescriptor();
 
     virtual bool doesSupport(omnetpp::cObject *obj) const override;
     virtual const char **getPropertyNames() const override;
@@ -3981,27 +3958,27 @@ class NDPSegmentDescriptor : public omnetpp::cClassDescriptor
     virtual void *getFieldStructValuePointer(void *object, int field, int i) const override;
 };
 
-Register_ClassDescriptor(NDPSegmentDescriptor)
+Register_ClassDescriptor(NdpHeaderDescriptor)
 
-NDPSegmentDescriptor::NDPSegmentDescriptor() : omnetpp::cClassDescriptor("inet::ndp::NDPSegment", "omnetpp::cPacket")
+NdpHeaderDescriptor::NdpHeaderDescriptor() : omnetpp::cClassDescriptor(omnetpp::opp_typename(typeid(inet::ndp::NdpHeader)), "inet::TransportHeaderBase")
 {
     propertynames = nullptr;
 }
 
-NDPSegmentDescriptor::~NDPSegmentDescriptor()
+NdpHeaderDescriptor::~NdpHeaderDescriptor()
 {
     delete[] propertynames;
 }
 
-bool NDPSegmentDescriptor::doesSupport(omnetpp::cObject *obj) const
+bool NdpHeaderDescriptor::doesSupport(omnetpp::cObject *obj) const
 {
-    return dynamic_cast<NDPSegment_Base *>(obj)!=nullptr;
+    return dynamic_cast<NdpHeader *>(obj)!=nullptr;
 }
 
-const char **NDPSegmentDescriptor::getPropertyNames() const
+const char **NdpHeaderDescriptor::getPropertyNames() const
 {
     if (!propertynames) {
-        static const char *names[] = { "customize", "fieldNameSuffix",  nullptr };
+        static const char *names[] = {  nullptr };
         omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
         const char **basenames = basedesc ? basedesc->getPropertyNames() : nullptr;
         propertynames = mergeLists(basenames, names);
@@ -4009,21 +3986,19 @@ const char **NDPSegmentDescriptor::getPropertyNames() const
     return propertynames;
 }
 
-const char *NDPSegmentDescriptor::getProperty(const char *propertyname) const
+const char *NdpHeaderDescriptor::getProperty(const char *propertyname) const
 {
-    if (!strcmp(propertyname,"customize")) return "true";
-    if (!strcmp(propertyname,"fieldNameSuffix")) return "_var";
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     return basedesc ? basedesc->getProperty(propertyname) : nullptr;
 }
 
-int NDPSegmentDescriptor::getFieldCount() const
+int NdpHeaderDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 27+basedesc->getFieldCount() : 27;
+    return basedesc ? 24+basedesc->getFieldCount() : 24;
 }
 
-unsigned int NDPSegmentDescriptor::getFieldTypeFlags(int field) const
+unsigned int NdpHeaderDescriptor::getFieldTypeFlags(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4032,38 +4007,35 @@ unsigned int NDPSegmentDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISEDITABLE,
-        FD_ISARRAY | FD_ISCOMPOUND,
-        FD_ISEDITABLE,
-        FD_ISARRAY | FD_ISCOMPOUND,
-        FD_ISCOMPOUND,
+        FD_ISEDITABLE,    // FIELD_srcPort
+        FD_ISEDITABLE,    // FIELD_destPort
+        FD_ISEDITABLE,    // FIELD_ackNo
+        FD_ISEDITABLE,    // FIELD_nackNo
+        FD_ISEDITABLE,    // FIELD_isHeader
+        FD_ISEDITABLE,    // FIELD_isPullPacket
+        FD_ISEDITABLE,    // FIELD_isDataPacket
+        FD_ISEDITABLE,    // FIELD_isLongFlow
+        FD_ISEDITABLE,    // FIELD_priorityValue
+        FD_ISEDITABLE,    // FIELD_numPacketsToSend
+        FD_ISEDITABLE,    // FIELD_pullSequenceNumber
+        FD_ISEDITABLE,    // FIELD_dataSequenceNumber
+        FD_ISEDITABLE,    // FIELD_isLastPktToSend
+        FD_ISEDITABLE,    // FIELD_ackBit
+        FD_ISEDITABLE,    // FIELD_nackBit
+        FD_ISEDITABLE,    // FIELD_headerLength
+        FD_ISEDITABLE,    // FIELD_urgBit
+        FD_ISEDITABLE,    // FIELD_pshBit
+        FD_ISEDITABLE,    // FIELD_rstBit
+        FD_ISEDITABLE,    // FIELD_synBit
+        FD_ISEDITABLE,    // FIELD_finBit
+        FD_ISEDITABLE,    // FIELD_window
+        FD_ISEDITABLE,    // FIELD_urgentPointer
+        FD_ISARRAY | FD_ISCOMPOUND | FD_ISPOINTER | FD_ISCOBJECT,    // FIELD_headerOption
     };
-    return (field>=0 && field<27) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 24) ? fieldTypeFlags[field] : 0;
 }
 
-const char *NDPSegmentDescriptor::getFieldName(int field) const
+const char *NdpHeaderDescriptor::getFieldName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4096,48 +4068,42 @@ const char *NDPSegmentDescriptor::getFieldName(int field) const
         "window",
         "urgentPointer",
         "headerOption",
-        "payloadLength",
-        "payload",
-        "byteArray",
     };
-    return (field>=0 && field<27) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 24) ? fieldNames[field] : nullptr;
 }
 
-int NDPSegmentDescriptor::findField(const char *fieldName) const
+int NdpHeaderDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0]=='s' && strcmp(fieldName, "srcPort")==0) return base+0;
-    if (fieldName[0]=='d' && strcmp(fieldName, "destPort")==0) return base+1;
-    if (fieldName[0]=='a' && strcmp(fieldName, "ackNo")==0) return base+2;
-    if (fieldName[0]=='n' && strcmp(fieldName, "nackNo")==0) return base+3;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isHeader")==0) return base+4;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isPullPacket")==0) return base+5;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isDataPacket")==0) return base+6;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isLongFlow")==0) return base+7;
-    if (fieldName[0]=='p' && strcmp(fieldName, "priorityValue")==0) return base+8;
-    if (fieldName[0]=='n' && strcmp(fieldName, "numPacketsToSend")==0) return base+9;
-    if (fieldName[0]=='p' && strcmp(fieldName, "pullSequenceNumber")==0) return base+10;
-    if (fieldName[0]=='d' && strcmp(fieldName, "dataSequenceNumber")==0) return base+11;
-    if (fieldName[0]=='i' && strcmp(fieldName, "isLastPktToSend")==0) return base+12;
-    if (fieldName[0]=='a' && strcmp(fieldName, "ackBit")==0) return base+13;
-    if (fieldName[0]=='n' && strcmp(fieldName, "nackBit")==0) return base+14;
-    if (fieldName[0]=='h' && strcmp(fieldName, "headerLength")==0) return base+15;
-    if (fieldName[0]=='u' && strcmp(fieldName, "urgBit")==0) return base+16;
-    if (fieldName[0]=='p' && strcmp(fieldName, "pshBit")==0) return base+17;
-    if (fieldName[0]=='r' && strcmp(fieldName, "rstBit")==0) return base+18;
-    if (fieldName[0]=='s' && strcmp(fieldName, "synBit")==0) return base+19;
-    if (fieldName[0]=='f' && strcmp(fieldName, "finBit")==0) return base+20;
-    if (fieldName[0]=='w' && strcmp(fieldName, "window")==0) return base+21;
-    if (fieldName[0]=='u' && strcmp(fieldName, "urgentPointer")==0) return base+22;
-    if (fieldName[0]=='h' && strcmp(fieldName, "headerOption")==0) return base+23;
-    if (fieldName[0]=='p' && strcmp(fieldName, "payloadLength")==0) return base+24;
-    if (fieldName[0]=='p' && strcmp(fieldName, "payload")==0) return base+25;
-    if (fieldName[0]=='b' && strcmp(fieldName, "byteArray")==0) return base+26;
+    if (fieldName[0] == 's' && strcmp(fieldName, "srcPort") == 0) return base+0;
+    if (fieldName[0] == 'd' && strcmp(fieldName, "destPort") == 0) return base+1;
+    if (fieldName[0] == 'a' && strcmp(fieldName, "ackNo") == 0) return base+2;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "nackNo") == 0) return base+3;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isHeader") == 0) return base+4;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isPullPacket") == 0) return base+5;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isDataPacket") == 0) return base+6;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isLongFlow") == 0) return base+7;
+    if (fieldName[0] == 'p' && strcmp(fieldName, "priorityValue") == 0) return base+8;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToSend") == 0) return base+9;
+    if (fieldName[0] == 'p' && strcmp(fieldName, "pullSequenceNumber") == 0) return base+10;
+    if (fieldName[0] == 'd' && strcmp(fieldName, "dataSequenceNumber") == 0) return base+11;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isLastPktToSend") == 0) return base+12;
+    if (fieldName[0] == 'a' && strcmp(fieldName, "ackBit") == 0) return base+13;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "nackBit") == 0) return base+14;
+    if (fieldName[0] == 'h' && strcmp(fieldName, "headerLength") == 0) return base+15;
+    if (fieldName[0] == 'u' && strcmp(fieldName, "urgBit") == 0) return base+16;
+    if (fieldName[0] == 'p' && strcmp(fieldName, "pshBit") == 0) return base+17;
+    if (fieldName[0] == 'r' && strcmp(fieldName, "rstBit") == 0) return base+18;
+    if (fieldName[0] == 's' && strcmp(fieldName, "synBit") == 0) return base+19;
+    if (fieldName[0] == 'f' && strcmp(fieldName, "finBit") == 0) return base+20;
+    if (fieldName[0] == 'w' && strcmp(fieldName, "window") == 0) return base+21;
+    if (fieldName[0] == 'u' && strcmp(fieldName, "urgentPointer") == 0) return base+22;
+    if (fieldName[0] == 'h' && strcmp(fieldName, "headerOption") == 0) return base+23;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
-const char *NDPSegmentDescriptor::getFieldTypeString(int field) const
+const char *NdpHeaderDescriptor::getFieldTypeString(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4146,38 +4112,35 @@ const char *NDPSegmentDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "unsigned short",
-        "unsigned short",
-        "unsigned int",
-        "unsigned int",
-        "bool",
-        "bool",
-        "bool",
-        "bool",
-        "unsigned int",
-        "unsigned int",
-        "unsigned int",
-        "unsigned int",
-        "bool",
-        "bool",
-        "bool",
-        "unsigned short",
-        "bool",
-        "bool",
-        "bool",
-        "bool",
-        "bool",
-        "unsigned short",
-        "unsigned short",
-        "NDPOptionPtr",
-        "unsigned long",
-        "NDPPayloadMessage",
-        "ByteArray",
+        "unsigned short",    // FIELD_srcPort
+        "unsigned short",    // FIELD_destPort
+        "unsigned int",    // FIELD_ackNo
+        "unsigned int",    // FIELD_nackNo
+        "bool",    // FIELD_isHeader
+        "bool",    // FIELD_isPullPacket
+        "bool",    // FIELD_isDataPacket
+        "bool",    // FIELD_isLongFlow
+        "unsigned int",    // FIELD_priorityValue
+        "unsigned int",    // FIELD_numPacketsToSend
+        "unsigned int",    // FIELD_pullSequenceNumber
+        "unsigned int",    // FIELD_dataSequenceNumber
+        "bool",    // FIELD_isLastPktToSend
+        "bool",    // FIELD_ackBit
+        "bool",    // FIELD_nackBit
+        "inet::B",    // FIELD_headerLength
+        "bool",    // FIELD_urgBit
+        "bool",    // FIELD_pshBit
+        "bool",    // FIELD_rstBit
+        "bool",    // FIELD_synBit
+        "bool",    // FIELD_finBit
+        "unsigned short",    // FIELD_window
+        "unsigned short",    // FIELD_urgentPointer
+        "inet::ndp::NdpOption",    // FIELD_headerOption
     };
-    return (field>=0 && field<27) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 24) ? fieldTypeStrings[field] : nullptr;
 }
 
-const char **NDPSegmentDescriptor::getFieldPropertyNames(int field) const
+const char **NdpHeaderDescriptor::getFieldPropertyNames(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4186,11 +4149,15 @@ const char **NDPSegmentDescriptor::getFieldPropertyNames(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
+        case FIELD_headerOption: {
+            static const char *names[] = { "owned",  nullptr };
+            return names;
+        }
         default: return nullptr;
     }
 }
 
-const char *NDPSegmentDescriptor::getFieldProperty(int field, const char *propertyname) const
+const char *NdpHeaderDescriptor::getFieldProperty(int field, const char *propertyname) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4199,11 +4166,14 @@ const char *NDPSegmentDescriptor::getFieldProperty(int field, const char *proper
         field -= basedesc->getFieldCount();
     }
     switch (field) {
+        case FIELD_headerOption:
+            if (!strcmp(propertyname, "owned")) return "";
+            return nullptr;
         default: return nullptr;
     }
 }
 
-int NDPSegmentDescriptor::getFieldArraySize(void *object, int field) const
+int NdpHeaderDescriptor::getFieldArraySize(void *object, int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4211,15 +4181,14 @@ int NDPSegmentDescriptor::getFieldArraySize(void *object, int field) const
             return basedesc->getFieldArraySize(object, field);
         field -= basedesc->getFieldCount();
     }
-    NDPSegment_Base *pp = (NDPSegment_Base *)object; (void)pp;
+    NdpHeader *pp = (NdpHeader *)object; (void)pp;
     switch (field) {
-        case 23: return pp->getHeaderOptionArraySize();
-        case 25: return pp->getPayloadArraySize();
+        case FIELD_headerOption: return pp->getHeaderOptionArraySize();
         default: return 0;
     }
 }
 
-const char *NDPSegmentDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
+const char *NdpHeaderDescriptor::getFieldDynamicTypeString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4227,13 +4196,14 @@ const char *NDPSegmentDescriptor::getFieldDynamicTypeString(void *object, int fi
             return basedesc->getFieldDynamicTypeString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPSegment_Base *pp = (NDPSegment_Base *)object; (void)pp;
+    NdpHeader *pp = (NdpHeader *)object; (void)pp;
     switch (field) {
+        case FIELD_headerOption: { const NdpOption * value = pp->getHeaderOption(i); return omnetpp::opp_typename(typeid(*value)); }
         default: return nullptr;
     }
 }
 
-std::string NDPSegmentDescriptor::getFieldValueAsString(void *object, int field, int i) const
+std::string NdpHeaderDescriptor::getFieldValueAsString(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4241,40 +4211,37 @@ std::string NDPSegmentDescriptor::getFieldValueAsString(void *object, int field,
             return basedesc->getFieldValueAsString(object,field,i);
         field -= basedesc->getFieldCount();
     }
-    NDPSegment_Base *pp = (NDPSegment_Base *)object; (void)pp;
+    NdpHeader *pp = (NdpHeader *)object; (void)pp;
     switch (field) {
-        case 0: return ulong2string(pp->getSrcPort());
-        case 1: return ulong2string(pp->getDestPort());
-        case 2: return ulong2string(pp->getAckNo());
-        case 3: return ulong2string(pp->getNackNo());
-        case 4: return bool2string(pp->getIsHeader());
-        case 5: return bool2string(pp->getIsPullPacket());
-        case 6: return bool2string(pp->getIsDataPacket());
-        case 7: return bool2string(pp->getIsLongFlow());
-        case 8: return ulong2string(pp->getPriorityValue());
-        case 9: return ulong2string(pp->getNumPacketsToSend());
-        case 10: return ulong2string(pp->getPullSequenceNumber());
-        case 11: return ulong2string(pp->getDataSequenceNumber());
-        case 12: return bool2string(pp->getIsLastPktToSend());
-        case 13: return bool2string(pp->getAckBit());
-        case 14: return bool2string(pp->getNackBit());
-        case 15: return ulong2string(pp->getHeaderLength());
-        case 16: return bool2string(pp->getUrgBit());
-        case 17: return bool2string(pp->getPshBit());
-        case 18: return bool2string(pp->getRstBit());
-        case 19: return bool2string(pp->getSynBit());
-        case 20: return bool2string(pp->getFinBit());
-        case 21: return ulong2string(pp->getWindow());
-        case 22: return ulong2string(pp->getUrgentPointer());
-        case 23: {std::stringstream out; out << pp->getHeaderOption(i); return out.str();}
-        case 24: return ulong2string(pp->getPayloadLength());
-        case 25: {std::stringstream out; out << pp->getPayload(i); return out.str();}
-        case 26: {std::stringstream out; out << pp->getByteArray(); return out.str();}
+        case FIELD_srcPort: return ulong2string(pp->getSrcPort());
+        case FIELD_destPort: return ulong2string(pp->getDestPort());
+        case FIELD_ackNo: return ulong2string(pp->getAckNo());
+        case FIELD_nackNo: return ulong2string(pp->getNackNo());
+        case FIELD_isHeader: return bool2string(pp->isHeader());
+        case FIELD_isPullPacket: return bool2string(pp->isPullPacket());
+        case FIELD_isDataPacket: return bool2string(pp->isDataPacket());
+        case FIELD_isLongFlow: return bool2string(pp->isLongFlow());
+        case FIELD_priorityValue: return ulong2string(pp->getPriorityValue());
+        case FIELD_numPacketsToSend: return ulong2string(pp->getNumPacketsToSend());
+        case FIELD_pullSequenceNumber: return ulong2string(pp->getPullSequenceNumber());
+        case FIELD_dataSequenceNumber: return ulong2string(pp->getDataSequenceNumber());
+        case FIELD_isLastPktToSend: return bool2string(pp->isLastPktToSend());
+        case FIELD_ackBit: return bool2string(pp->getAckBit());
+        case FIELD_nackBit: return bool2string(pp->getNackBit());
+        case FIELD_headerLength: return unit2string(pp->getHeaderLength());
+        case FIELD_urgBit: return bool2string(pp->getUrgBit());
+        case FIELD_pshBit: return bool2string(pp->getPshBit());
+        case FIELD_rstBit: return bool2string(pp->getRstBit());
+        case FIELD_synBit: return bool2string(pp->getSynBit());
+        case FIELD_finBit: return bool2string(pp->getFinBit());
+        case FIELD_window: return ulong2string(pp->getWindow());
+        case FIELD_urgentPointer: return ulong2string(pp->getUrgentPointer());
+        case FIELD_headerOption: {std::stringstream out; out << pp->getHeaderOption(i); return out.str();}
         default: return "";
     }
 }
 
-bool NDPSegmentDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
+bool NdpHeaderDescriptor::setFieldValueAsString(void *object, int field, int i, const char *value) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4282,37 +4249,36 @@ bool NDPSegmentDescriptor::setFieldValueAsString(void *object, int field, int i,
             return basedesc->setFieldValueAsString(object,field,i,value);
         field -= basedesc->getFieldCount();
     }
-    NDPSegment_Base *pp = (NDPSegment_Base *)object; (void)pp;
+    NdpHeader *pp = (NdpHeader *)object; (void)pp;
     switch (field) {
-        case 0: pp->setSrcPort(string2ulong(value)); return true;
-        case 1: pp->setDestPort(string2ulong(value)); return true;
-        case 2: pp->setAckNo(string2ulong(value)); return true;
-        case 3: pp->setNackNo(string2ulong(value)); return true;
-        case 4: pp->setIsHeader(string2bool(value)); return true;
-        case 5: pp->setIsPullPacket(string2bool(value)); return true;
-        case 6: pp->setIsDataPacket(string2bool(value)); return true;
-        case 7: pp->setIsLongFlow(string2bool(value)); return true;
-        case 8: pp->setPriorityValue(string2ulong(value)); return true;
-        case 9: pp->setNumPacketsToSend(string2ulong(value)); return true;
-        case 10: pp->setPullSequenceNumber(string2ulong(value)); return true;
-        case 11: pp->setDataSequenceNumber(string2ulong(value)); return true;
-        case 12: pp->setIsLastPktToSend(string2bool(value)); return true;
-        case 13: pp->setAckBit(string2bool(value)); return true;
-        case 14: pp->setNackBit(string2bool(value)); return true;
-        case 15: pp->setHeaderLength(string2ulong(value)); return true;
-        case 16: pp->setUrgBit(string2bool(value)); return true;
-        case 17: pp->setPshBit(string2bool(value)); return true;
-        case 18: pp->setRstBit(string2bool(value)); return true;
-        case 19: pp->setSynBit(string2bool(value)); return true;
-        case 20: pp->setFinBit(string2bool(value)); return true;
-        case 21: pp->setWindow(string2ulong(value)); return true;
-        case 22: pp->setUrgentPointer(string2ulong(value)); return true;
-        case 24: pp->setPayloadLength(string2ulong(value)); return true;
+        case FIELD_srcPort: pp->setSrcPort(string2ulong(value)); return true;
+        case FIELD_destPort: pp->setDestPort(string2ulong(value)); return true;
+        case FIELD_ackNo: pp->setAckNo(string2ulong(value)); return true;
+        case FIELD_nackNo: pp->setNackNo(string2ulong(value)); return true;
+        case FIELD_isHeader: pp->setIsHeader(string2bool(value)); return true;
+        case FIELD_isPullPacket: pp->setIsPullPacket(string2bool(value)); return true;
+        case FIELD_isDataPacket: pp->setIsDataPacket(string2bool(value)); return true;
+        case FIELD_isLongFlow: pp->setIsLongFlow(string2bool(value)); return true;
+        case FIELD_priorityValue: pp->setPriorityValue(string2ulong(value)); return true;
+        case FIELD_numPacketsToSend: pp->setNumPacketsToSend(string2ulong(value)); return true;
+        case FIELD_pullSequenceNumber: pp->setPullSequenceNumber(string2ulong(value)); return true;
+        case FIELD_dataSequenceNumber: pp->setDataSequenceNumber(string2ulong(value)); return true;
+        case FIELD_isLastPktToSend: pp->setIsLastPktToSend(string2bool(value)); return true;
+        case FIELD_ackBit: pp->setAckBit(string2bool(value)); return true;
+        case FIELD_nackBit: pp->setNackBit(string2bool(value)); return true;
+        case FIELD_headerLength: pp->setHeaderLength(B(string2long(value))); return true;
+        case FIELD_urgBit: pp->setUrgBit(string2bool(value)); return true;
+        case FIELD_pshBit: pp->setPshBit(string2bool(value)); return true;
+        case FIELD_rstBit: pp->setRstBit(string2bool(value)); return true;
+        case FIELD_synBit: pp->setSynBit(string2bool(value)); return true;
+        case FIELD_finBit: pp->setFinBit(string2bool(value)); return true;
+        case FIELD_window: pp->setWindow(string2ulong(value)); return true;
+        case FIELD_urgentPointer: pp->setUrgentPointer(string2ulong(value)); return true;
         default: return false;
     }
 }
 
-const char *NDPSegmentDescriptor::getFieldStructName(int field) const
+const char *NdpHeaderDescriptor::getFieldStructName(int field) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4321,14 +4287,12 @@ const char *NDPSegmentDescriptor::getFieldStructName(int field) const
         field -= basedesc->getFieldCount();
     }
     switch (field) {
-        case 23: return omnetpp::opp_typename(typeid(NDPOptionPtr));
-        case 25: return omnetpp::opp_typename(typeid(NDPPayloadMessage));
-        case 26: return omnetpp::opp_typename(typeid(ByteArray));
+        case FIELD_headerOption: return omnetpp::opp_typename(typeid(NdpOption));
         default: return nullptr;
     };
 }
 
-void *NDPSegmentDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
+void *NdpHeaderDescriptor::getFieldStructValuePointer(void *object, int field, int i) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     if (basedesc) {
@@ -4336,11 +4300,9 @@ void *NDPSegmentDescriptor::getFieldStructValuePointer(void *object, int field, 
             return basedesc->getFieldStructValuePointer(object, field, i);
         field -= basedesc->getFieldCount();
     }
-    NDPSegment_Base *pp = (NDPSegment_Base *)object; (void)pp;
+    NdpHeader *pp = (NdpHeader *)object; (void)pp;
     switch (field) {
-        case 23: return (void *)(&pp->getHeaderOption(i)); break;
-        case 25: return (void *)(&pp->getPayload(i)); break;
-        case 26: return (void *)(&pp->getByteArray()); break;
+        case FIELD_headerOption: return toVoidPtr(pp->getHeaderOption(i)); break;
         default: return nullptr;
     }
 }

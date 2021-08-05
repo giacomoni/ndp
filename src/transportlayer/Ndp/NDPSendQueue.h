@@ -18,9 +18,11 @@
 #ifndef __INET_NDPSENDQUEUE_H
 #define __INET_NDPSENDQUEUE_H
 
-#include "../../ndptransportlayer/Ndp/NDPConnection.h"
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
 #include "inet/common/INETDefs.h"
+#include "inet/common/packet/ChunkQueue.h"
+#include "inet/common/packet/Packet.h"
+#include "NDPConnection.h"
+#include "ndp_common/NdpHeader.h"
 
 
 namespace inet {
@@ -30,19 +32,25 @@ namespace ndp {
 class INET_API NDPSendQueue : public cObject
 {
   protected:
-    NDPConnection *conn;    // the connection that owns this queue
+    NDPConnection *conn = nullptr;    // the connection that owns this queue
+    uint32 begin = 0;    // 1st sequence number stored
+    uint32 end = 0;    // last sequence number stored +1
+
+    ChunkQueue dataToSendQueue;      // dataBuffer
+    ChunkQueue sentDataQueue;
 
   public:
     /**
      * Ctor.
      */
-    NDPSendQueue() { conn = nullptr; }
+    NDPSendQueue();
 
     /**
      * Virtual dtor.
      */
-    virtual ~NDPSendQueue() {}
+    virtual ~NDPSendQueue();
 
+    virtual ChunkQueue& getDataBuffer() { return dataBuffer; }
     /**
      * Set the connection that owns this queue.
      */
@@ -56,7 +64,12 @@ class INET_API NDPSendQueue : public cObject
      * init() may be called more than once; every call flushes the existing contents
      * of the queue.
      */
-    virtual void init(unsigned int numPacketsToSend, unsigned int mss) = 0;
+    virtual void init(unsigned int numPacketsToSend , unsigned int mss);
+
+    /**
+     * Returns a string with the region stored.
+     */
+    virtual std::string str() const override;
 
     /**
      * Called on SEND app command, it inserts in the queue the data the user
@@ -66,23 +79,22 @@ class INET_API NDPSendQueue : public cObject
      * The msg object should not be referenced after this point (sendQueue may
      * delete it.)
      */
-    virtual void enqueueAppData(cPacket *msg) = 0;
+    virtual void enqueueAppData(Packet *msg);
 
     /**
      * Returns the sequence number of the first byte stored in the buffer.
      */
-    virtual uint32 getBufferStartSeq() = 0;
+    virtual uint32 getBufferStartSeq();
 
     /**
      * Returns the sequence number of the last byte stored in the buffer plus one.
      * (The first byte of the next send operation would get this sequence number.)
      */
-    virtual uint32 getBufferEndSeq() = 0;
+    virtual uint32 getBufferEndSeq();
 
-    virtual NDPSegment *getNdpSegment() = 0;
 
-    virtual void ackArrivedFreeBuffer(unsigned int ackNum) = 0;
-    virtual void nackArrivedMoveFront(unsigned int nackNum) = 0;
+    virtual void ackArrivedFreeBuffer(unsigned int ackNum);
+    virtual void nackArrivedMoveFront(unsigned int nackNum);
 
 
     /**
@@ -95,6 +107,9 @@ class INET_API NDPSendQueue : public cObject
         return seqLess(fromSeq, bufEndSeq) ? bufEndSeq - fromSeq : 0;
     }
 
+    void removeFromDataQueueToSentQueue(std::list<Payload>::iterator iter);
+    void moveFrontDataQueue(std::list<Payload>::iterator iter);
+
     /**
      * Called when the NDP wants to send or retransmit data, it constructs
      * a NDP segment which contains the data from the requested sequence
@@ -102,13 +117,13 @@ class INET_API NDPSendQueue : public cObject
      * maxNumBytes bytes if the subclass wants to reproduce the original
      * segment boundaries when retransmitting.
      */
-    virtual NDPSegment *createSegmentWithBytes(uint32 fromSeq, ulong maxNumBytes) = 0;
+    virtual Packet *createSegmentWithBytes(uint32 fromSeq, ulong numBytes);
 
     /**
      * Tells the queue that bytes up to (but NOT including) seqNum have been
      * transmitted and ACKed, so they can be removed from the queue.
      */
-    virtual void discardUpTo(uint32 seqNum) = 0;
+    virtual void discardUpTo(uint32 seqNum);
 };
 
 } // namespace raptoNDP
