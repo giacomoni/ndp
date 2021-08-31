@@ -1,8 +1,8 @@
 #include "../../../transportlayer/Ndp/flavours/NDPBaseAlg.h"
 
 #include "../../../transportlayer/Ndp/Ndp.h"
-#include "inet/transportlayer/tcp/TCPSACKRexmitQueue.h"
-#include "inet/ndp/application/ndpapp/GenericAppMsgNdp_m.h"
+//#include "inet/transportlayer/tcp/TCPSACKRexmitQueue.h"
+#include "../../../application/ndpapp/GenericAppMsgNdp_m.h"
 
 namespace inet {
 
@@ -112,7 +112,7 @@ void NDPBaseAlg::initialize() {
 
     NDPAlgorithm::initialize();
 
-    conn->getNDPMain()->appGateIndexTimeOutMap[conn->appGateIndex] = state->numPullsTimeOuts; // moh added
+    conn->getNDPMain()->appGateIndexTimeOutMap[conn->listeningSocketId] = state->numPullsTimeOuts; // moh added
 
 
      rexmitTimer = new cMessage("REXMIT-MOH");
@@ -124,16 +124,6 @@ void NDPBaseAlg::initialize() {
     persistTimer->setContextPointer(conn);
     delayedAckTimer->setContextPointer(conn);
     keepAliveTimer->setContextPointer(conn);
-
-    if (conn->getNDPMain()->recordStatistics) {
-        cwndVector = new cOutVector("cwnd");
-        ssthreshVector = new cOutVector("ssthresh");
-        rttVector = new cOutVector("measured RTT");
-        srttVector = new cOutVector("smoothed RTT");
-        rttvarVector = new cOutVector("RTTVAR");
-        rtoVector = new cOutVector("RTO");
-        numRtosVector = new cOutVector("numRTOs");
-    }
 }
 
 void NDPBaseAlg::established(bool active) {

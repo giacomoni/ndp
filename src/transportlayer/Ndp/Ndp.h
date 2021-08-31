@@ -41,6 +41,7 @@ class NDPReceiveQueue;
 class INET_API Ndp : public TransportProtocolBase
 {
   public:
+    static simsignal_t numRequestsRTOs;
 
     enum PortRange {
         EPHEMERAL_PORTRANGE_START = 1024,
@@ -87,6 +88,8 @@ class INET_API Ndp : public TransportProtocolBase
                     return localPort < b.localPort;
             }
         };
+    cMessage *requestTimerMsg = nullptr;
+
     std::map<int, int> appGateIndexTimeOutMap;  // moh: contains num of timeouts for each app
     bool test = true;
     std::map< int,  NDPConnection * > requestCONNMap;

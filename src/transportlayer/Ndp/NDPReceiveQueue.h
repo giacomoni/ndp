@@ -64,7 +64,7 @@ class INET_API NDPReceiveQueue : public cObject
     /**
      * Virtual dtor.
      */
-    virtual ~NDPReceiveQueue() {}
+    virtual ~NDPReceiveQueue();
 
     virtual ReorderBuffer& getReorderBuffer() { return reorderBuffer; }
     /**

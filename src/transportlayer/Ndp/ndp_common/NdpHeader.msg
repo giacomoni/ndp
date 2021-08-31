@@ -218,7 +218,7 @@ cplusplus(NdpHeader) {{
     virtual void setSourcePort(unsigned int port) override { setSrcPort(port); }
     virtual unsigned int getDestinationPort() const override { return getDestPort(); }
     virtual void setDestinationPort(unsigned int port) override { setDestPort(port); }
-
+	virtual void setPriorityValue(unsigned int priorityValue) const override {setPriorityValue(priorityValue};
     virtual std::string str() const override;
 }}
 

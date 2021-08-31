@@ -36,8 +36,10 @@
 #include "inet/networklayer/icmpv6/Icmpv6Header_m.h"
 #endif // ifdef WITH_IPv6
 
+#define PACING_TIME 12  //    MTU/linkRate
+
 #include "inet/transportlayer/common/TransportPseudoHeader_m.h"
-#include "inet/transportlayer/contract/tcp/TcpCommand_m.h"
+#include "../contract/ndp/NDPCommand_m.h"
 #include "Ndp.h"
 #include "NDPConnection.h"
 #include "NDPReceiveQueue.h"
@@ -47,9 +49,9 @@
 namespace inet {
 namespace ndp {
 
-Define_Module(ndp::Ndp);
+Define_Module(Ndp);
 
-simsignal_t numRequestsRTOs = ndp::Ndp::registerSignal("numRequestsRTOs");
+simsignal_t Ndp::numRequestsRTOs = registerSignal("numRequestsRTOs");
 
 Ndp::~Ndp()
 {
@@ -135,7 +137,7 @@ void Ndp::handleLowerPacket(Packet *packet)
 {
     // must be a NdpHeader
     auto ndpHeader = packet->peekAtFront<NdpHeader>();
-    ndpHeader->setPriorityValue(const 10);                     //ADD THIS METHOD
+    ndpHeader->setPriorityValue(10);                     //ADD THIS METHOD
     // get src/dest addresses
     L3Address srcAddr, destAddr;
     srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();
@@ -148,14 +150,6 @@ void Ndp::handleLowerPacket(Packet *packet)
     // process segment
     NDPConnection *conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
     if (conn) {
-        NdpStateVariables* state = conn->getState();
-        if (state && state->ect) {
-            // This may be true only in receiver side. According to RFC 3168, page 20:
-            // pure acknowledgement packets (e.g., packets that do not contain
-            // any accompanying data) MUST be sent with the not-ECT codepoint.
-            if (ecn == 3)
-                state->gotCeIndication = true;
-        }
 
         bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr, destAddr);
         if (!ret)
@@ -196,11 +190,11 @@ void Ndp::removeConnection(NDPConnection *conn)
     if (it != usedEphemeralPorts.end())
         usedEphemeralPorts.erase(it);
 
-    emit(ndpConnectionRemovedSignal, conn);
+    //emit(ndpConnectionRemovedSignal, conn);
     conn->deleteModule();
 }
 
-NDPConnection *Ndp::findConnForSegment(const Ptr<const NDPHeader>& ndpseg, L3Address srcAddr, L3Address destAddr)
+NDPConnection *Ndp::findConnForSegment(const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr)
 {
     SockPair key;
     key.localAddr = destAddr;
@@ -374,7 +368,7 @@ void Ndp::reset()
     lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
 }
 
-void Ndp::refreshDisplay() {
+void Ndp::refreshDisplay() const {
     OperationalBase::refreshDisplay();
 
    if (getEnvir()->isExpressMode()) {
@@ -472,23 +466,173 @@ void Ndp::refreshDisplay() {
     getDisplayString().setTagArg("t", 0, buf2);
 }
 
-std::ostream& operator<<(std::ostream& os, const Tcp::SockPair& sp)
+void Ndp::printConnRequestMap() {
+//    std::cout << "   printConnRequestMap   "     << "\n";
+    auto iterrr = requestCONNMap.begin();
+    int index = 0;
+    while (iterrr != requestCONNMap.end()) {
+//          EV << index << " printConnRequestMap \n " ;
+//          EV <<  " connIndex = " <<  iterrr->first << " \n " ;
+//          EV << "  connId=  " << iterrr->second->connId  << "\n" ;
+//          EV << " getPullsQueueLength()=  " << iterrr->second->getPullsQueueLength() << "\n" ;
+//          EV << " rcvdSymbols =  " << iterrr->second->getNumRcvdSymbols() <<  "\n\n\n" ;
+//          EV << " requestCONNMap.size() =  " << requestCONNMap.size() <<  "\n\n\n" ;
+
+//          std::cout << " requestCONNMap.size() =  " << requestCONNMap.size() <<  "\n\n\n" ;
+
+//        if (iterrr->second->getNumRcvdSymbols() > 0 && test == true) {
+//            requestTimer();
+//            test = false;
+//        }
+        index++;
+        iterrr++;
+    }
+
+}
+
+void Ndp::sendFirstRequest() {
+//       std::cout << "  sendFirstRequest  \n";
+    bool allEmpty = allPullQueuesEmpty();
+//    if (allEmpty == false && test == true) {   // ?????? why test is here
+    if (allEmpty == false ) {
+         requestTimer();
+
+    //    process_REQUEST_TIMER();
+//        test = false;
+    }
+}
+
+bool Ndp::allPullQueuesEmpty() {
+//     std::cout << "  Ndp::allPullQueuesEmpty()    "  << this->getFullPath()   << "\n";
+    int pullsQueueLength =0;
+    auto iter = requestCONNMap.begin();
+    while (iter !=  requestCONNMap.end()){
+//        std::cout << "   aaaaallPullQueuesEmpty   "     << "\n";
+         pullsQueueLength = iter->second->getPullsQueueLength();
+//         std::cout <<    this->getFullPath()   << " pullsQueueLength=   "  <<   pullsQueueLength<< "\n";
+
+        if (pullsQueueLength >0) return false;
+        ++iter;
+    }
+      return true;
+}
+
+bool Ndp::allConnFinished() {
+//     std::cout << "  allConnFinished ?   "     << "\n";
+    bool connDone;
+
+    auto iter = requestCONNMap.begin();
+    int ii=0;
+    while (iter != requestCONNMap.end()) {
+        connDone = iter->second->isConnFinished();
+//        std::cout << "  allConnFinished ssss  "    << requestCONNMap.size() << "\n";
+      if (connDone == false) {
+//            std::cout << "allConnFinished FALSE FFFFFFFFFFF, connIndex=  " << ii << " ,numConn = " << requestCONNMap.size() << "\n";
+            return false;
+        }
+        ++iter;
+        ++ii;
+    }
+    cancelRequestTimer();
+    return true;
+}
+
+void Ndp::updateConnMap() {
+    std::cout << "  updateConnMap updateConnMap   "     << "\n";
+    a:
+    bool connDone;
+    auto iter = requestCONNMap.begin();
+
+    while (iter != requestCONNMap.end()) {
+        connDone = iter->second->isConnFinished();
+        if (connDone == true)  {
+            requestCONNMap.erase(iter);
+            goto a;
+        }
+         ++iter;
+   }
+}
+
+void Ndp::requestTimer() {
+//    std::cout << "  requestTimer  \n";
+//  //  state->request_rexmit_count = 0;
+//  //  state->request_rexmit_timeout = NDP_TIMEOUT_PULL_REXMIT;  // 3 sec
+//    std::cout << " start requestTimer... \n ";
+//    EV << " start requestTimer... \n ";
+    cancelRequestTimer();
+    simtime_t requestTime = (simTime() + SimTime( PACING_TIME , SIMTIME_US)); // pacing
+//    if (allConnFinished() == false)
+     scheduleAt(requestTime, requestTimerMsg); // 0.000009
+//     requestTimerStamps.record(requestTime);
+
+//    if (allConnFinished() == true)
+//        cancelRequestTimer();
+}
+
+void Ndp::cancelRequestTimer() {
+//    std::cout << " cancelRequestTimer  "   << "\n";
+    if (requestTimerMsg->isScheduled())
+        cancelEvent(requestTimerMsg);
+//    delete requestTimerMsg;
+}
+
+bool Ndp::getNapState() {
+    return nap;
+}
+
+void Ndp::process_REQUEST_TIMER() {
+//   std::cout << "  \n process_REQUEST_TIMER " << this->getFullPath() << " \n";
+    bool sendNewRequest = false;
+    auto iter = requestCONNMap.begin();
+    bool allEmpty = allPullQueuesEmpty();
+    bool allDone = allConnFinished();
+
+    if (allDone == true) {
+        cancelRequestTimer();
+    } else if (allDone == false && allEmpty == true) {
+        ++times;
+//         requestTimer(); // ?????????????????????
+//        if (times == 50000) {
+//            times=0;
+//            cancelRequestTimer();
+//        }
+        nap = true;
+    } else if (allDone == false && allEmpty == false) {
+        times = 0;
+        nap = false;
+        while (sendNewRequest != true) {
+            if (counter == requestCONNMap.size())
+                counter = 0;
+            auto iter = requestCONNMap.begin();
+            std::advance(iter, counter);
+            int pullsQueueLength = iter->second->getPullsQueueLength();
+            if (pullsQueueLength > 0) {
+                iter->second->sendRequestFromPullsQueue();
+                requestTimer();
+                sendNewRequest = true;
+            }
+            ++counter;
+        }
+    }
+}
+
+std::ostream& operator<<(std::ostream& os, const Ndp::SockPair& sp)
 {
     os << "locSocket=" << sp.localAddr << ":"<< sp.localPort << " "
        << "remSocket=" << sp.remoteAddr << ":" << sp.remotePort;
     return os;
 }
 
-std::ostream& operator<<(std::ostream& os, const TcpConnection& conn)
+std::ostream& operator<<(std::ostream& os, const NDPConnection& conn)
 {
     os << "socketId=" << conn.socketId << " ";
-    os << "fsmState=" << TcpConnection::stateName(conn.getFsmState()) << " ";
-    os << "connection=" << (conn.getState() == nullptr ? "<empty>" : conn.getState()->str()) << " ";
-    os << "ttl=" << (conn.ttl == -1 ? "<default>" : std::to_string(conn.ttl)) << " ";
+    os << "fsmState=" << NDPConnection::stateName(conn.getFsmState()) << " ";
+    //os << "connection=" << (conn.getState() == nullptr ? "<empty>" : conn.getState()->str()) << " ";
+    //os << "ttl=" << (conn.ttl == -1 ? "<default>" : std::to_string(conn.ttl)) << " ";
     return os;
 }
 
-} // namespace tcp
+} // namespace ncp
 } // namespace inet
 
 

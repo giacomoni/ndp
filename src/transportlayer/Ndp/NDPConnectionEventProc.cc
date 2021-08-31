@@ -1,13 +1,13 @@
 
 #include <string.h>
 
-#include "../../ndptransportlayer/contract/ndp/NDPCommand_m.h"
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
-#include "../../transportlayer/Ndp/Ndp.h"
-#include "../../transportlayer/Ndp/NDPAlgorithm.h"
-#include "../../transportlayer/Ndp/NDPConnection.h"
-#include "../../transportlayer/Ndp/NDPReceiveQueue.h"
-#include "../../transportlayer/Ndp/NDPSendQueue.h"
+#include "../contract/ndp/NDPCommand_m.h"
+#include "ndp_common/NdpHeader.h"
+#include "Ndp.h"
+#include "NDPAlgorithm.h"
+#include "NDPConnection.h"
+#include "NDPReceiveQueue.h"
+#include "NDPSendQueue.h"
 
 
 namespace inet {
@@ -36,9 +36,9 @@ void NDPConnection::process_OPEN_ACTIVE(NDPEventCode& event, NDPCommand *ndpComm
             remotePort = openCmd->getRemotePort();
 
             state->numPacketsToSend = openCmd->getNumPacketsToSend();
-            state->isSender =  openCmd->getIsSender();  // true
-            state->isReceiver = openCmd->getIsReceiver(); // false
-            state->isLongFlow = openCmd->getIsLongFlow();
+            state->isSender =  openCmd->isSender();  // true
+            state->isReceiver = openCmd->isReceiver(); // false
+            state->isLongFlow = openCmd->isLongFlow();
             state->priorityValue = openCmd->getPriorityValue();
 
 
@@ -58,7 +58,7 @@ void NDPConnection::process_OPEN_ACTIVE(NDPEventCode& event, NDPCommand *ndpComm
 
              sendEstabIndicationToApp();
              //             sendSyn();
-             sendQueue->init(state->numPacketsToSend , state->snd_mss);
+             sendQueue->init(state->numPacketsToSend , B(state->snd_mss)); //added B
 //             generatePacketsList();
              sendInitialWindow();
 //            startSynRexmitTimer(); // timer for SYN mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
@@ -86,8 +86,8 @@ void NDPConnection::process_OPEN_PASSIVE(NDPEventCode& event, NDPCommand *ndpCom
             state->active = false;
              localAddr = openCmd->getLocalAddr();
             localPort = openCmd->getLocalPort();
-            state->isSender =  openCmd->getIsSender(); // false
-            state->isReceiver = openCmd->getIsReceiver(); // true
+            state->isSender =  openCmd->isSender(); // false
+            state->isReceiver = openCmd->isReceiver(); // true
 
             if (localPort == -1)
                 throw cRuntimeError(ndpMain, "Error processing command OPEN_PASSIVE: local port must be specified");

@@ -75,10 +75,13 @@ void NdpBasicClientApp::sendWriteRequest() {
 //    sprintf(msgname, "REQUEST-%d",++requestIndex);
     sprintf(msgname, "REQUEST-WRITE-INIT");
 
-    GenericAppMsgNdp *msg = new GenericAppMsgNdp(msgname);
-    msg->setByteLength(requestLength);
-     msg->setServerClose(false);
-    sendPacket(msg);
+    auto packet = new Packet("REQUEST-WRITE-INIT");
+    const auto& payload = makeShared<GenericAppMsgNdp>();
+    payload->setChunkLength(B(requestLength));
+    //payload->setExpectedReplyLength(B(replyLength));
+    payload->setServerClose(false);
+    packet->insertAtFront(payload);
+    sendPacket(packet);
 }
 
 void NdpBasicClientApp::handleTimer(cMessage *msg) {

@@ -10,12 +10,11 @@
 #include "NdpServerHostApp.h"
 
 namespace inet {
-
 /**
  * Accepts any number of incoming connections, and sends back whatever
  * arrives on them.
  */
-class INET_API NdpEchoApp : public NdpServerHostApp
+class NdpEchoApp : public NdpServerHostApp
 {
   protected:
     simtime_t delay;
@@ -64,6 +63,5 @@ class INET_API NdpEchoAppThread : public NdpServerThreadBase
 };
 
 } // namespace inet
-
 #endif // ifndef __INET_NdpEchoApp_H
 

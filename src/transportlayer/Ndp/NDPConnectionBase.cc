@@ -1,7 +1,7 @@
 #include <string.h>
 #include <assert.h>
 
-#include "ndp_common/NDPHeader.h"
+#include "ndp_common/NdpHeader.h"
 #include "Ndp.h"
 #include "NDPAlgorithm.h"
 #include "NDPReceiveQueue.h"
@@ -15,7 +15,7 @@ namespace inet {
 
 namespace ndp {
 
-NDPStateVariables::NDPStateVariables() {
+NdpStateVariables::NdpStateVariables() {
     internal_request_id = 0;
     request_id = 0;  // source block number (8-bit unsigned integer)
 
@@ -51,12 +51,12 @@ NDPStateVariables::NDPStateVariables() {
     syn_rexmit_timeout = 0;
 }
 
-std::string NDPStateVariables::str() const {
+std::string NdpStateVariables::str() const {
     std::stringstream out;
     return out.str();
 }
 
-std::string NDPStateVariables::detailedInfo() const {
+std::string NdpStateVariables::detailedInfo() const {
     std::stringstream out;
     out << "active=" << active << "\n";
     out << "snd_mss=" << snd_mss << "\n";
@@ -65,7 +65,7 @@ std::string NDPStateVariables::detailedInfo() const {
     return out.str();
 }
 
-NDPConnection::initConnection(Ndp *_mod, int _socketId) {
+void NDPConnection::initConnection(Ndp *_mod, int _socketId) {
     Enter_Method_Silent();
 
     ndpMain = _mod;
@@ -91,11 +91,11 @@ NDPConnection::initConnection(Ndp *_mod, int _socketId) {
 
 NDPConnection::~NDPConnection() {
 
-    std::list<PakcetsToSend>::iterator iter;  // received iterator
+    std::list<PacketsToSend>::iterator iter;  // received iterator
 
     while (!retransmitQueue.empty()) {
-              std::cout << " destructor NDPConnection " << iter->pktId << " msgName "  << iter->msg->getFullName() << "\n";
-        delete retransmitQueue.front().msg;
+              //std::cout << " destructor NDPConnection " << iter->pktId << " msgName "  << iter->msg->getFullName() << "\n";
+        //delete retransmitQueue.front().msg;
         iter++;
         retransmitQueue.pop_front();
     }
@@ -103,7 +103,7 @@ NDPConnection::~NDPConnection() {
 
 
     while (!receivedPacketsList.empty()) {
-        delete receivedPacketsList.front().msg;
+        //delete receivedPacketsList.front().msg;
         receivedPacketsList.pop_front();
     }
 

@@ -9,11 +9,18 @@
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 
 namespace inet {
-
 Define_Module(NdpEchoApp);
-
+Define_Module(NdpEchoAppThread);
 //simsignal_t NdpEchoApp::rcvdPkSignal = registerSignal("rcvdPk");
 //simsignal_t NdpEchoApp::sentPkSignal = registerSignal("sentPk");
+
+NdpEchoApp::NdpEchoApp()
+{
+}
+
+NdpEchoApp::~NdpEchoApp()
+{
+}
 
 void NdpEchoApp::initialize(int stage)
 {

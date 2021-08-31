@@ -23,6 +23,7 @@
 #include "inet/common/packet/Packet.h"
 #include "NDPConnection.h"
 #include "ndp_common/NdpHeader.h"
+#include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 
 
 namespace inet {
@@ -50,7 +51,8 @@ class INET_API NDPSendQueue : public cObject
      */
     virtual ~NDPSendQueue();
 
-    virtual ChunkQueue& getDataBuffer() { return dataBuffer; }
+    virtual ChunkQueue& getDataToSendQueue() { return dataToSendQueue; }
+    virtual ChunkQueue& getSentDataQueue() { return sentDataQueue; }
     /**
      * Set the connection that owns this queue.
      */
@@ -64,7 +66,7 @@ class INET_API NDPSendQueue : public cObject
      * init() may be called more than once; every call flushes the existing contents
      * of the queue.
      */
-    virtual void init(unsigned int numPacketsToSend , unsigned int mss);
+    virtual void init(unsigned int numPacketsToSend , B mss);
 
     /**
      * Returns a string with the region stored.
@@ -92,6 +94,7 @@ class INET_API NDPSendQueue : public cObject
      */
     virtual uint32 getBufferEndSeq();
 
+    virtual const std::tuple<Ptr<NdpHeader>, Packet*> getNdpHeader();
 
     virtual void ackArrivedFreeBuffer(unsigned int ackNum);
     virtual void nackArrivedMoveFront(unsigned int nackNum);
@@ -107,8 +110,8 @@ class INET_API NDPSendQueue : public cObject
         return seqLess(fromSeq, bufEndSeq) ? bufEndSeq - fromSeq : 0;
     }
 
-    void removeFromDataQueueToSentQueue(std::list<Payload>::iterator iter);
-    void moveFrontDataQueue(std::list<Payload>::iterator iter);
+//    void removeFromDataQueueToSentQueue(Chunk::Iterator iter);
+    void moveFrontDataQueue(Chunk::Iterator iter);
 
     /**
      * Called when the NDP wants to send or retransmit data, it constructs
@@ -124,6 +127,8 @@ class INET_API NDPSendQueue : public cObject
      * transmitted and ACKed, so they can be removed from the queue.
      */
     virtual void discardUpTo(uint32 seqNum);
+
+//    virtual void removeFromDataQueueToSentQueue(std::list<Chunk>::iterator iter);
 };
 
 } // namespace raptoNDP

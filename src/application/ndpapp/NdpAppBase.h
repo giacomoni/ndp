@@ -40,7 +40,7 @@ class INET_API NdpAppBase : public ApplicationBase, public NDPSocket::ICallback
     /* Utility functions */
     virtual void connect();
     virtual void close();
-    virtual void sendPacket(cPacket *pkt);
+    virtual void sendPacket(Packet *pkt);
     virtual void setStatusString(const char *s);
 
     /* NDPSocket::ICallback callback methods */

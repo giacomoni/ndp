@@ -13,7 +13,7 @@ namespace ndp {
 /**
  * State variables for DumbNDP.
  */
-class INET_API DumbNDPStateVariables : public NDPStateVariables
+class INET_API DumbNDPStateVariables : public NdpStateVariables
 {
   public:
     //...
@@ -35,7 +35,7 @@ class INET_API DumbNDP : public NDPAlgorithm
 
   protected:
     /** Creates and returns a DumbNDPStateVariables object. */
-    virtual NDPStateVariables *createStateVariables() override
+    virtual NdpStateVariables *createStateVariables() override
     {
         return new DumbNDPStateVariables();
     }

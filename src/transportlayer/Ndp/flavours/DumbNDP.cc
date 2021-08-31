@@ -1,6 +1,6 @@
 
 
-#include "../../../transportlayer/Ndp/flavours/DumbNDP.h"
+#include "DumbNDP.h"
 
 #include "../Ndp.h"
 

@@ -62,11 +62,11 @@ B NdpHeader::getHeaderOptionArrayLength()
     return B(usedLength);
 }
 
-void TcpHeader::dropHeaderOptions()
+void NdpHeader::dropHeaderOptions()
 {
     setHeaderOptionArraySize(0);
-    setHeaderLength(TCP_MIN_HEADER_LENGTH);
-    setChunkLength(TCP_MIN_HEADER_LENGTH);
+    setHeaderLength(NDP_MIN_HEADER_LENGTH);
+    setChunkLength(NDP_MIN_HEADER_LENGTH);
 }
 
 std::string NdpHeader::str() const
@@ -78,14 +78,6 @@ std::string NdpHeader::str() const
     static const char *flagEnd = "]";
     stream << getSrcPort() << "->" << getDestPort();
     const char *separ = flagStart;
-    if (getCwrBit()) {
-        stream << separ << "Cwr";
-        separ = flagSepar;
-    }
-    if (getEceBit()) {
-        stream << separ << "Ece";
-        separ = flagSepar;
-    }
     if (getUrgBit()) {
         stream << separ << "Urg=" << getUrgentPointer();
         separ = flagSepar;
@@ -113,7 +105,7 @@ std::string NdpHeader::str() const
     if (separ == flagSepar)
         stream << flagEnd;
 
-    stream << " Seq=" << getSequenceNo()
+    stream << " Seq=" << getDataSequenceNumber()
            << " Win=" << getWindow()
            << ", length = " << getChunkLength();
 

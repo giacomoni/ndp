@@ -4,7 +4,7 @@
 #include "../../transportlayer/Ndp/Ndp.h"
 #include "ndp_common/NdpHeader.h"
 #include "inet/common/INETDefs.h"
-
+#include <queue>
 #include "inet/networklayer/common/L3Address.h"
 
 namespace inet {
@@ -114,8 +114,8 @@ enum NDPEventCode {
 class INET_API NdpStateVariables: public cObject {
 public:
     NdpStateVariables();
-    virtual std::string info() const override;
-    virtual std::string detailedInfo() const override;
+    virtual std::string str() const override;
+    virtual std::string detailedInfo() const OMNETPP5_CODE(override);
 
 public:
     bool active;    // set if the connection was initiated by an active open
@@ -169,12 +169,12 @@ public:
 };
 
 
-class INET_API NDPConnection {
+class INET_API NDPConnection : public cSimpleModule{
 public:
 
     struct PacketsToSend {
         unsigned int pktId;
-        cPacket *msg;
+        //Ptr<Chunk> *msg;
     };
     typedef std::list<PacketsToSend> PacketsList;
 //    PacketsList sentPacketsList;
@@ -192,7 +192,9 @@ public:
 
     // socket pair
     L3Address localAddr;
+    const L3Address& getLocalAddr() const { return localAddr; }
     L3Address remoteAddr;
+    const L3Address& getRemoteAddr() const { return remoteAddr; }
     int localPort = -1;
     int remotePort = -1;
 //    int ClientOrServerSel=10;
@@ -219,7 +221,9 @@ public:
     virtual void  setConnFinished() ;
 
 protected:
-    cQueue pullQueue;
+    //cQueue pullQueue;
+    std::queue<std::tuple<const Ptr<NdpHeader>&, Packet*>> pullQueue;
+    cQueue pullTets;
     // NDP behavior in data transfer state
     NDPAlgorithm *ndpAlgorithm = nullptr;
     NDPAlgorithm *getNdpAlgorithm() const { return ndpAlgorithm; }
@@ -346,12 +350,6 @@ public:
     /** Utility: adds control info to segment and sends it to IP */
     virtual void sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg);
 
-    /**
-     * Utility: This factory method gets invoked throughout the NDP model to
-     * create a NDPSegment. Override it if you need to subclass NDPSegment.
-     */
-    virtual NdpHeader *createNDPSegment(const char *name);
-
     virtual void startRequestRexmitTimer(); // MOH
     virtual void  addRequestToPullsQueue();
     virtual void  sendRequestFromPullsQueue();
@@ -380,6 +378,9 @@ protected:
 
     /** Utility: sends status indication (NDP_I_xxx) to application */
     virtual void sendIndicationToApp(int code, const int id = 0);
+
+    /** Utility: sends NDP_I_AVAILABLE indication with NDPAvailableInfo to application */
+    virtual void sendAvailableIndicationToApp();
 
     /** Utility: sends NDP_I_ESTABLISHED indication with NDPConnectInfo to application */
     virtual void sendEstabIndicationToApp();
@@ -418,6 +419,12 @@ public:
      */
     virtual ~NDPConnection();
 
+    int getLocalPort() const { return localPort; }
+        L3Address getLocalAddress() const { return localAddr; }
+
+    int getRemotePort() const { return remotePort; }
+    L3Address getRemoteAddress() const { return remoteAddr; }
+
     virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
 
     /** @name Various getters **/
@@ -435,7 +442,7 @@ public:
     NDPReceiveQueue *getReceiveQueue() {
         return receiveQueue;
     }
-    NDPAlgorithm *getNDPAlgorithm() {
+    NDPAlgorithm *getNdpAlgorithm() {
         return ndpAlgorithm;
     }
     Ndp *getNDPMain() {
@@ -448,6 +455,7 @@ public:
 
     virtual bool processAppCommand(cMessage *msg);
 
+    virtual void handleMessage(cMessage *msg);
 
 
     /**

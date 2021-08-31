@@ -1,12 +1,11 @@
 
 
-cplusplus {{
-#include "inet/networklayer/common/L3Address.h"
-}}
+import inet.common.INETDefs;
+import inet.networklayer.common.IpProtocolId;
+import inet.networklayer.common.L3Address;
 
 namespace inet;
 
-class noncobject L3Address;
 
 //
 // NDPR command codes, sent by the application to NDPR. These constants
@@ -61,7 +60,7 @@ enum NDPErrorCode
 }
 
 
-class NDPCommand
+class NDPCommand extends cObject
 {
     int connId = -1;   // identifies the socket within the application
     int userId = -1;   // id than can be freely used by the app

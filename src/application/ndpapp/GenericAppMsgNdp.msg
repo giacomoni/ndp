@@ -1,13 +1,13 @@
 
 
-cplusplus {{
-#include "inet/common/INETDefs.h"
-}}
+import inet.common.INETDefs;
+import inet.common.Units;
+import inet.common.packet.chunk.Chunk;
 
 namespace inet;
 
  
-packet GenericAppMsgNdp
+class GenericAppMsgNdp extends FieldsChunk
 {
   
     int numPaketToSend;  //  if this is a reader(receiver)

@@ -19,7 +19,7 @@
 #ifndef __INET_NDPALGORITHM_H
 #define __INET_NDPALGORITHM_H
 
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
+#include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 #include "../../transportlayer/Ndp/NDPConnection.h"
 #include "inet/common/INETDefs.h"
 
@@ -38,7 +38,7 @@ class INET_API NDPAlgorithm : public cObject
 {
   protected:
     NDPConnection *conn;    // we belong to this connection
-    NDPStateVariables *state;    // our state variables
+    NdpStateVariables *state;    // our state variables
 
     /**
      * Create state block (TCB) used by this NDP variant. It is expected
@@ -46,7 +46,7 @@ class INET_API NDPAlgorithm : public cObject
      * subclassed from NDPStateVariables. This factory method should
      * create and return a "blank" state block of the appropriate type.
      */
-    virtual NDPStateVariables *createStateVariables() = 0;
+    virtual NdpStateVariables *createStateVariables() = 0;
 
   public:
     /**
@@ -68,7 +68,7 @@ class INET_API NDPAlgorithm : public cObject
     /**
      * Creates and returns the NDP state variables.
      */
-    NDPStateVariables *getStateVariables()
+    NdpStateVariables *getStateVariables()
     {
         if (!state)
             state = createStateVariables();

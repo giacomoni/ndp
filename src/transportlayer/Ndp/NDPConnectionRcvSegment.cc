@@ -1,13 +1,13 @@
 #include <string.h>
 
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
-#include "../../transportlayer/Ndp/Ndp.h"
-#include "../../transportlayer/Ndp/NDPAlgorithm.h"
-#include "../../transportlayer/Ndp/NDPReceiveQueue.h"
-#include "../../transportlayer/Ndp/NDPSendQueue.h"
-#include "inet/ndp/ndptransportlayer/Ndp/NDPConnection.h"
-#include "inet/ndp/ndptransportlayer/contract/ndp/NDPCommand_m.h"
-#include "inet/ndp/application/ndpapp/GenericAppMsgNdp_m.h"
+#include "ndp_common/NdpHeader.h"
+#include "Ndp.h"
+#include "NDPAlgorithm.h"
+#include "NDPReceiveQueue.h"
+#include "NDPSendQueue.h"
+#include "NDPConnection.h"
+#include "../contract/ndp/NDPCommand_m.h"
+#include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 
 //Preprocessor directives
 //  #define  ShowOut
@@ -36,7 +36,7 @@ void NDPConnection::sendInitialWindow() {
 
     // TODO  we don't do any checking about the received request segment, e.g. check if it's  a request nothing else
     // fetch the next Packet from the encodingPackets list
-    std::list<PakcetsToSend>::iterator itt;
+    std::list<PacketsToSend>::iterator itt;
 
     if (state->isLongFlow == true)
         state->IW = 5;
@@ -53,9 +53,10 @@ void NDPConnection::sendInitialWindow() {
 //            std::advance(itt, state->sequenceNumber); // increment the iterator by esi
 
             // create a segment for the Packet that will be sent
-            NDPSegment *ndpseg = new NDPSegment(nullptr);
+            //NdpHeader *ndpseg = new NdpHeader();
+            const auto& ndpseg = makeShared<NdpHeader>();
 //            ++state->sequenceNumber;
-            ndpseg = sendQueue->getNdpSegment();
+            //ndpseg = sendQueue->getNdpHeader();
             if (ndpseg) {
                 ndpseg->setIsDataPacket(true);
                 ndpseg->setIsPullPacket(false);
@@ -69,7 +70,8 @@ void NDPConnection::sendInitialWindow() {
                 ndpseg->setPriorityValue(state->priorityValue);
 //                ndpseg->setIsLastPacketToSend(false);
 //                ndpseg->setDataSequenceNumber(state->sequenceNumber);
-                sendToIP(ndpseg);
+                Packet *fp = new Packet("TcpAck");
+                sendToIP(fp, ndpseg);
             }
         }
 
@@ -77,25 +79,25 @@ void NDPConnection::sendInitialWindow() {
 }
 
 
-NDPEventCode NDPConnection::process_RCV_SEGMENT(NDPSegment *ndpseg, L3Address src, L3Address dest) {
+NDPEventCode NDPConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest) {
     EV_INFO << "Seg arrived: ";
-    printSegmentBrief(ndpseg);
+    printSegmentBrief(packet, ndpseg);
     EV_DETAIL << "TCB: " << state->info() << "\n";
 
     NDPEventCode event;
     if (fsm.getState() == NDP_S_LISTEN) {
-         event = processSegmentInListen(ndpseg, src, dest);
+         event = processSegmentInListen(packet, ndpseg, src, dest);
          if (event == NDP_E_RCV_SYN) {
              FSM_Goto(fsm, NDP_S_ESTABLISHED);
-             event = processSegment1stThru8th(ndpseg);
+             event = processSegment1stThru8th(packet, ndpseg);
          }
     }
     else {
         ndpMain->updateSockPair(this, dest, src,  ndpseg->getDestPort(), ndpseg->getSrcPort());
-        event = processSegment1stThru8th(ndpseg);
+        event = processSegment1stThru8th(packet, ndpseg);
     }
 
-    delete ndpseg;
+    delete packet;
     return event;
 }
 
@@ -105,15 +107,15 @@ void NDPConnection::ackArrivedFreeBuffer(unsigned int ackNum) {
 
 }
 
-void NDPConnection::getFirstBufferedPkt( std::list<PakcetsToSend>::iterator& iter ) {
+void NDPConnection::getFirstBufferedPkt( std::list<PacketsToSend>::iterator& iter ) {
 
 }
 
-void NDPConnection::getBufferedPkt(unsigned int seqNum , std::list<PakcetsToSend>::iterator& iter ) {
+void NDPConnection::getBufferedPkt(unsigned int seqNum , std::list<PacketsToSend>::iterator& iter ) {
 
 }
 
-NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
+NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader>& ndpseg) {
 
      NDPEventCode event = NDP_E_IGNORE;
     if (ndpseg->getFinBit()) {
@@ -162,7 +164,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
 // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
 // ££££££££££££££££££££££££ REQUEST Arrived at the sender £££££££££££££££
 // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-   if (fsm.getState() == NDP_S_ESTABLISHED && state->isSender == true &&  ndpseg->getIsPullPacket() == true) {
+   if (fsm.getState() == NDP_S_ESTABLISHED && state->isSender == true &&  ndpseg->isPullPacket() == true) {
 
 //          MY_COUT << "  \n\n\n  ££££££££££££££££  Sender ££££££££££££££ new  REQUEST arrived: RequestSequenceNumber= " << ndpseg->getPullSequenceNumber() << std::endl;
 //        MY_COUT << " sender " << getNDPMain()->getFullPath()  << "\n";
@@ -177,9 +179,9 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
             // as we have assumed it was lost and we send extra Packets previously
             for (int i = 1; i <= requestsGap; i++) {
                 ++state->internal_request_id;
-                NDPSegment *ndpseg = new NDPSegment(nullptr);
-//                ++state->sequenceNumber;
-                ndpseg = sendQueue->getNdpSegment();
+                std::tuple<Ptr<NdpHeader>, Packet*> headPack = sendQueue->getNdpHeader();
+                const auto& ndpseg = std::get<0>(headPack);
+                Packet *fp = std::get<1>(headPack);
                 if (ndpseg) {
                     ndpseg->setIsDataPacket(true);
                     ndpseg->setIsPullPacket(false);
@@ -192,9 +194,11 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
                     ndpseg->setIsLongFlow(state->isLongFlow);
                     ndpseg->setNumPacketsToSend(state->numPacketsToSend);
                     ndpseg->setPriorityValue(state->priorityValue);
+                    //ndpseg->setDataSequenceNumber(state->snd_nxt); //maybe change
 //                    ndpseg->setIsLastPacketsToSend(false);
 //                    ndpseg->setDataSequenceNumber(state->sequenceNumber);
-                    sendToIP(ndpseg);
+                    //Packet *fp = new Packet("Ndp");
+                    sendToIP(fp, ndpseg);
                 }
             }
         } else if (requestsGap < 1) {
@@ -208,7 +212,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 // header arrived at the receiver==> send new request with pacing (fixed pacing: MTU/1Gbps)
-    if (fsm.getState() == NDP_S_ESTABLISHED   && ndpseg->getIsHeader() == true   && ndpseg->getIsDataPacket() == false ) { // 1 read, 2 write
+    if (fsm.getState() == NDP_S_ESTABLISHED   && ndpseg->isHeader() == true   && ndpseg->isDataPacket() == false ) { // 1 read, 2 write
 
 //        MY_COUT  << "  $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " << std::endl;
 //         MY_COUT  << " \n\n\n\n\n $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " <<  getNDPMain()->getFullPath() << std::endl;
@@ -235,14 +239,14 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
 // $$$$$$$$$$$$$$$$$$$$$$  data pkt arrived at the receiver  $$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-    if (fsm.getState() == NDP_S_ESTABLISHED &&   state->isReceiver == true && ndpseg->getIsDataPacket() == true && ndpseg->getIsHeader() == false) {
+    if (fsm.getState() == NDP_S_ESTABLISHED &&   state->isReceiver == true && ndpseg->isDataPacket() == true && ndpseg->isHeader() == false) {
 //        EV_INFO  << " \n\n\n\n $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  packet arrived. SQN= " << ndpseg->getDataSequenceNumber() << std::endl;
         unsigned int arrivedPktSeqNo = ndpseg->getDataSequenceNumber();
         sendAckNdp(arrivedPktSeqNo);
 
 //        ++state->sequenceNumber;
 
-        bool isLongFlowPacket = ndpseg->getIsLongFlow();
+        bool isLongFlowPacket = ndpseg->isLongFlow();
         unsigned int seqNo = ndpseg->getDataSequenceNumber();
 
 
@@ -262,12 +266,14 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
           if (isLongFlowPacket == true) {
 //              std::cout << " hiii \n\n\n";
               addRequestToPullsQueue();
-              cPacket *msgRx;
+              Packet *msgRx;
               uint32 endSeqNo;
-              msgRx = check_and_cast<cPacket *>(ndpseg->removeFirstPayloadMessage(endSeqNo)); // each segment has just one packet
-              cMessage *msgRcvd = nullptr;
-              msgRcvd = check_and_cast<cMessage *>(msgRx);
-              delete msgRcvd;
+              //msgRx = check_and_cast<Packet *>(ndpseg->removeFirstPayloadMessage(endSeqNo)); // each segment has just one packet
+              //msgRx = check_and_cast<Packet *>(packet->removeAtFront(b(endSeqNo), 0));
+              msgRx->eraseAll();
+              //cMessage *msgRcvd = nullptr;
+              //msgRcvd = check_and_cast<cMessage *>(msgRx);
+              //delete msgRcvd;
               goto ll;
           }
 
@@ -298,29 +304,28 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
         // %%%%%%%%%%%%%%%%%%%%%%%%%  4  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         //  send any received Packet to the app
-        cPacket *msgRx;
+        Ptr<Chunk> msgRx;
         uint32 endSeqNo;
-        msgRx = check_and_cast<cPacket *>( ndpseg->removeFirstPayloadMessage(endSeqNo)); // each segment has just one packet
+        msgRx = packet->removeAtFront(b(endSeqNo),0); // each segment has just one packet
 //        MY_COUT << " endSeqNo " << endSeqNo << "\n";
 
         if (state->connFinished == false && isLongFlowPacket == false) {
             // buffer the received Packet segment
-            std::list<PakcetsToSend>::iterator itR;  // received iterator
+            std::list<PacketsToSend>::iterator itR;  // received iterator
             itR = receivedPacketsList.begin();
             std::advance(itR, seqNo); // increment the iterator by esi
-            PakcetsToSend receivedPkts;
+            PacketsToSend receivedPkts;
             receivedPkts.pktId = seqNo;
-            receivedPkts.msg = msgRx;
             receivedPacketsList.push_back(receivedPkts);
-
             // MOH: Send any received Packet to the app, just for now to test the Incast example, this shouldn't be the normal case
-            cMessage *msgRcvd = nullptr;
-            msgRcvd = check_and_cast<cMessage *>(msgRx);
-            msgRcvd->setKind(NDP_I_DATA); // TBD currently we never send TCP_I_URGENT_DATA
+            //cMessage *msgRcvd = nullptr;
+            //msgRcvd = check_and_cast<Packet *>(msgRx);
+            Packet *newPacket = new Packet("ReceivePacket", msgRx);
+            newPacket->setKind(NDP_I_DATA); // TBD currently we never send TCP_I_URGENT_DATA
             NDPCommand *cmd = new NDPCommand();
-            cmd->setConnId(connId);
-            msgRcvd->setControlInfo(cmd);
-            sendToApp(msgRcvd);
+            cmd->setConnId(socketId);
+            newPacket->setControlInfo(cmd);
+            sendToApp(newPacket);
         }
 
 
@@ -331,11 +336,11 @@ NDPEventCode NDPConnection::processSegment1stThru8th(NDPSegment *ndpseg) {
 //            MY_COUT << " \n\n all Packets  received, no more request to be sent \n ";
                 // checking that all the Packets  have been stored in the receivedPacketsList
 //            MY_COUT << " aaaaaaaaaaaaa  All the Packets  have been received All the Packets  have been received All the Packets  have been received aaaaaaaaaaaaa " << receivedPacketsList.size()<< "\n";
-                std::list<PakcetsToSend>::iterator iter;  // received iterator
+                std::list<PacketsToSend>::iterator iter;  // received iterator
                 iter = receivedPacketsList.begin();
                 int index = 0;
                 while (iter != receivedPacketsList.end()) {
-                    MY_COUT << ++index << "  SQN: " << iter->pktId << " msgName " << iter->msg->getFullName() << "\n";
+                    //MY_COUT << ++index << "  SQN: " << iter->pktId << " msgName " << iter->msg->getFullName() << "\n";
                     iter++;
                 }
 
@@ -359,8 +364,12 @@ void NDPConnection::addRequestToPullsQueue(){
 //     MY_COUT << "Add new request packet to pullsQueue.  ,   request_id = " << state->request_id << " \n";
     char msgname[16];
     sprintf(msgname, "PULL-%d", state->request_id);
-    NDPSegment *ndpseg = createNDPSegment(msgname);
-    ndpseg->setPayloadLength(10);
+    //NdpHeader *ndpseg = createNDPSegment(msgname);
+    Packet *ndppack = createNDPSegment(msgname);
+    const auto& ndpseg = makeShared<NdpHeader>();
+    ndppack->setByteLength(10); //maybe bit?
+    //ndpseg->setPayloadLength(10);
+
 
     ndpseg->setIsDataPacket(false);
     ndpseg->setIsPullPacket(true);
@@ -378,8 +387,12 @@ void NDPConnection::addRequestToPullsQueue(){
      ndpseg->setPullSequenceNumber(state->request_id);
      //    ndpseg->addPayloadMessage(msg->dup(),10);
     //sendToIP(ndpseg);
-    pullQueue.insert(ndpseg);
-    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength()<< "\n\n\n\n";
+    //pullQueue.insert(ndppack);
+    //pullQueue.insert(ndpseg);
+    //pullQueue.insert(std::make_tuple(ndppack, ndpseg));
+    pullQueue.push(std::make_tuple(ndpseg, ndppack));
+    //EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength()<< "\n\n\n\n";
+    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.size()<< "\n\n\n\n";
 //    MY_COUT << "pullsQueue length now = " << pullQueue.getLength()<< ".\n";
 //    MY_COUT  << " mmmm  addRequestToPullsQueue  this->getFullPath() " << ndpMain->getFullPath() << " , len= " << pullQueue.getLength()   << "\n";
     bool napState = getNDPMain()->getNapState();
@@ -393,16 +406,19 @@ void NDPConnection::addRequestToPullsQueue(){
 void NDPConnection::sendRequestFromPullsQueue(){
 //    MY_COUT  << " ssssssssssssss sendRequestFromPullsQueuemmmm  this->getFullPath() " << ndpMain->getFullPath()     << "\n";
 
-    if (pullQueue.getLength() > 0  ){
-        NDPSegment *ndpseg =(NDPSegment *)  pullQueue.pop();
-        EV << "a request has been poped from the Pull queue, the new queue length  = " << pullQueue.getLength()<< " \n\n";
-        sendToIP(ndpseg);
+    if (pullQueue.size() > 0  ){
+        const auto& ndpseg = (std::get<0>(pullQueue.front()));
+        Packet* fp = std::get<1>(pullQueue.front());
+        pullQueue.pop();
+        EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.size()<< " \n\n";
+        sendToIP(fp, ndpseg);
     }
 }
 
 int NDPConnection::getPullsQueueLength()  {
 //    MY_COUT << "pullsQueue length now = " <<" " << pullQueue.getLength()<< ".\n";
-    int len = pullQueue.getLength();
+    int len = pullQueue.size();
+    //int len = pullQueue.getLength();
     return len;
 }
 
@@ -447,7 +463,7 @@ void NDPConnection::setConnFinished() {
 
 
 
-NDPEventCode NDPConnection::processSegmentInListen(NDPSegment *ndpseg,  L3Address srcAddr, L3Address destAddr) {
+NDPEventCode NDPConnection::processSegmentInListen(Packet *packet, const Ptr<const NdpHeader>& ndpseg,  L3Address srcAddr, L3Address destAddr) {
     EV_DETAIL << "Processing segment in LISTEN\n";
 //    MY_COUT << "Processing segment in LISTEN\n";
     EV_INFO << " \n\n aaaMMM srcAddr" << srcAddr << " \n";
@@ -460,7 +476,7 @@ NDPEventCode NDPConnection::processSegmentInListen(NDPSegment *ndpseg,  L3Addres
         selectInitialSeqNum();
 
 
-        if (ndpseg->getHeaderLength() > NDP_HEADER_OCTETS) // Header options present? NDP_HEADER_OCTETS = 20
+        if (ndpseg->getHeaderLength() > NDP_MIN_HEADER_LENGTH) // Header options present? NDP_HEADER_OCTETS = 20
             readHeaderOptions(ndpseg);
 
         // this is a receiver
@@ -531,10 +547,9 @@ void NDPConnection::process_TIMEOUT_FIN_WAIT_2() {
 
 
 
-void NDPConnection::segmentArrivalWhileClosed(NDPSegment *ndpseg,
-        L3Address srcAddr, L3Address destAddr) {
+void NDPConnection::segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr) {
     EV_INFO << "Seg arrived: ";
-    printSegmentBrief(ndpseg);
+    printSegmentBrief(packet, ndpseg);
 
     // This segment doesn't belong to any connection, so this object
     // must be a temp object created solely for the purpose of calling us
@@ -550,7 +565,7 @@ void NDPConnection::segmentArrivalWhileClosed(NDPSegment *ndpseg,
 
     if (!ndpseg->getAckBit()) {
         EV_DETAIL << "ACK bit not set: sending RST+ACK\n";
-        uint32 ackNo = ndpseg->getDataSequenceNumber() + ndpseg->getSegLen();
+        uint32 ackNo = ndpseg->getDataSequenceNumber() + packet->getByteLength();
         sendRstAck(0, ackNo, destAddr, srcAddr, ndpseg->getDestPort(),
                 ndpseg->getSrcPort());
     } else {

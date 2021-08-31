@@ -12,7 +12,7 @@ cplusplus {{
 #include "NDPConnection.h"
 #include "NDPReceiveQueue.h"
 #include "NDPSendQueue.h"
-#include "NDPHeader.h"
+#include "ndp_common/NdpHeader.h"
 }}
 
 namespace inet::ndp;
@@ -66,7 +66,8 @@ class NDPSendQueue extends cObject
 {
     @existingClass;
     @descriptor(readonly);
-    ChunkQueue dataBuffer;
+    ChunkQueue dataToSendQueue;      // dataBuffer
+    ChunkQueue sentDataQueue;
 }
 
 class NDPReceiveQueue extends cObject

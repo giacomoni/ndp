@@ -96,13 +96,16 @@ void NdpSinkApp::refreshDisplay() const
 } // namespace inet
 
 void NdpSinkAppThread::sendRequest() {
-        char msgname[16];
-    //    sprintf(msgname, "REQUEST-%d",++requestIndex);
-        sprintf(msgname, "REQUEST-INIT_READ");
-  GenericAppMsgNdp *msg = new GenericAppMsgNdp(msgname);
-        msg->setByteLength(10);
-        msg->setServerClose(false);
-         sock->send(msg);
+    char msgname[16];
+    //sprintf(msgname, "REQUEST-%d",++requestIndex);
+    sprintf(msgname, "REQUEST-INIT_READ");
+
+    auto packet = new Packet("REQUEST-INIT_READ");
+    const auto& payload = makeShared<GenericAppMsgNdp>();
+    payload->setChunkLength(B(10));
+    payload->setServerClose(false);
+    packet->insertAtFront(payload);
+    sock->send(packet);
 
 }
 

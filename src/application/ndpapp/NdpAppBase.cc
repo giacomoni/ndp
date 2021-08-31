@@ -84,8 +84,9 @@ void NdpAppBase::close() {
     socket.close();
 }
 
-void NdpAppBase::sendPacket(cPacket *msg) {
+void NdpAppBase::sendPacket(Packet *msg) {
     int numBytes = msg->getByteLength();
+    emit(packetSentSignal, msg);
     socket.send(msg);
 
     packetsSent++;

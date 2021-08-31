@@ -35,7 +35,6 @@ class INET_API NdpBasicClientApp : public NdpAppBase
 
 
     virtual void sendWriteRequest();
-    virtual void sendData();
 
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 //    virtual void  startRequestRexmitTimer(); // Added

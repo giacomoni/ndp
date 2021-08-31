@@ -1,21 +1,25 @@
 #include <string.h>
 #include <algorithm>
 
-#include "../../transportlayer/Ndp/ndp_common/NDPSegment.h"
-#include "../../transportlayer/Ndp/Ndp.h"
-#include "../../transportlayer/Ndp/NDPAlgorithm.h"
-#include "../../transportlayer/Ndp/NDPReceiveQueue.h"
-#include "../../transportlayer/Ndp/NDPSendQueue.h"
-#include "inet/ndp/ndptransportlayer/contract/ndp/NDPCommand_m.h"
-#include "inet/ndp/ndptransportlayer/Ndp/NDPConnection.h"
+#include "ndp_common/NdpHeader.h"
+#include "Ndp.h"
+#include "NDPAlgorithm.h"
+#include "NDPReceiveQueue.h"
+#include "NDPSendQueue.h"
+#include "../contract/ndp/NDPCommand_m.h"
+#include "NDPConnection.h"
 #include "inet/networklayer/contract/IL3AddressType.h"
-#include "inet/networklayer/contract/INetworkProtocolControlInfo.h"
-#include "inet/networklayer/common/IPProtocolId_m.h"
+#include "inet/networklayer/common/IpProtocolId_m.h"
+#include "inet/transportlayer/common/L4Tools.h"
+#include "inet/applications/common/SocketTag_m.h"
 #include "inet/common/INETUtils.h"
-
-#include "inet/ndp/application/ndpapp/GenericAppMsgNdp_m.h"
+#include "inet/common/packet/Message.h"
+#include "inet/networklayer/common/EcnTag_m.h"
+#include "inet/networklayer/common/IpProtocolId_m.h"
+#include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
-
+#include "inet/networklayer/common/L3AddressTag_m.h"
+#include "../../common/ProtocolNdp.h"
 namespace inet {
 
 namespace ndp {
@@ -66,25 +70,58 @@ const char *NDPConnection::indicationName(int code) {
 #undef CASE
 }
 
+void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg) {
+    ndpseg->setSrcPort(localPort);
+    ndpseg->setDestPort(remotePort);
+    ASSERT(ndpseg->getHeaderLength() >= NDP_MIN_HEADER_LENGTH);
+    ASSERT(ndpseg->getHeaderLength() <= NDP_MAX_HEADER_LENGTH);
+    ASSERT(ndpseg->getChunkLength() == ndpseg->getHeaderLength());
+    //state->sentBytes = packet->getByteLength();    // resetting sentBytes to 0 if sending a segment without data (e.g. ACK)
 
-
-void NDPConnection::sendToIP(NDPSegment *ndpseg, L3Address src, L3Address dest) {
     EV_INFO << "Sending: ";
-    printSegmentBrief(ndpseg);
+    printSegmentBrief(packet, ndpseg);
+
+    // TBD reuse next function for sending
+
+    IL3AddressType *addressType = remoteAddr.getAddressType();
+    packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
+
+    auto addresses = packet->addTagIfAbsent<L3AddressReq>();
+    addresses->setSrcAddress(localAddr);
+    addresses->setDestAddress(remoteAddr);
+
+    //packet->addTagIfAbsent<EcnReq>()->setExplicitCongestionNotification((state->ect && !state->sndAck && !state->rexmit) ? IP_ECN_ECT_1 : IP_ECN_NOT_ECT);
+
+    //ndpseg->setCrc(0);
+    //ndpseg->setCrcMode(ndpMain->crcMode);
+
+    insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpseg);
+
+    ndpMain->sendFromConn(packet, "ipOut");
+}
+
+void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg, L3Address src, L3Address dest) {
+    EV_INFO << "Sending: ";
+    printSegmentBrief(packet, ndpseg);
 
     IL3AddressType *addressType = dest.getAddressType();
-    INetworkProtocolControlInfo *controlInfo = addressType->createNetworkProtocolControlInfo();
-    controlInfo->setTransportProtocol(IP_PROT_TCP);
-    controlInfo->setSourceAddress(src);
-    controlInfo->setDestinationAddress(dest);
-    ndpseg->setControlInfo(check_and_cast<cObject *>(controlInfo));
-    ndpseg->setByteLength(ndpseg->getHeaderLength() + ndpseg->getPayloadLength());
-    check_and_cast<Ndp *>(getSimulation()->getContextModule())->send(ndpseg,"ipOut");
+    ASSERT(ndpseg->getChunkLength() == ndpseg->getHeaderLength());
+    //setByteLength() Replacement^
+    packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
+
+    auto addresses = packet->addTagIfAbsent<L3AddressReq>();
+    addresses->setSrcAddress(src);
+    addresses->setDestAddress(dest);
+    //ndpseg->setByteLength(ndpseg->getHeaderLength() + ndpseg->getPayloadLength());
+
+    //FIX THIS - new Protocol::ndp
+    insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpseg);
+    ndpMain->sendFromConn(packet,"ipOut");
 }
 
-NDPSegment *NDPConnection::createNDPSegment(const char *name) {
-    return new NDPSegment(name);
-}
+//Packet *NDPConnection::createNDPSegment(const char *name) {
+//    return new Packet(name);
+//}
 
 void NDPConnection::signalConnectionTimeout() {
     sendIndicationToApp(NDP_I_TIMED_OUT);
@@ -92,33 +129,65 @@ void NDPConnection::signalConnectionTimeout() {
 
 void NDPConnection::sendIndicationToApp(int code, const int id) {
     EV_INFO << "Notifying app: " << indicationName(code) << "\n";
-    cMessage *msg = new cMessage(indicationName(code));
-    msg->setKind(code);
+    auto indication = new Indication(indicationName(code), code);
     NDPCommand *ind = new NDPCommand();
     ind->setNumRcvTrimmedHeader(state->numRcvTrimmedHeader);
-    ind->setConnId(connId);
     ind->setUserId(id);
-    msg->setControlInfo(ind);
-    sendToApp(msg);
+    indication->addTag<SocketInd>()->setSocketId(socketId);
+    indication->setControlInfo(ind);
+    sendToApp(indication);
 }
 
-void NDPConnection::sendEstabIndicationToApp() {
-    EV_INFO << "Notifying app: " << indicationName(NDP_I_ESTABLISHED) << "\n";
-    cMessage *msg = new cMessage(indicationName(NDP_I_ESTABLISHED));
-    msg->setKind(NDP_I_ESTABLISHED);
-
-    NDPConnectInfo *ind = new NDPConnectInfo();
-    ind->setConnId(connId);
+void NDPConnection::sendAvailableIndicationToApp()
+{
+    EV_INFO << "Notifying app: " << indicationName(NDP_I_AVAILABLE) << "\n";
+    auto indication = new Indication(indicationName(NDP_I_AVAILABLE), NDP_I_AVAILABLE);
+    NDPAvailableInfo *ind = new NDPAvailableInfo();
+    ind->setNewSocketId(socketId);
     ind->setLocalAddr(localAddr);
     ind->setRemoteAddr(remoteAddr);
     ind->setLocalPort(localPort);
     ind->setRemotePort(remotePort);
-    msg->setControlInfo(ind);
-    sendToApp(msg);
+
+    indication->addTag<SocketInd>()->setSocketId(listeningSocketId);
+    indication->setControlInfo(ind);
+    sendToApp(indication);
+}
+
+void NDPConnection::sendEstabIndicationToApp() {
+    EV_INFO << "Notifying app: " << indicationName(NDP_I_ESTABLISHED) << "\n";
+    auto indication = new Indication(indicationName(NDP_I_ESTABLISHED), NDP_I_ESTABLISHED);
+    NDPConnectInfo *ind = new NDPConnectInfo();
+    ind->setLocalAddr(localAddr);
+    ind->setRemoteAddr(remoteAddr);
+    ind->setLocalPort(localPort);
+    ind->setRemotePort(remotePort);
+    indication->addTag<SocketInd>()->setSocketId(socketId);
+    indication->setControlInfo(ind);
+    sendToApp(indication);
 }
 
 void NDPConnection::sendToApp(cMessage *msg) {
-    ndpMain->send(msg, "appOut", appGateIndex);
+    ndpMain->sendFromConn(msg, "appOut");
+}
+
+void NDPConnection::sendAvailableDataToApp()
+{
+    if (receiveQueue->getAmountOfBufferedBytes()) {
+        if (ndpMain->useDataNotification) {
+            auto indication = new Indication("Data Notification", NDP_I_DATA_NOTIFICATION); // TBD currently we never send TCP_I_URGENT_DATA
+            NDPCommand *cmd = new NDPCommand();
+            indication->addTag<SocketInd>()->setSocketId(socketId);
+            indication->setControlInfo(cmd);
+            sendToApp(indication);
+        } else {
+            while (auto msg = receiveQueue->extractBytesUpTo(state->rcv_nxt)) {
+                msg->setKind(NDP_I_DATA);    // TBD currently we never send TCP_I_URGENT_DATA
+                msg->addTag<SocketInd>()->setSocketId(socketId);
+                sendToApp(msg);
+            }
+        }
+    }
 }
 
 void NDPConnection::initConnection(NDPOpenCommand *openCmd) {
@@ -130,9 +199,12 @@ void NDPConnection::initConnection(NDPOpenCommand *openCmd) {
     sendQueue->setConnection(this);
 //    receiveQueue->setConnection(this);
 
+    //create algorithm
     const char *ndpAlgorithmClass = openCmd->getNdpAlgorithmClass();
+
     if (!ndpAlgorithmClass || !ndpAlgorithmClass[0])
         ndpAlgorithmClass = ndpMain->par("ndpAlgorithmClass");
+
     ndpAlgorithm = check_and_cast<NDPAlgorithm *>( inet::utils::createOne(ndpAlgorithmClass));
     ndpAlgorithm->setConnection(this);
     // create state block
@@ -145,7 +217,7 @@ void NDPConnection::configureStateVariables() {
     state->IW = ndpMain->par("initialWindow");
     ndpMain->recordScalar("initialWindow=", state->IW);
 
-    state->snd_mss = ndpMain->par("mss").longValue(); // Maximum Segment Size
+    state->snd_mss = ndpMain->par("mss");// Maximum Segment Size
 
 }
 
@@ -156,42 +228,15 @@ void NDPConnection::selectInitialSeqNum() {
 
 }
 
-
-
-void NDPConnection::sendToIP(NDPSegment *ndpseg) {
-    // final touches on the segment before sending
-    ndpseg->setSrcPort(localPort);
-    ndpseg->setDestPort(remotePort);
-
-    ASSERT(ndpseg->getHeaderLength() >= NDP_HEADER_OCTETS); // NDP_HEADER_OCTETS = 20 (without options)
-    ASSERT(ndpseg->getHeaderLength() <= NDP_MAX_HEADER_OCTETS); // NDP_MAX_HEADER_OCTETS = 60
-    ndpseg->setByteLength(ndpseg->getHeaderLength() + ndpseg->getPayloadLength());
-//    state->sentBytes = ndpseg->getPayloadLength(); // resetting sentBytes to 0 if sending a segment without data (e.g. ACK)
-
-    EV_INFO << "Sending: ";
-    printSegmentBrief(ndpseg);
-    // TBD reuse next function for sending
-    IL3AddressType *addressType = remoteAddr.getAddressType();
-    INetworkProtocolControlInfo *controlInfo = addressType->createNetworkProtocolControlInfo();
-    controlInfo->setTransportProtocol(IP_PROT_TCP); // TODO NDP ???
-    controlInfo->setSourceAddress(localAddr);
-    controlInfo->setDestinationAddress(remoteAddr);
-    ndpseg->setControlInfo(check_and_cast<cObject *>(controlInfo));
-    ndpMain->send(ndpseg, "ipOut");
-}
-
-
-
-
 // the receiver sends NACK when receiving a header
 void NDPConnection::sendNackNdp(unsigned int nackNum) {
-    NDPSegment *ndpseg = createNDPSegment("NACK");
-
+    //NDPSegment *ndpseg = createNDPSegment("NACK");
+    const auto& ndpseg = makeShared<NdpHeader>();
     ndpseg->setAckBit(false);
     ndpseg->setNackBit(true);
     ndpseg->setNackNo(nackNum);
 
-    ndpseg->setPayloadLength(1); // ooooooooo
+    //ndpseg->setPayloadLength(1); // ooooooooo
     ndpseg->setSynBit(false);
 
     ndpseg->setIsDataPacket(false);
@@ -200,20 +245,21 @@ void NDPConnection::sendNackNdp(unsigned int nackNum) {
 
     // write header options
     writeHeaderOptions(ndpseg);
-
+    Packet *fp = new Packet("NdpNAck");
     // send it
-    sendToIP(ndpseg);
+    sendToIP(fp, ndpseg);
 }
 
 
 void NDPConnection::sendAckNdp(unsigned int AckNum) {
 
-    NDPSegment *ndpseg = createNDPSegment("ACK");
+    //NDPSegment *ndpseg = createNDPSegment("ACK");
+    const auto& ndpseg = makeShared<NdpHeader>();
     ndpseg->setAckBit(true);
     ndpseg->setAckNo(AckNum);
 
     ndpseg->setNackBit(false);
-    ndpseg->setPayloadLength(0);
+    //ndpseg->setPayloadLength(0);
 
     ndpseg->setSynBit(false);
     ndpseg->setIsDataPacket(false);
@@ -222,9 +268,10 @@ void NDPConnection::sendAckNdp(unsigned int AckNum) {
 
     // write header options
     writeHeaderOptions(ndpseg);
+    Packet *fp = new Packet("NdpAck");
 
     // send it
-    sendToIP(ndpseg);  // MOH: HAS BEEN REMOVED
+    sendToIP(fp, ndpseg);  // MOH: HAS BEEN REMOVED
 
     // notify
     ndpAlgorithm->ackSent(); //???????
@@ -293,13 +340,15 @@ const char *NDPConnection::optionName(int option) {
 }
 
 void NDPConnection::printConnBrief() const {
-    EV_DETAIL << "Connection " << localAddr << ":" << localPort << " to "
-                     << remoteAddr << ":" << remotePort << "  on app["
-                     << appGateIndex << "], connId=" << connId << "  in "
-                     << stateName(fsm.getState()) << "\n";
+    EV_DETAIL << "Connection "
+              << localAddr << ":" << localPort << " to " << remoteAddr << ":" << remotePort
+              << "  on socketId=" << socketId
+              << "  in " << stateName(fsm.getState())
+              << "\n";
 }
 
-void NDPConnection::printSegmentBrief(NDPSegment *ndpseg) {
+void NDPConnection::printSegmentBrief(Packet *packet, const Ptr<const NdpHeader>& ndpseg) {
+    EV_STATICCONTEXT;
     EV_INFO << "." << ndpseg->getSrcPort() << " > ";
     EV_INFO << "." << ndpseg->getDestPort() << ": ";
 
@@ -315,21 +364,20 @@ void NDPConnection::printSegmentBrief(NDPSegment *ndpseg) {
     if (ndpseg->getPshBit())
         EV_INFO << "PSH ";
 
-    if (ndpseg->getPayloadLength() > 0 || ndpseg->getSynBit()) {
-        EV_INFO << "[" << ndpseg->getDataSequenceNumber() << ".."
-                       << (ndpseg->getDataSequenceNumber() + ndpseg->getPayloadLength())
-                       << ") ";
-        EV_INFO << "(l=" << ndpseg->getPayloadLength() << ") ";
+    auto payloadLength = packet->getByteLength() - B(ndpseg->getHeaderLength()).get();
+    if (payloadLength > 0 || ndpseg->getSynBit()) {
+        EV_INFO << "[" << ndpseg->getDataSequenceNumber() << ".." << (ndpseg->getDataSequenceNumber() + payloadLength) << ") ";
+        EV_INFO << "(l=" << payloadLength << ") ";
     }
 
     if (ndpseg->getAckBit())
         EV_INFO << "ack " << ndpseg->getAckNo() << " ";
 
-    if (ndpseg->getHeaderLength() > NDP_HEADER_OCTETS) { // Header options present? NDP_HEADER_OCTETS = 20
+    if (ndpseg->getHeaderLength() > NDP_MIN_HEADER_LENGTH) { // Header options present? NDP_HEADER_OCTETS = 20
         EV_INFO << "options ";
 
         for (uint i = 0; i < ndpseg->getHeaderOptionArraySize(); i++) {
-            const NDPOption *option = ndpseg->getHeaderOption(i);
+            const NdpOption *option = ndpseg->getHeaderOption(i);
             short kind = option->getKind();
             EV_INFO << optionName(kind) << " ";
         }
@@ -339,24 +387,23 @@ void NDPConnection::printSegmentBrief(NDPSegment *ndpseg) {
 
 
 
-void NDPConnection::sendRst(uint32 seq, L3Address src, L3Address dest,
-        int srcPort, int destPort) {
-    NDPSegment *ndpseg = createNDPSegment("RST");
-
+void NDPConnection::sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort, int destPort) {
+    const auto& ndpseg = makeShared<NdpHeader>();
     ndpseg->setSrcPort(srcPort);
     ndpseg->setDestPort(destPort);
 
     ndpseg->setRstBit(true);
     ndpseg->setDataSequenceNumber(seq);
 
+    Packet *fp = new Packet("RST");
+
     // send it
-    sendToIP(ndpseg, src, dest);
+    sendToIP(fp, ndpseg, src, dest);
 }
 
-void NDPConnection::sendRstAck(uint32 seq, uint32 ack, L3Address src,
-        L3Address dest, int srcPort, int destPort) {
-    NDPSegment *ndpseg = createNDPSegment("RST+ACK");
-
+void NDPConnection::sendRstAck(uint32 seq, uint32 ack, L3Address src, L3Address dest, int srcPort, int destPort) {
+    //NDPSegment *ndpseg = createNDPSegment("RST+ACK");
+    const auto& ndpseg = makeShared<NdpHeader>();
     ndpseg->setSrcPort(srcPort);
     ndpseg->setDestPort(destPort);
 
@@ -365,19 +412,20 @@ void NDPConnection::sendRstAck(uint32 seq, uint32 ack, L3Address src,
     ndpseg->setDataSequenceNumber(seq);
     ndpseg->setAckNo(ack);
 
+    Packet *fp = new Packet("RST+ACK");
     // send it
-    sendToIP(ndpseg, src, dest);
+    sendToIP(fp, ndpseg, src, dest);
 
     // notify
     if (ndpAlgorithm)
         ndpAlgorithm->ackSent();
 }
 
-void NDPConnection::readHeaderOptions(NDPSegment *ndpseg) {
+void NDPConnection::readHeaderOptions(const Ptr<const NdpHeader>& ndpseg) {
     EV_INFO << "NDP Header Option(s) received:\n";
 
     for (uint i = 0; i < ndpseg->getHeaderOptionArraySize(); i++) {
-        const NDPOption *option = ndpseg->getHeaderOption(i);
+        const NdpOption *option = ndpseg->getHeaderOption(i);
         short kind = option->getKind();
         short length = option->getLength();
         bool ok = true;
@@ -396,7 +444,7 @@ void NDPConnection::readHeaderOptions(NDPSegment *ndpseg) {
 
         case NDPOPTION_MAXIMUM_SEGMENT_SIZE:    // MSS=2
             ok = processMSSOption(ndpseg,
-                    *check_and_cast<const NDPOptionMaxSegmentSize *>(option));
+                    *check_and_cast<const NdpOptionMaxSegmentSize *>(option));
             break;
             // TODO add new NDPOptions here once they are implemented
             // TODO delegate to NDPAlgorithm as well -- it may want to recognized additional options
@@ -409,8 +457,7 @@ void NDPConnection::readHeaderOptions(NDPSegment *ndpseg) {
     }
 }
 
-bool NDPConnection::processMSSOption(NDPSegment *ndpseg,
-        const NDPOptionMaxSegmentSize& option) {
+bool NDPConnection::processMSSOption(const Ptr<const NdpHeader>& ndpseg, const NdpOptionMaxSegmentSize& option) {
     if (option.getLength() != 4) {
         EV_ERROR << "ERROR: MSS option length incorrect\n";
         return false;
@@ -428,8 +475,7 @@ bool NDPConnection::processMSSOption(NDPSegment *ndpseg,
     if (state->snd_mss == 0)
         state->snd_mss = 536;
 
-    EV_INFO << "NDP Header Option MSS(=" << option.getMaxSegmentSize()
-                   << ") received, SMSS is set to " << state->snd_mss << "\n";
+    EV_INFO << "NDP Header Option MSS(=" << option.getMaxSegmentSize() << ") received, SMSS is set to " << state->snd_mss << "\n";
     return true;
 }
 
@@ -438,7 +484,7 @@ bool NDPConnection::processMSSOption(NDPSegment *ndpseg,
 
 
 
-NDPSegment NDPConnection::writeHeaderOptions(NDPSegment *ndpseg) {
+NdpHeader NDPConnection::writeHeaderOptions(const Ptr<NdpHeader>& ndpseg) {
     // SYN flag set and connetion in INIT or LISTEN state (or after synRexmit timeout)
     if (ndpseg->getSynBit()  && (fsm.getState() == NDP_S_INIT || fsm.getState() == NDP_S_LISTEN
                     || ((fsm.getState() == NDP_S_SYN_SENT
@@ -446,9 +492,9 @@ NDPSegment NDPConnection::writeHeaderOptions(NDPSegment *ndpseg) {
                             && state->syn_rexmit_count > 0))) {
         // MSS header option
         if (state->snd_mss > 0) {
-            NDPOptionMaxSegmentSize *option = new NDPOptionMaxSegmentSize();
+            NdpOptionMaxSegmentSize *option = new NdpOptionMaxSegmentSize();
             option->setMaxSegmentSize(state->snd_mss);
-            ndpseg->addHeaderOption(option);
+            ndpseg->insertHeaderOption(option);
             EV_INFO << "NDP Header Option MSS(=" << state->snd_mss << ") sent\n";
         }
 
@@ -458,12 +504,16 @@ NDPSegment NDPConnection::writeHeaderOptions(NDPSegment *ndpseg) {
     }
 
     if (ndpseg->getHeaderOptionArraySize() != 0) {
-        uint options_len = ndpseg->getHeaderOptionArrayLength();
-        if (options_len <= NDP_OPTIONS_MAX_SIZE) // Options length allowed? - maximum: 40 Bytes
-            ndpseg->setHeaderLength(NDP_HEADER_OCTETS + options_len); // NDP_HEADER_OCTETS = 20
+        B options_len = ndpseg->getHeaderOptionArrayLength();
+
+        if (options_len <= B(NDP_OPTIONS_MAX_SIZE)) {// Options length allowed? - maximum: 40 Bytes
+            ndpseg->setHeaderLength(NDP_MIN_HEADER_LENGTH + options_len); // NDP_HEADER_OCTETS = 20
+            ndpseg->setChunkLength(B(NDP_MIN_HEADER_LENGTH + options_len));
+        }
         else {
-            ndpseg->setHeaderLength(NDP_HEADER_OCTETS);   // NDP_HEADER_OCTETS = 20
-            ndpseg->dropHeaderOptions();    // drop all options
+            ndpseg->dropHeaderOptions();
+            ndpseg->setHeaderLength(NDP_MIN_HEADER_LENGTH);   // NDP_HEADER_OCTETS = 20
+            ndpseg->setChunkLength(NDP_MIN_HEADER_LENGTH);
             EV_ERROR << "ERROR: Options length exceeded! Segment will be sent without options" << "\n";
         }
     }
@@ -471,21 +521,21 @@ NDPSegment NDPConnection::writeHeaderOptions(NDPSegment *ndpseg) {
     return *ndpseg;
 }
 
-uint32 NDPConnection::getTSval(NDPSegment *ndpseg) const {
+uint32 NDPConnection::getTSval(const Ptr<const NdpHeader>& ndpseg) const {
     for (uint i = 0; i < ndpseg->getHeaderOptionArraySize(); i++) {
-        const NDPOption *option = ndpseg->getHeaderOption(i);
+        const NdpOption *option = ndpseg->getHeaderOption(i);
         if (option->getKind() == NDPOPTION_TIMESTAMP)
-            return check_and_cast<const NDPOptionTimestamp *>(option)->getSenderTimestamp();
+            return check_and_cast<const NdpOptionTimestamp *>(option)->getSenderTimestamp();
     }
 
     return 0;
 }
 
-uint32 NDPConnection::getTSecr(NDPSegment *ndpseg) const {
+uint32 NDPConnection::getTSecr(const Ptr<const NdpHeader>& ndpseg) const {
     for (uint i = 0; i < ndpseg->getHeaderOptionArraySize(); i++) {
-        const NDPOption *option = ndpseg->getHeaderOption(i);
+        const NdpOption *option = ndpseg->getHeaderOption(i);
         if (option->getKind() == NDPOPTION_TIMESTAMP)
-            return check_and_cast<const NDPOptionTimestamp *>(option)->getEchoedTimestamp();
+            return check_and_cast<const NdpOptionTimestamp *>(option)->getEchoedTimestamp();
     }
 
     return 0;

@@ -37,6 +37,7 @@ OBJS = \
     $O/application/ndpapp/NdpEchoApp.o \
     $O/application/ndpapp/NdpServerHostApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
+    $O/common/ProtocolNdp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NDPConnectionBase.o \
     $O/transportlayer/Ndp/NDPConnectionEventProc.o \
@@ -48,10 +49,8 @@ OBJS = \
     $O/transportlayer/Ndp/flavours/NDPBaseAlg.o \
     $O/transportlayer/Ndp/flavours/NDPSegmentTransmitInfoList.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader.o \
-    $O/transportlayer/Ndp/queues/NDPMsgBasedSendQueue.o \
-    $O/transportlayer/Ndp/queues/receiveQueue.o \
+    $O/transportlayer/common/L4ToolsNdp.o \
     $O/transportlayer/contract/ndp/NDPSocket.o \
-    $O/transportlayer/contract/ndp/NDPSocketMap.o \
     $O/application/base/ApplicationPacketNdp_m.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
     $O/transportlayer/Ndp/NDPConnection_m.o \
