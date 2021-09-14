@@ -2,11 +2,12 @@
 package ndp.application.ndpapp;
 
 import ndp.application.contract.INdpApp;
+import inet.applications.contract.IApp;
 
-
-simple NdpBasicClientApp like INdpApp
+simple NdpBasicClientApp like IApp
 {
     parameters:
+        @class("inet::NdpBasicClientApp");
         string localAddress = default(""); // may be left empty ("")
         int localPort = default(-1); // port number to listen on
         string connectAddress = default("");  // server address (may be symbolic)
@@ -16,7 +17,7 @@ simple NdpBasicClientApp like INdpApp
         double stopTime @unit(s) = default(-1s);  // time of finishing sending, negative values mean forever
 
        
-        double sendBytes @unit(B) =  default(1MiB); 
+        volatile int sendBytes @unit(B) =  default(1MiB); 
         int numPacketsToSend;  // if this is a sender
         bool isLongFlow = default(false);  // 
         int priorityValue = default(0);
@@ -28,7 +29,10 @@ simple NdpBasicClientApp like INdpApp
 
         volatile double reconnectInterval @unit(s) = default(30s);  // if connection breaks, waits this much before trying to reconnect
  
-
+		@lifecycleSupport;
+		double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
+        double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
+        
         @signal[rcvdPacketSignal](type=cPacket);
         @statistic[rcvdPacketSignal](title="packets received"; source=rcvdPacketSignal; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         //MOH: method2 instantaneous throughputs, see ResultFilter.cc
@@ -36,7 +40,7 @@ simple NdpBasicClientApp like INdpApp
 
         @display("i=msg/mail;i2=status/down");
     gates:
-        input ndpIn @labels(NDPCommand/up);
-        output ndpOut @labels(NDPCommand/down);
+        input socketIn @labels(NDPCommand/up);
+        output socketOut @labels(NDPCommand/down);
 }
 

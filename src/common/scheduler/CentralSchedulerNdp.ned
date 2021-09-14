@@ -13,11 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-package ndp.simulations.FatTreeNDP;
+package ndp.common.scheduler;
 
 simple CentralSchedulerNdp
 {
     parameters:
+	   @class("inet::CentralSchedulerNdp");
+       //@namespace(inet);
        bool isWebSearchWorkLoad; 
        int IW; // initial windows size
        int ndpSwitchQueueLength; // initial windows size
@@ -34,11 +36,11 @@ simple CentralSchedulerNdp
 //        double longFlowSize @unit(B)=  default(10MiB);
 
         int flowSize;
-        double longFlowSize;
+        int longFlowSize;
 
-        double numShortFlows;
+        int numShortFlows;
         double percentLongFlowNodes;
-        volatile double numCompletedShortFlows = default(0);
+        volatile int numCompletedShortFlows = default(0);
          //  @unit(s) = default(1s);
         bool shuffle;
         
@@ -59,6 +61,4 @@ simple CentralSchedulerNdp
 
 //        @signal[multicastGroupID](type=double);
 //        @statistic[multicastGroupID](title="multicast Group ID"; source=multicastGroupID; unit=s; record=last);
-
-
 }

@@ -379,14 +379,9 @@ protected:
     /** Utility: sends status indication (NDP_I_xxx) to application */
     virtual void sendIndicationToApp(int code, const int id = 0);
 
-    /** Utility: sends NDP_I_AVAILABLE indication with NDPAvailableInfo to application */
-    virtual void sendAvailableIndicationToApp();
-
     /** Utility: sends NDP_I_ESTABLISHED indication with NDPConnectInfo to application */
     virtual void sendEstabIndicationToApp();
 
-    /** Utility: sends data or data notification to application */
-    virtual void sendAvailableDataToApp();
 
 public:
     /** Utility: prints local/remote addr/port and app gate index/connId */

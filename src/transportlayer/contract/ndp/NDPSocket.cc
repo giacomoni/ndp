@@ -2,6 +2,7 @@
 #include "inet/common/packet/Message.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/applications/common/SocketTag_m.h"
+#include "../../../common/ProtocolNdp.h"
 
 namespace inet {
 
@@ -9,35 +10,27 @@ NDPSocket::NDPSocket() {
     // don't allow user-specified connIds because they may conflict with
     // automatically assigned ones.
     connId = getEnvir()->getUniqueNumber();
-    sockstate = NOT_BOUND;
-    localPrt = remotePrt = -1;
-    cb = nullptr;
-    yourPtr = nullptr;
-    gateToNdp = nullptr;
 }
 
 NDPSocket::NDPSocket(cMessage *msg) {
-    NDPCommand *ind = dynamic_cast<NDPCommand *>(msg->getControlInfo());
-
-    if (!ind)
-        throw cRuntimeError(
-                "NDPSocket::NDPSocket(cMessage *): no NDPCommand control info in message (not from NDP?)");
-
-    connId = ind->getConnId();
+    connId = check_and_cast<Indication *>(msg)->getTag<SocketInd>()->getSocketId();
     sockstate = CONNECTED;
-    localPrt = remotePrt = -1;
-    cb = nullptr;
-    yourPtr = nullptr;
 
-    gateToNdp = nullptr;
-
-    if (msg->getKind() == NDP_I_ESTABLISHED) {
+    if (msg->getKind() == NDP_I_AVAILABLE) {
+        NDPAvailableInfo *availableInfo = check_and_cast<NDPAvailableInfo *>(msg->getControlInfo());
+        connId = availableInfo->getNewSocketId();
+        localAddr = availableInfo->getLocalAddr();
+        remoteAddr = availableInfo->getRemoteAddr();
+        localPrt = availableInfo->getLocalPort();
+        remotePrt = availableInfo->getRemotePort();
+    }
+    else if (msg->getKind() == NDP_I_ESTABLISHED) {
         // management of stockstate is left to processMessage() so we always
-        // set it to CONNECTED in the ctor, whatever NDP_I_xxx arrives.
-        // However, for convenience we extract NDPConnectInfo already here, so that
+        // set it to CONNECTED in the ctor, whatever TCP_I_xxx arrives.
+        // However, for convenience we extract TcpConnectInfo already here, so that
         // remote address/port can be read already after the ctor call.
 
-        NDPConnectInfo *connectInfo = check_and_cast<NDPConnectInfo *>( msg->getControlInfo());
+        NDPConnectInfo *connectInfo = check_and_cast<NDPConnectInfo *>(msg->getControlInfo());
         localAddr = connectInfo->getLocalAddr();
         remoteAddr = connectInfo->getRemoteAddr();
         localPrt = connectInfo->getLocalPort();
@@ -53,18 +46,18 @@ NDPSocket::NDPSocket(NDPAvailableInfo *availableInfo)
     remoteAddr = availableInfo->getRemoteAddr();
     localPrt = availableInfo->getLocalPort();
     remotePrt = availableInfo->getRemotePort();
-    cb = nullptr;
-    yourPtr = nullptr;
-    gateToNdp = nullptr;
 }
 
 NDPSocket::~NDPSocket() {
-    if (cb)
+    if (cb) {
         cb->socketDeleted(this);
         cb = nullptr;
+    }
+    delete receiveQueue;
 }
 
-const char *NDPSocket::stateName(int state) {
+
+const char *NDPSocket::stateName(NDPSocket::State state) {
 #define CASE(x)    case x: \
         s = #x; break
     const char *s = "unknown";
@@ -83,11 +76,15 @@ const char *NDPSocket::stateName(int state) {
 #undef CASE
 }
 
-void NDPSocket::sendToNDP(cMessage *msg) {
+void NDPSocket::sendToNDP(cMessage *msg, int connId) {
     if (!gateToNdp)
         throw cRuntimeError( "NDPSocket: setOutputGate() must be invoked before socket can be used");
 
-    check_and_cast<cSimpleModule *>(gateToNdp->getOwnerModule())->send(msg,  gateToNdp);
+    auto& tags = getTags(msg);
+    //tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&ProtocolNdp::ndp);
+    tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&ProtocolNdp::ndp);
+    tags.addTagIfAbsent<SocketReq>()->setSocketId(connId == -1 ? this->connId : connId);
+    check_and_cast<cSimpleModule *>(gateToNdp->getOwnerModule())->send(msg, gateToNdp);
 }
 
 void NDPSocket::bind(int lPort) {
@@ -118,24 +115,20 @@ void NDPSocket::bind(L3Address lAddr, int lPort) {
  void NDPSocket::listen(bool fork) {
 
     if (sockstate != BOUND)
-        throw cRuntimeError(
-                sockstate == NOT_BOUND ?
-                        "NDPSocket: must call bind() before listen()" :
-                        "NDPSocket::listen(): connect() or listen() already called");
+        throw cRuntimeError(sockstate == NOT_BOUND ? "NDPSocket: must call bind() before listen()"
+                : "NDPSocket::listen(): connect() or listen() already called");
 
-    cMessage *msg = new cMessage("PassiveOPEN", NDP_C_OPEN_PASSIVE);
+    auto request = new Request("PassiveOPEN", NDP_C_OPEN_PASSIVE);
 
     NDPOpenCommand *openCmd = new NDPOpenCommand();
     openCmd->setLocalAddr(localAddr);
     openCmd->setLocalPort(localPrt);
-    openCmd->setConnId(connId);
 
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
     openCmd->setIsSender(false);
     openCmd->setIsReceiver(true);
-
-    msg->setControlInfo(openCmd);
-    sendToNDP(msg);
+    request->setControlInfo(openCmd);
+    sendToNDP(request);
     sockstate = LISTENING;
 }
  void NDPSocket::accept(int socketId)
@@ -143,7 +136,7 @@ void NDPSocket::bind(L3Address lAddr, int lPort) {
      auto request = new Request("ACCEPT", NDP_C_ACCEPT);
      NDPAcceptCommand *acceptCmd = new NDPAcceptCommand();
      request->setControlInfo(acceptCmd);
-     sendToNDP(request);
+     sendToNDP(request, socketId);
  }
 
 // note: moh i added localAddress here, so instead of waiting for the syn/ack to be received to know my loaca add
@@ -159,15 +152,16 @@ void NDPSocket::connect(L3Address  localAddress ,  L3Address remoteAddress, int 
         throw cRuntimeError( "NDPSocket::connect(): invalid remote port number %d", remotePort);
 
 
-    cMessage *msg = new cMessage("ActiveOPEN", NDP_C_OPEN_ACTIVE);
+    auto request = new Request("ActiveOPEN", NDP_C_OPEN_ACTIVE);
     localAddr = localAddress;
     remoteAddr = remoteAddress;
     remotePrt = remotePort;
     EV_INFO << "\n\n\n wwwwww socket bind-- localAddr: " << localAddr << "  , remoteAddr: " << remoteAddr << "\n";
     EV_INFO << "localPrt: " << localPrt << " , remotePort:" << remotePrt << "\n\n\n";
 
+    EV_INFO << "\nCreating Command";
     NDPOpenCommand *openCmd = new NDPOpenCommand();
-    openCmd->setConnId(connId);
+    EV_INFO << "\nCommand Created!";
     openCmd->setLocalAddr(localAddr);
     openCmd->setLocalPort(localPrt);
     openCmd->setRemoteAddr(remoteAddr);
@@ -183,28 +177,24 @@ void NDPSocket::connect(L3Address  localAddress ,  L3Address remoteAddress, int 
     openCmd->setIsLongFlow(isLongFlow);
 
 
-
-    msg->setControlInfo(openCmd);
-    sendToNDP(msg);
-
-
+    EV_INFO << "\n\n\nCONTROL INFO SENT";
+    request->setControlInfo(openCmd);
+    sendToNDP(request);
     sockstate = CONNECTING;
+    EV_INFO << "\n\n\nCONNECTING FINISHED";
 }
 
-void NDPSocket::send(cMessage *msg) {
+void NDPSocket::send(Packet *msg) {
     if (sockstate != CONNECTED && sockstate != CONNECTING && sockstate != PEER_CLOSED)
         throw cRuntimeError(
                 "NDPSocket::send(): socket not connected or connecting, state is %s",
                 stateName(sockstate));
 
     msg->setKind(NDP_C_SEND);
-    NDPSendCommand *cmd = new NDPSendCommand();
-    cmd->setConnId(connId);
-    msg->setControlInfo(cmd);
     sendToNDP(msg);
 }
 
-void NDPSocket::sendCommand(cMessage *msg) {
+void NDPSocket::sendCommand(Request *msg) {
     sendToNDP(msg);
 }
 
@@ -216,42 +206,38 @@ void NDPSocket::close() {
                 "NDPSocket::close(): not connected or close() already called (sockstate=%s)",
                 stateName(sockstate));
 
-    cMessage *msg = new cMessage("CLOSE", NDP_C_CLOSE);
+    auto request = new Request("CLOSE", NDP_C_CLOSE);
     NDPCommand *cmd = new NDPCommand();
-    cmd->setConnId(connId);
-    msg->setControlInfo(cmd);
-    sendToNDP(msg);
+    request->setControlInfo(cmd);
+    sendToNDP(request);
     sockstate = (sockstate == CONNECTED) ? LOCALLY_CLOSED : CLOSED;
 }
 
 void NDPSocket::abort() {
     if (sockstate != NOT_BOUND && sockstate != BOUND && sockstate != CLOSED
             && sockstate != SOCKERROR) {
-        cMessage *msg = new cMessage("ABORT", NDP_C_ABORT);
+        auto request = new Request("ABORT", NDP_C_ABORT);
         NDPCommand *cmd = new NDPCommand();
-        cmd->setConnId(connId);
-        msg->setControlInfo(cmd);
-        sendToNDP(msg);
+        request->setControlInfo(cmd);
+        sendToNDP(request);
     }
     sockstate = CLOSED;
 }
 
 void NDPSocket::destroy()
 {
-    auto request = new cMessage("DESTROY", NDP_C_DESTROY);
+    auto request = new Request("DESTROY", NDP_C_DESTROY);
     NDPCommand *cmd = new NDPCommand();
-    cmd->setConnId(connId);
     request->setControlInfo(cmd);
     sendToNDP(request);
     sockstate = CLOSED;
 }
 
 void NDPSocket::requestStatus() {
-    cMessage *msg = new cMessage("STATUS", NDP_C_STATUS);
+    auto request = new Request("STATUS", NDP_C_STATUS);
     NDPCommand *cmd = new NDPCommand();
-    cmd->setConnId(connId);
-    msg->setControlInfo(cmd);
-    sendToNDP(msg);
+    request->setControlInfo(cmd);
+    sendToNDP(request);
 }
 
 void NDPSocket::renewSocket() {
@@ -280,13 +266,11 @@ bool NDPSocket::isOpen() const
     }
 }
 
-bool NDPSocket::belongsToSocket(cMessage *msg) const {
-    return dynamic_cast<NDPCommand *>(msg->getControlInfo())
-            && ((NDPCommand *) (msg->getControlInfo()))->getConnId() == connId;
-}
-
-bool NDPSocket::belongsToAnyNDPSocket(cMessage *msg) {
-    return dynamic_cast<NDPCommand *>(msg->getControlInfo());
+bool NDPSocket::belongsToSocket(cMessage *msg) const
+{
+    auto& tags = getTags(msg);
+    auto socketInd = tags.findTag<SocketInd>();
+    return socketInd != nullptr && socketInd->getSocketId() == connId;
 }
 
 void NDPSocket::setCallback(ICallback *callback) {
@@ -298,6 +282,7 @@ void NDPSocket::processMessage(cMessage *msg) {
      ASSERT(belongsToSocket(msg));
 
     NDPStatusInfo *status;
+    NDPAvailableInfo *availableInfo;
     NDPConnectInfo *connectInfo;
 
     switch (msg->getKind()) {
@@ -316,7 +301,14 @@ void NDPSocket::processMessage(cMessage *msg) {
             delete msg;
 
         break;
-
+    case NDP_I_AVAILABLE:
+                availableInfo = check_and_cast<NDPAvailableInfo *>(msg->getControlInfo());
+                if (cb)
+                    cb->socketAvailable(this, availableInfo);
+                else
+                    accept(availableInfo->getNewSocketId());
+                delete msg;
+                break;
     case NDP_I_ESTABLISHED:
         // Note: this code is only for sockets doing active open, and nonforking
         // listening sockets. For a forking listening sockets, NDP_I_ESTABLISHED
@@ -324,58 +316,46 @@ void NDPSocket::processMessage(cMessage *msg) {
         // so you won't get here. Rather, when you see NDP_I_ESTABLISHED, you'll
         // want to create a new NDPSocket object via new NDPSocket(msg).
         sockstate = CONNECTED;
-        connectInfo = check_and_cast<NDPConnectInfo *>(msg->getControlInfo());
-        localAddr = connectInfo->getLocalAddr();
-        remoteAddr = connectInfo->getRemoteAddr();
-        localPrt = connectInfo->getLocalPort();
-        remotePrt = connectInfo->getRemotePort();
-        delete msg;
-
-        if (cb)
-            cb->socketEstablished(this); // MOH: this calls  NdpBasicClientApp::socketEstablished(int connId, void *ptr) to send the first request
-
-        break;
+       connectInfo = check_and_cast<NDPConnectInfo *>(msg->getControlInfo());
+       localAddr = connectInfo->getLocalAddr();
+       remoteAddr = connectInfo->getRemoteAddr();
+       localPrt = connectInfo->getLocalPort();
+       remotePrt = connectInfo->getRemotePort();
+       if (cb)
+           cb->socketEstablished(this);
+       delete msg;
+       break;
 
     case NDP_I_PEER_CLOSED:
         sockstate = PEER_CLOSED;
-
-        delete msg;
-
         if (cb)
             cb->socketPeerClosed(this);
-
+        delete msg;
         break;
 
     case NDP_I_CLOSED:
         std::cout << " socket closed \n";
-
         sockstate = CLOSED;
-        delete msg;
-
         if (cb) {
             cb->socketClosed(this);
         }
-
+        delete msg;
         break;
 
     case NDP_I_CONNECTION_REFUSED:
     case NDP_I_CONNECTION_RESET:
     case NDP_I_TIMED_OUT:
         sockstate = SOCKERROR;
-
         if (cb)
             cb->socketFailure(this, msg->getKind());
-
         delete msg;
         break;
 
     case NDP_I_STATUS:
         status = check_and_cast<NDPStatusInfo *>(msg->removeControlInfo());
-        delete msg;
-
         if (cb)
             cb->socketStatusArrived(this, status);
-
+        delete msg;
         break;
 
     default:

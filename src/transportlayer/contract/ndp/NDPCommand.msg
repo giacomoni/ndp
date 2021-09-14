@@ -62,7 +62,6 @@ enum NDPErrorCode
 
 class NDPCommand extends cObject
 {
-    int connId = -1;   // identifies the socket within the application
     int userId = -1;   // id than can be freely used by the app
  
    unsigned int  numRcvTrimmedHeader = 0;   
@@ -71,7 +70,7 @@ class NDPCommand extends cObject
 
 class NDPErrorInfo extends NDPCommand
 {
-    int errorCode @enum(NDPErrorCode);
+    NDPErrorCode errorCode;
     string messageText;
 }
 
@@ -82,12 +81,12 @@ class NDPOpenCommand extends NDPCommand
     L3Address remoteAddr;
     int localPort = -1;      
     int remotePort = -1;      
-
+	bool fork = false;
     string ndpAlgorithmClass; 
     
     unsigned int priorityValue;
     unsigned int numPacketsToSend;
-    bool    isLongFlow;
+    bool isLongFlow;
     bool isSender;
     bool isReceiver;
 }

@@ -14,7 +14,26 @@ using namespace std;
 namespace inet {
 
 namespace ndp {
+Define_Module(NDPConnection);
 
+//simsignal_t NDPConnection::stateSignal = registerSignal("state");    // FSM state
+//simsignal_t NDPConnection::sndWndSignal = registerSignal("sndWnd");    // snd_wnd
+//simsignal_t NDPConnection::rcvWndSignal = registerSignal("rcvWnd");    // rcv_wnd
+//simsignal_t NDPConnection::rcvAdvSignal = registerSignal("rcvAdv");    // current advertised window (=rcv_adv)
+//simsignal_t NDPConnection::sndNxtSignal = registerSignal("sndNxt");    // sent seqNo
+//simsignal_t NDPConnection::sndAckSignal = registerSignal("sndAck");    // sent ackNo
+//simsignal_t NDPConnection::rcvSeqSignal = registerSignal("rcvSeq");    // received seqNo
+//simsignal_t NDPConnection::rcvAckSignal = registerSignal("rcvAck");    // received ackNo (=snd_una)
+//simsignal_t NDPConnection::unackedSignal = registerSignal("unacked");    // number of bytes unacknowledged
+//simsignal_t NDPConnection::dupAcksSignal = registerSignal("dupAcks");    // current number of received dupAcks
+//simsignal_t NDPConnection::pipeSignal = registerSignal("pipe");    // current sender's estimate of bytes outstanding in the network
+//simsignal_t NDPConnection::sndSacksSignal = registerSignal("sndSacks");    // number of sent Sacks
+//simsignal_t NDPConnection::rcvSacksSignal = registerSignal("rcvSacks");    // number of received Sacks
+//simsignal_t NDPConnection::rcvOooSegSignal = registerSignal("rcvOooSeg");    // number of received out-of-order segments
+//simsignal_t NDPConnection::rcvNASegSignal = registerSignal("rcvNASeg");    // number of received not acceptable segments
+//simsignal_t NDPConnection::sackedBytesSignal = registerSignal("sackedBytes");    // current number of received sacked bytes
+//simsignal_t NDPConnection::tcpRcvQueueBytesSignal = registerSignal("ndpRcvQueueBytes");    // current amount of used bytes in tcp receive queue
+//simsignal_t NDPConnection::tcpRcvQueueDropsSignal = registerSignal("ndpRcvQueueDrops");    // number of drops in tcp receive queue
 NdpStateVariables::NdpStateVariables() {
     internal_request_id = 0;
     request_id = 0;  // source block number (8-bit unsigned integer)
@@ -132,7 +151,7 @@ void NDPConnection::handleMessage(cMessage *msg)
             ndpMain->removeConnection(this);
     }
     else
-        throw cRuntimeError("model error: TcpConnection allows only self messages");
+        throw cRuntimeError("model error: NDPConnection allows only self messages");
 }
 
 bool NDPConnection::processTimer(cMessage *msg) {

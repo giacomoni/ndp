@@ -8,7 +8,6 @@
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/packet/Message.h"
-//#include "inet/transportlayer/contract/tcp/TCPCommand_m.h"
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 //#include "/Volumes/LocalDataHD/m/ma/ma777/Desktop/omnetpp-5.2.1-hpc/omnetpp-5.2.1/samples/inet-myprojects/inet/src/inet/common/ResultFilters.h"
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
@@ -143,7 +142,7 @@ void NdpSinkAppThread::dataArrived(Packet *msg, bool urgent)
      if (centralMod && isLongFlow == false) {
             int   numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows +1 ;
-            centralMod->par("numCompletedShortFlows").setDoubleValue(newNumFinishedFlows);
+            centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
              MY_COUT << "NdpSinkAppThread::dataArrived  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
         }
         delete msg;

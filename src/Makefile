@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for ndp
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -KINET_PROJ=../../inet -DINET_IMPORT -I$$\(INET_PROJ\)/src -L$$\(INET_PROJ\)/src -lINET$$\(D\)
+#  opp_makemake -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -16,13 +16,13 @@ USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(QTENV_LIBS) $(CMDENV_LI
 #USERIF_LIBS = $(QTENV_LIBS)
 
 # C++ include paths (with -I)
-INCLUDE_PATH = -I$(INET_PROJ)/src
+INCLUDE_PATH = -I$(INET4_PROJ)/src
 
 # Additional object and library files to link with
 EXTRA_OBJS =
 
 # Additional libraries (-L, -l options)
-LIBS = $(LDFLAG_LIBPATH)$(INET_PROJ)/src  -lINET$(D)
+LIBS = $(LDFLAG_LIBPATH)$(INET4_PROJ)/src  -lINET$(D)
 
 # Output directory
 PROJECT_OUTPUT_DIR = ../out
@@ -37,7 +37,15 @@ OBJS = \
     $O/application/ndpapp/NdpEchoApp.o \
     $O/application/ndpapp/NdpServerHostApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
+    $O/common/ProtocolGroupNdp.o \
     $O/common/ProtocolNdp.o \
+    $O/common/queue/NDPQueue.o \
+    $O/common/scheduler/CentralSchedulerNdp.o \
+    $O/networklayer/ipv4/IcmpNdp.o \
+    $O/networklayer/ipv4/Ipv4FragBufNdp.o \
+    $O/networklayer/ipv4/Ipv4NatTableNdp.o \
+    $O/networklayer/ipv4/Ipv4Ndp.o \
+    $O/networklayer/ipv4/Ipv4NetworkLayerNdp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NDPConnectionBase.o \
     $O/transportlayer/Ndp/NDPConnectionEventProc.o \
@@ -53,6 +61,7 @@ OBJS = \
     $O/transportlayer/contract/ndp/NDPSocket.o \
     $O/application/base/ApplicationPacketNdp_m.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
+    $O/common/ProtocolNdp_m.o \
     $O/transportlayer/Ndp/NDPConnection_m.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader_m.o \
     $O/transportlayer/contract/ndp/NDPCommand_m.o
@@ -61,6 +70,7 @@ OBJS = \
 MSGFILES = \
     application/base/ApplicationPacketNdp.msg \
     application/ndpapp/GenericAppMsgNdp.msg \
+    common/ProtocolNdp.msg \
     transportlayer/Ndp/NDPConnection.msg \
     transportlayer/Ndp/ndp_common/NdpHeader.msg \
     transportlayer/contract/ndp/NDPCommand.msg
@@ -69,7 +79,7 @@ MSGFILES = \
 SMFILES =
 
 # Other makefile variables (-K)
-INET_PROJ=../../inet
+INET4_PROJ=../../inet4
 
 #------------------------------------------------------------------------------
 
@@ -94,7 +104,7 @@ include $(CONFIGFILE)
 # Simulation kernel and user interface libraries
 OMNETPP_LIBS = $(OPPMAIN_LIB) $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
 ifneq ($(TOOLCHAIN_NAME),clangc2)
-LIBS += -Wl,-rpath,$(abspath $(INET_PROJ)/src)
+LIBS += -Wl,-rpath,$(abspath $(INET4_PROJ)/src)
 endif
 
 COPTS = $(CFLAGS) $(IMPORT_DEFINES) -DINET_IMPORT $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)

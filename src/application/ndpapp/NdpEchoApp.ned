@@ -10,7 +10,7 @@ simple NdpEchoApp extends NdpServerHostApp
         @class(NdpEchoApp);
         double echoFactor = default(1);
         double echoDelay @unit(s) = default(0s);
-        serverThreadModuleType = default("inet.applications.tcpapp.TcpEchoAppThread"); // module type of "thread" module to launch on incoming connections
+        serverThreadModuleType = default("inet.applications.ndpapp.NdpEchoAppThread"); // module type of "thread" module to launch on incoming connections
         @display("i=block/app");
         @signal[packetSent](type=inet::Packet);
         @signal[packetReceived](type=cPacket);

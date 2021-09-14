@@ -24,9 +24,7 @@
 #include "inet/transportlayer/udp/UdpHeader_m.h"
 #endif
 
-#ifdef WITH_NDP
 #include "../Ndp/ndp_common/NdpHeader_m.h"
-#endif
 
 #ifdef WITH_SCTP
 //TODO
@@ -54,14 +52,12 @@ const Ptr<const TransportHeaderBase> peekTransportProtocolHeader(Packet *packet,
     if (protocol == Protocol::udp)
         return packet->peekAtFront<UdpHeader>(b(-1), flags);
 #endif
-#ifdef WITH_NDP
     if (protocol == ProtocolNdp::ndp)
-        return packet->peekAtFront<NdpHeader>(b(-1), flags);
-#endif
+        return packet->peekAtFront<ndp::NdpHeader>(b(-1), flags);
     // TODO: add other L4 protocols
     if (flags & Chunk::PF_ALLOW_NULLPTR)
         return nullptr;
-    throw cRuntimeError("Unknown protocol: %s", protocol.getName());
+    throw cRuntimeError("Unknown protocolTEST6: %s", protocol.getName());
 }
 
 
@@ -75,12 +71,10 @@ const Ptr<TransportHeaderBase> removeTransportProtocolHeader(Packet *packet, con
     if (protocol == Protocol::udp)
         return removeTransportProtocolHeader<UdpHeader>(packet);
 #endif
-#ifdef WITH_NDP
     if (protocol == ProtocolNdp::ndp)
-        return removeTransportProtocolHeader<NdpHeader>(packet);
-#endif
+        return removeTransportProtocolHeader<ndp::NdpHeader>(packet);
     // TODO: add other L4 protocols
-    throw cRuntimeError("Unknown protocol: %s", protocol.getName());
+    throw cRuntimeError("Unknown protocolTEST7: %s", protocol.getName());
 }
 
 } // namespace inet

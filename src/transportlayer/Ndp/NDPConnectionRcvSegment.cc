@@ -8,7 +8,7 @@
 #include "NDPConnection.h"
 #include "../contract/ndp/NDPCommand_m.h"
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
-
+#include "inet/applications/common/SocketTag_m.h"
 //Preprocessor directives
 //  #define  ShowOut
  #ifdef ShowOut
@@ -70,7 +70,7 @@ void NDPConnection::sendInitialWindow() {
                 ndpseg->setPriorityValue(state->priorityValue);
 //                ndpseg->setIsLastPacketToSend(false);
 //                ndpseg->setDataSequenceNumber(state->sequenceNumber);
-                Packet *fp = new Packet("TcpAck");
+                Packet *fp = new Packet("Init-Win Packet");
                 sendToIP(fp, ndpseg);
             }
         }
@@ -323,7 +323,8 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             Packet *newPacket = new Packet("ReceivePacket", msgRx);
             newPacket->setKind(NDP_I_DATA); // TBD currently we never send TCP_I_URGENT_DATA
             NDPCommand *cmd = new NDPCommand();
-            cmd->setConnId(socketId);
+            //cmd->setConnId(socketId);
+            newPacket->addTag<SocketInd>()->setSocketId(socketId);
             newPacket->setControlInfo(cmd);
             sendToApp(newPacket);
         }
@@ -365,7 +366,7 @@ void NDPConnection::addRequestToPullsQueue(){
     char msgname[16];
     sprintf(msgname, "PULL-%d", state->request_id);
     //NdpHeader *ndpseg = createNDPSegment(msgname);
-    Packet *ndppack = createNDPSegment(msgname);
+    Packet *ndppack = new Packet(msgname, 0);
     const auto& ndpseg = makeShared<NdpHeader>();
     ndppack->setByteLength(10); //maybe bit?
     //ndpseg->setPayloadLength(10);

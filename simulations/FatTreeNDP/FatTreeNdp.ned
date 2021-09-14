@@ -1,12 +1,15 @@
 package ndp.simulations.FatTreeNDP;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
-import ndp.StandardHostNdp;
+import ndp.node.StandardHostNdp;
+import ndp.common.scheduler.CentralSchedulerNdp;
 import inet.node.inet.Router;
+import ndp.base.Pod;
+import ndp.base.Rack;
 import inet.node.ethernet.Eth100M;
-
+import ndp.common.queue.NDPQueue;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
-import inet.visualizer.integrated.IntegratedCanvasVisualizer;
+import inet.visualizer.contract.IIntegratedVisualizer;
 
 import ned.DatarateChannel;
 import ned.IdealChannel;
@@ -19,8 +22,8 @@ network FatTreeNdp
         int k = default(4);
 
         // Value for display string needed.
-        int khalf = k/2;
-        int kCore = (k/2)^2;
+        int khalf = int(k/2);
+        int kCore = int((k/2)^2);
 
         @display("bgb=1494.948,723.128,white");
 
@@ -43,7 +46,7 @@ network FatTreeNdp
         }
 
 		// (k/2)^2 core routers.
-        CoreRouter[(k/2)^2]: Router {
+        CoreRouter[kCore]: Router {
             //   k = k;
             //          position = index;
             @display("p=337.736,87.024,m,$kCore,120,150");
@@ -52,9 +55,8 @@ network FatTreeNdp
         }
 
 
-        visualizer: IntegratedCanvasVisualizer {
-            //configurator: FatTreeConfigurator;
-            @display("p=1179.675,672.2275");
+        visualizer: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
+            @display("p=305.665,67.625`");
         }
         configurator: Ipv4NetworkConfigurator {
             @display("p=1314.495,672.2275");

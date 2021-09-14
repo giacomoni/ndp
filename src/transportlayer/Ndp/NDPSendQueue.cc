@@ -2,7 +2,7 @@
 
 
 #include "NDPSendQueue.h"
-
+#include "inet/common/TimeTag_m.h"
 namespace inet {
 
 namespace ndp {
@@ -35,15 +35,17 @@ void NDPSendQueue::init(unsigned int numPacketsToSend , B mss)
 //        payload.msg->setByteLength(mss);
 //        dataToSendQueue.push(payload);
 
-        auto datamsg = new GenericAppMsgNdp(); // state->iss
-        datamsg->setChunkLength(mss);
+        const auto& payload = makeShared<GenericAppMsgNdp>(); // state->iss
         std::string packetName = "DATAPKT-"+std::to_string(i);
+        Packet *packet = new Packet(packetName.c_str());
+        payload->setChunkLength(mss);
+        payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
+        packet->insertAtBack(payload);
         //auto packet = new Packet(packetName.c_str(), check_and_cast<Ptr <const Chunk>>(datamsg));
-        auto packet = new Packet(packetName.c_str(), 0); //FIX
-        Packet pack;
-        auto header = makeShared<NdpHeader>();
-        header->setDataSequenceNumber(i);
-        packet->insertAtFront(header); // insert header into segment
+        //auto packet = new Packet(packetName.c_str(), 0); //FIX
+        //auto header = makeShared<NdpHeader>();
+        //header->setDataSequenceNumber(i);
+        //packet->insertAtFront(header); // insert header into segment
         dataToSendQueue.push((packet->peekDataAt(B(0), packet->getDataLength())));
     }
 }

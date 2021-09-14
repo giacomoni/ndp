@@ -29,37 +29,50 @@ class INET_API NDPSocket : public ISocket
     {
       public:
         virtual ~ICallback() {}
+        /**
+         * Notifies about data arrival, packet ownership is transferred to the callee.
+         */
         virtual void socketDataArrived(NDPSocket *socket, Packet *packet, bool urgent) = 0;
         virtual void socketAvailable(NDPSocket *socket, NDPAvailableInfo *availableInfo) = 0;
-        virtual void socketEstablished(NDPSocket *socket) {}
-        virtual void socketPeerClosed(NDPSocket *socket) {}
-        virtual void socketClosed(NDPSocket *socket) {}
-        virtual void socketFailure(NDPSocket *socket, int code) {}
-        virtual void socketStatusArrived(NDPSocket *socket,NDPStatusInfo *status) { delete status; }
-        virtual void socketDeleted(NDPSocket *socket) {}
+        virtual void socketEstablished(NDPSocket *socket) = 0;
+        virtual void socketPeerClosed(NDPSocket *socket) = 0;
+        virtual void socketClosed(NDPSocket *socket) = 0;
+        virtual void socketFailure(NDPSocket *socket, int code) = 0;
+        virtual void socketStatusArrived(NDPSocket *socket,NDPStatusInfo *status) = 0;
+        virtual void socketDeleted(NDPSocket *socket) = 0;
+    };
+
+    class INET_API ReceiveQueueBasedCallback : public ICallback
+    {
+      public:
+        virtual void socketDataArrived(NDPSocket *socket) = 0;
+
+        virtual void socketDataArrived(NDPSocket *socket, Packet *packet, bool urgent) override {
+            socket->getReceiveQueue()->push(packet->peekData());
+            delete packet;
+            socketDataArrived(socket);
+        }
     };
 
     enum State { NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED, PEER_CLOSED, LOCALLY_CLOSED, CLOSED, SOCKERROR };
 
   protected:
-    int connId;
-    int sockstate;
+    int connId = -1;
+    State sockstate = NOT_BOUND;
 
     L3Address localAddr;
-    int localPrt;
+    int localPrt = -1;
     L3Address remoteAddr;
-    int remotePrt;
+    int remotePrt = -1;
 
-    ICallback *cb;
-    void *yourPtr;
-
-    cGate *gateToNdp;
-
-
+    ICallback *cb  = nullptr;
+    void *userData = nullptr;
+    cGate *gateToNdp = nullptr;
     std::string ndpAlgorithmClass;
 
+    ChunkQueue *receiveQueue = nullptr;
   protected:
-    void sendToNDP(cMessage *msg);
+    void sendToNDP(cMessage *msg, int c = -1);
 
     // internal: implementation behind listen() and listenOnce()
     void listen(bool fork);
@@ -93,21 +106,25 @@ class INET_API NDPSocket : public ISocket
      * to identify the connection when it receives a command from the application
      * (or NDPSocket).
      */
-    int getSocketId() const { return connId; }
+    int getSocketId() const override { return connId; }
 
+    ChunkQueue *getReceiveQueue() { if (receiveQueue == nullptr) receiveQueue = new ChunkQueue(); return receiveQueue; }
+
+    void *getUserData() const { return userData; }
+    void setUserData(void *userData) { this->userData = userData; }
     /**
      * Returns the socket state, one of NOT_BOUND, CLOSED, LISTENING, CONNECTING,
      * CONNECTED, etc. Messages received from NDP must be routed through
      * processMessage() in order to keep socket state up-to-date.
      */
-    int getState() { return sockstate; }
+    NDPSocket::State getState() { return sockstate; }
 
     /**
      * Returns name of socket state code returned by getState().
      */
-    static const char *stateName(int state);
+    static const char *stateName(NDPSocket::State state);
 
-    void setState(enum State state) { sockstate = state; };
+    void setState(NDPSocket::State state) { sockstate = state; };
 
     /** @name Getter functions */
     //@{
@@ -184,12 +201,12 @@ class INET_API NDPSocket : public ISocket
     /**
      * Sends data packet.
      */
-    void send(cMessage *msg);
+    void send(Packet *msg);
 
     /**
      * Sends command.
      */
-    void sendCommand(cMessage *msg);
+    void sendCommand(Request *msg);
 
     /**
      * Closes the local end of the connection. With NDP, a CLOSE operation
@@ -248,13 +265,6 @@ class INET_API NDPSocket : public ISocket
      * that of the socket.)
      */
     bool belongsToSocket(cMessage *msg) const override;
-
-    /**
-     * Returns true if the message belongs to any NDPSocket instance.
-     * (This basically checks if the message has a NDPCommand attached to
-     * it as getControlInfo().)
-     */
-    static bool belongsToAnyNDPSocket(cMessage *msg);
 
     /**
      * Sets a callback object, to be used with processMessage().

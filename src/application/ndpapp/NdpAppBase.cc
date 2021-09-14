@@ -20,7 +20,7 @@ void NdpAppBase::initialize(int stage){
 
         socket.bind( *localAddress ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
         socket.setCallback(this);
-        socket.setOutputGate(gate("ndpOut"));
+        socket.setOutputGate(gate("socketOut"));
         setStatusString("Sender ready ...");
     }
 }
@@ -34,15 +34,12 @@ void NdpAppBase::handleMessageWhenUp(cMessage *msg) {
         socket.processMessage(msg);
 }
 
-
-
-
 void NdpAppBase::connect() {
     // we need a new connId if this is not the first connection
     socket.renewSocket();
 
     unsigned int numPacketsToSend = par("numPacketsToSend").longValue();
-    unsigned int priorityValue = par("priorityValue").doubleValue();
+    unsigned int priorityValue = par("priorityValue").intValue();
     bool isLongFlow = par("isLongFlow").boolValue();
     bool isSender = par("isSender").boolValue();
     bool isReceiver = par("isReceiver").boolValue();

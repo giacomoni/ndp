@@ -59,7 +59,7 @@ class INET_API NdpSinkAppThread : public NdpServerThreadBase
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void refreshDisplay() const override;
     virtual void finish() override;
-    //TcpServerThreadBase:
+    //NdpServerThreadBase:
     /**
      * Called when connection is established.
      */

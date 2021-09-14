@@ -2,7 +2,7 @@ package ndp.simulations;
 
 @namespace(inet);
 @namespace(ndp);
-import ndp.StandardHostNdp;
+import ndp.node.StandardHostNdp;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.ethernet.Eth10G;
 import inet.node.inet.Router;

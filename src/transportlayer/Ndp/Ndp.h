@@ -27,7 +27,7 @@
 #include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/transportlayer/base/TransportProtocolBase.h"
-#include "inet/transportlayer/contract/tcp/TcpCommand_m.h"
+#include "../contract/ndp/NDPCommand_m.h"
 #include "ndp_common/NdpHeader.h"
 
 namespace inet {

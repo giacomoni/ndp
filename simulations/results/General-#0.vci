@@ -1,0 +1,102 @@
+                                                                
+version 2
+run General-0-20210914-16:54:47-46716
+attr configname General
+attr datetime 20210914-16:54:47
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsf ""
+attr measurement ""
+attr network myexample
+attr processid 46716
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+param **.ndpType "\"Ndp\""
+param **.client.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.client2.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.server.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.ndp.mss 1000
+param **.**.app[0].numPacketsToSend 5
+param **.client.numApps 1
+param **.client.app[*].typename "\"NdpBasicClientApp\""
+param **.client.app[*].localAddress "\"client\""
+param **.client.app[*].localPort -1
+param **.client.app[*].connectAddress "\"server\""
+param **.client.app[0].connectPort 80
+param **.client.app[*].startTime 0s
+param **.client.app[*].idleInterval 10s
+param **.client.app[*].isLongFlow false
+param **.client.app[*].numSymbolsToSend 50
+param **.client.ppp[*].queue.typename "\"\""
+param **.client2.numApps 1
+param **.client2.app[*].typename "\"NdpBasicClientApp\""
+param **.client2.app[*].localAddress "\"client2\""
+param **.client2.app[*].localPort -1
+param **.client2.app[*].connectAddress "\"server\""
+param **.client2.app[0].connectPort 81
+param **.client2.app[*].startTime 0s
+param **.client2.app[*].idleInterval 10s
+param **.client2.app[*].isLongFlow false
+param **.client2.app[*].numSymbolsToSend 50
+param **.client2.ppp[*].queue.typename "\"\""
+param **.initialWindow 14
+param **.server.numApps 2
+param **.server.app[*].typename "\"NdpSinkApp\""
+param **.server.app[*].localAddress "\"server\""
+param **.server.app[0].localPort 80
+param **.server.app[1].localPort 81
+param myexample.router.ppp[*].ppp.queue.typename "\"NDPQueue\""
+param myexample.router.ppp[*].ppp.queue.packetCapacity 1
+param **.networkLayer.configurator.networkConfiguratorModule "\"\""
+
+vector 0 myexample.client.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 1 myexample.client2.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 2 myexample.server.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 3 myexample.router.ppp[0].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 4 myexample.router.ppp[1].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 5 myexample.router.ppp[2].ppp transmissionState:vector ETV
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, vector"
+vector 6 myexample.client.ppp[0].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 7 myexample.client.ppp[0].ppp.queue packetPushed:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet pushed, vector(packetBytes)"
+vector 8 myexample.client.ppp[0].ppp.queue queueLength:vector ETV
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, vector"
+vector 9 myexample.client.ppp[0].ppp.queue packetPopped:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet popped, vector(packetBytes)"
+vector 10 myexample.client.ppp[0].ppp.queue queueingTime:vector ETV
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, vector"
+attr unit s
+vector 11 myexample.client.ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "pac

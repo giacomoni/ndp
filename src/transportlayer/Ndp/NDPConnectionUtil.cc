@@ -10,7 +10,8 @@
 #include "NDPConnection.h"
 #include "inet/networklayer/contract/IL3AddressType.h"
 #include "inet/networklayer/common/IpProtocolId_m.h"
-#include "inet/transportlayer/common/L4Tools.h"
+//#include "inet/transportlayer/common/L4Tools.h"
+#include "../common/L4ToolsNdp.h"
 #include "inet/applications/common/SocketTag_m.h"
 #include "inet/common/INETUtils.h"
 #include "inet/common/packet/Message.h"
@@ -114,7 +115,6 @@ void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg, L3Add
     addresses->setDestAddress(dest);
     //ndpseg->setByteLength(ndpseg->getHeaderLength() + ndpseg->getPayloadLength());
 
-    //FIX THIS - new Protocol::ndp
     insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpseg);
     ndpMain->sendFromConn(packet,"ipOut");
 }
@@ -138,21 +138,21 @@ void NDPConnection::sendIndicationToApp(int code, const int id) {
     sendToApp(indication);
 }
 
-void NDPConnection::sendAvailableIndicationToApp()
-{
-    EV_INFO << "Notifying app: " << indicationName(NDP_I_AVAILABLE) << "\n";
-    auto indication = new Indication(indicationName(NDP_I_AVAILABLE), NDP_I_AVAILABLE);
-    NDPAvailableInfo *ind = new NDPAvailableInfo();
-    ind->setNewSocketId(socketId);
-    ind->setLocalAddr(localAddr);
-    ind->setRemoteAddr(remoteAddr);
-    ind->setLocalPort(localPort);
-    ind->setRemotePort(remotePort);
-
-    indication->addTag<SocketInd>()->setSocketId(listeningSocketId);
-    indication->setControlInfo(ind);
-    sendToApp(indication);
-}
+//void NDPConnection::sendAvailableIndicationToApp()
+//{
+//    EV_INFO << "Notifying app: " << indicationName(NDP_I_AVAILABLE) << "\n";
+//    auto indication = new Indication(indicationName(NDP_I_AVAILABLE), NDP_I_AVAILABLE);
+//    NDPAvailableInfo *ind = new NDPAvailableInfo();
+//    ind->setNewSocketId(socketId);
+//    ind->setLocalAddr(localAddr);
+//    ind->setRemoteAddr(remoteAddr);
+//    ind->setLocalPort(localPort);
+//    ind->setRemotePort(remotePort);
+//
+//    indication->addTag<SocketInd>()->setSocketId(listeningSocketId);
+//    indication->setControlInfo(ind);
+//    sendToApp(indication);
+//}
 
 void NDPConnection::sendEstabIndicationToApp() {
     EV_INFO << "Notifying app: " << indicationName(NDP_I_ESTABLISHED) << "\n";
@@ -171,24 +171,6 @@ void NDPConnection::sendToApp(cMessage *msg) {
     ndpMain->sendFromConn(msg, "appOut");
 }
 
-void NDPConnection::sendAvailableDataToApp()
-{
-    if (receiveQueue->getAmountOfBufferedBytes()) {
-        if (ndpMain->useDataNotification) {
-            auto indication = new Indication("Data Notification", NDP_I_DATA_NOTIFICATION); // TBD currently we never send TCP_I_URGENT_DATA
-            NDPCommand *cmd = new NDPCommand();
-            indication->addTag<SocketInd>()->setSocketId(socketId);
-            indication->setControlInfo(cmd);
-            sendToApp(indication);
-        } else {
-            while (auto msg = receiveQueue->extractBytesUpTo(state->rcv_nxt)) {
-                msg->setKind(NDP_I_DATA);    // TBD currently we never send TCP_I_URGENT_DATA
-                msg->addTag<SocketInd>()->setSocketId(socketId);
-                sendToApp(msg);
-            }
-        }
-    }
-}
 
 void NDPConnection::initConnection(NDPOpenCommand *openCmd) {
 

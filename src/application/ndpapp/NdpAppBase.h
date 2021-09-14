@@ -53,6 +53,7 @@ class INET_API NdpAppBase : public ApplicationBase, public NDPSocket::ICallback
     virtual void socketClosed(NDPSocket *socket) override;
     virtual void socketFailure(NDPSocket *socket, int code) override;
     virtual void socketStatusArrived(NDPSocket *socket, NDPStatusInfo *status) override { delete status; }
+    virtual void socketDeleted(NDPSocket *socket) override {}
 };
 
 } // namespace inet

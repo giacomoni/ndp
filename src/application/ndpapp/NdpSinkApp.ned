@@ -1,22 +1,20 @@
 
 package ndp.application.ndpapp;
 import ndp.application.contract.INdpApp;
+import ndp.application.ndpapp.NdpServerHostApp;
 
-simple NdpSinkApp like INdpApp
+simple NdpSinkApp extends NdpServerHostApp
 {
     parameters:
-        volatile string localAddress = default(""); // may be left empty ("")
-        volatile int localPort; // port number to listen on
+        @class("inet::NdpSinkApp");
          @display("i=block/sink");
-
-
         int multiCastGroupId = default(-1);
         int multiSrcGroupId = default(-1);
- 
+ 		serverThreadModuleType = default("ndp.application.ndpapp.NdpSinkAppThread"); // module type of "thread" module to launch on incoming connections
         // moh
         bool isLongFlow = default(false);
         
-       @signal[numRcvTrimmedHeaderSigNdp](type=double);
+        @signal[numRcvTrimmedHeaderSigNdp](type=double);
         @statistic[numRcvTrimmedHeaderSigNdp](title="numRcvTrimmedHeaderNdp"; source=numRcvTrimmedHeaderSigNdp; unit=s; record=last);
            
         @signal[multicastGroupIdSignal](type=double);
@@ -27,7 +25,7 @@ simple NdpSinkApp like INdpApp
 
 
         @signal[fctRecordv3](type=double);
-        @statistic[fctRecordv3](title="TCP Sesssion's flow completion time"; source=fctRecordv3; unit=s; record=last);
+        @statistic[fctRecordv3](title="NDP Sesssion's flow completion time"; source=fctRecordv3; unit=s; record=last);
 
         @signal[rcvdPk](type=cPacket);
         @statistic[rcvdPk](title="packets (symbols) received"; source=rcvdPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
@@ -36,10 +34,5 @@ simple NdpSinkApp like INdpApp
 //       @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(rcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
 
         @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(rcvdPk)"; unit=bps; record=mean);
-
-
-    gates:
-        input ndpIn @labels(NDPCommand/up);
-        output ndpOut @labels(NDPCommand/down);
 }
 

@@ -1,5 +1,5 @@
 
-package ndp.simulations.FatTreeNDP;
+package ndp.base;
  
 import ned.DatarateChannel;
 import ned.IdealChannel;
@@ -12,7 +12,7 @@ import ned.DatarateChannel;
 import ned.IBidirectionalChannel;
 import inet.node.ethernet.Eth10M;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
-import ndp.StandardHostNdp;
+import ndp.node.StandardHostNdp;
  
  
 module Pod
@@ -22,12 +22,12 @@ module Pod
         // We get value from FatTree module.
         int k;
         int position;
-        int khalf = k/2;
+        int khalf = int(k/2);
 
         @display("bgb=600,250");
     gates:
         // As many gates as core routers.
-        inout podg[(k/2)^2];
+        inout podg[(khalf)^2];
 
     types:
         channel ethernetline extends DatarateChannel
@@ -39,7 +39,7 @@ module Pod
 
     submodules:
         // k/2 racks are in one pod.
-        racks[k/2]: Rack {
+        racks[khalf]: Rack {
             // Reach values down.
             k = k;
             position = index;
@@ -48,7 +48,7 @@ module Pod
         }
 
 		// Also k/2 aggregation routers in one pod.
-        aggRouters[k/2]: Router {
+        aggRouters[khalf]: Router {
             @display("p=80,100,m,$k,120,150");
         }
     //          configurator: IPv4NetworkConfigurator;

@@ -6,8 +6,9 @@ package ndp.simulations;
 @namespace(ndp);
 
 
-import ndp.StandardHostNdp;
+import ndp.node.StandardHostNdp;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
+import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.inet.Router;
 //import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
@@ -28,7 +29,7 @@ network myexample
         client2: StandardHostNdp {
             @display("p=50,312");
         }
-        flatNetworkConfigurator: Ipv4FlatNetworkConfigurator {
+        configurator: Ipv4NetworkConfigurator {
             @display("p=295,91");
         }
         server: StandardHostNdp {

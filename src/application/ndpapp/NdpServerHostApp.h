@@ -68,16 +68,16 @@ class INET_API NdpServerHostApp : public ApplicationBase, public NDPSocket::ICal
 };
 
 /**
- * Abstract base class for server processes to be used with TcpServerHostApp.
+ * Abstract base class for server processes to be used with NdpServerHostApp.
  * Subclasses need to be registered using the Register_Class() macro.
  *
- * @see TcpServerHostApp
+ * @see NdpServerHostApp
  */
 class INET_API NdpServerThreadBase : public cSimpleModule, public NDPSocket::ICallback
 {
   protected:
     NdpServerHostApp *hostmod;
-    NDPSocket *sock;    // ptr into socketMap managed by TcpServerHostApp
+    NDPSocket *sock;    // ptr into socketMap managed by NdpServerHostApp
 
     // internal: NDPSocket::ICallback methods
     virtual void socketDataArrived(NDPSocket* socket, Packet *msg, bool urgent) override { dataArrived(msg, urgent); }
@@ -131,7 +131,7 @@ class INET_API NdpServerThreadBase : public cSimpleModule, public NDPSocket::ICa
     virtual void peerClosed() { getSocket()->close(); }
 
     /*
-     * Called when the connection breaks (TCP error). By default it deletes
+     * Called when the connection breaks (NDP error). By default it deletes
      * this thread, but it can be redefined to do something different.
      */
     virtual void failure(int code) { hostmod->removeThread(this); }
@@ -146,4 +146,4 @@ class INET_API NdpServerThreadBase : public cSimpleModule, public NDPSocket::ICa
 
 } // namespace inet
 
-#endif // ifndef __INET_TCPSRVHOSTAPP_H
+#endif // ifndef __INET_NDPSRVHOSTAPP_H

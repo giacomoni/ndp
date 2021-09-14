@@ -16,11 +16,12 @@
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 
-#include "inet/ndp/application/ndpapp/NdpBasicClientApp.h"
-#include "inet/ndp//application/ndpapp/NdpSinkApp.h"
+#include "../../application/ndpapp/NdpBasicClientApp.h"
+#include "../../application/ndpapp/NdpSinkApp.h"
 #include <algorithm>
 
-namespace inet {
+namespace inet{
+
 class INET_API CentralSchedulerNdp: public cSimpleModule, public ILifecycle {
 
 protected:
@@ -95,8 +96,7 @@ protected:
 ////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////
 
-    virtual bool handleOperationStage(LifecycleOperation *operation, int stage,
-            IDoneCallback *doneCallback) override
+    virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override
             {
         Enter_Method_Silent(); throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName()); return true;}
 

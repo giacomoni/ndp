@@ -1,5 +1,5 @@
 
-package ndp.simulations.FatTreeNDP;
+package ndp.base;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 import inet.node.inet.StandardHost;
@@ -12,7 +12,7 @@ import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import ned.DatarateChannel;
 import ned.IdealChannel;
 
-import ndp.StandardHostNdp;
+import ndp.node.StandardHostNdp;
  
 module Rack
 {
@@ -20,12 +20,12 @@ module Rack
         @Rack;
         // We get value from pod module.
         int k;
-         int position;
+        int position;
         @display("bgb=600,250");
 
     gates:
         // As many ports as aggregation routers.
-        inout rackg[k/2];
+        inout rackg[int(k/2)];
 
     types:
         channel ethernetline extends DatarateChannel
@@ -37,7 +37,7 @@ module Rack
 
     submodules:
         // k/2 servers are connected with one edge router.
-        servers[k/2]: StandardHostNdp {
+        servers[int(k/2)]: StandardHostNdp {
             // Reach value down.
   //           position = index;
             @display("p=80,160,r,80");
@@ -62,7 +62,7 @@ module Rack
             edgeSwitch.pppg++ <--> ethernetline <--> servers[i].pppg++;
         }
         // Connect the ports of the edge switch with the gates of the compound module.
-        for i=0..k/2-1 {
+        for i=0..int(k/2)-1 {
             edgeSwitch.pppg++ <--> IdealChannel <--> rackg++;
               
         }

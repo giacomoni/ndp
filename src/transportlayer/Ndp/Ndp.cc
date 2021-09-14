@@ -19,6 +19,7 @@
 #include "inet/common/IProtocolRegistrationListener.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/ProtocolTag_m.h"
+#include "../common/L4ToolsNdp.h"
 #include "inet/common/checksum/TcpIpChecksum.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"
 #include "inet/common/lifecycle/ModuleOperations.h"
@@ -27,7 +28,7 @@
 #include "inet/networklayer/common/EcnTag_m.h"
 #include "inet/networklayer/common/IpProtocolId_m.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
-
+#include "../../common/ProtocolNdp.h"
 #ifdef WITH_IPv4
 #include "inet/networklayer/ipv4/IcmpHeader_m.h"
 #endif // ifdef WITH_IPv4
@@ -57,7 +58,7 @@ Ndp::~Ndp()
 {
     while (!ndpAppConnMap.empty()) {
        auto i = ndpAppConnMap.begin();
-       delete i->second;
+       i->second->deleteModule();
        ndpAppConnMap.erase(i);
     }
 }
@@ -82,8 +83,8 @@ void Ndp::initialize(int stage)
         requestTimerMsg = new cMessage("requestTimerMsg");
         requestTimerMsg->setContextPointer(this);
 
-        registerService(Protocol::tcp, gate("appIn"), gate("ipIn"));
-        registerProtocol(Protocol::tcp, gate("ipOut"), gate("appOut"));
+        registerService(ProtocolNdp::ndp, gate("appIn"), gate("ipIn"));
+        registerProtocol(ProtocolNdp::ndp, gate("ipOut"), gate("appOut"));
     }
 }
 
@@ -137,7 +138,10 @@ void Ndp::handleLowerPacket(Packet *packet)
 {
     // must be a NdpHeader
     auto ndpHeader = packet->peekAtFront<NdpHeader>();
-    ndpHeader->setPriorityValue(10);                     //ADD THIS METHOD
+    //inet::Ptr<NdpHeader> header = makeShared<NdpHeader>();
+    //header->copy(ndpHeader);
+    //header->setPriorityValue(10);   //FIX THIS
+    //ndpHeader->setPriorityValue(10);
     // get src/dest addresses
     L3Address srcAddr, destAddr;
     srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();

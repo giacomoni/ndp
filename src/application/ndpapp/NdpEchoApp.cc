@@ -7,6 +7,7 @@
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/packet/Packet_m.h"
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
+#include "../../common/ProtocolNdp.h"
 
 namespace inet {
 Define_Module(NdpEchoApp);
@@ -44,7 +45,7 @@ void NdpEchoApp::sendDown(Packet *msg)
         emit(packetSentSignal, pk);
     }
 
-    msg->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::tcp);
+    msg->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&ProtocolNdp::ndp);
     msg->getTag<SocketReq>();
     send(msg, "socketOut");
 }

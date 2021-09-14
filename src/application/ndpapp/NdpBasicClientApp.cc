@@ -2,6 +2,7 @@
 #include "NdpBasicClientApp.h"
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/ModuleAccess.h"
+#include "inet/common/TimeTag_m.h"
 #include <iostream>
 #include <random>
 
@@ -75,12 +76,13 @@ void NdpBasicClientApp::sendWriteRequest() {
 //    sprintf(msgname, "REQUEST-%d",++requestIndex);
     sprintf(msgname, "REQUEST-WRITE-INIT");
 
-    auto packet = new Packet("REQUEST-WRITE-INIT");
     const auto& payload = makeShared<GenericAppMsgNdp>();
+    Packet *packet = new Packet("REQUEST-WRITE-INIT");
     payload->setChunkLength(B(requestLength));
     //payload->setExpectedReplyLength(B(replyLength));
     payload->setServerClose(false);
-    packet->insertAtFront(payload);
+    payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
+    packet->insertAtBack(payload);
     sendPacket(packet);
 }
 
