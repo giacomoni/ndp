@@ -1,0 +1,1364 @@
+version 2
+run General-0-20210915-14:37:28-32949
+attr configname General
+attr datetime 20210915-14:37:28
+attr experiment General
+attr inifile omnetpp.ini
+attr iterationvars ""
+attr iterationvarsf ""
+attr measurement ""
+attr network myexample
+attr processid 32949
+attr repetition 0
+attr replication #0
+attr resultdir results
+attr runnumber 0
+attr seedset 0
+param **.ndpType "\"Ndp\""
+param **.client.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.client2.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.server.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.ndp.mss 1000
+param **.**.app[0].numPacketsToSend 5
+param **.client.numApps 1
+param **.client.app[*].typename "\"NdpBasicClientApp\""
+param **.client.app[*].localAddress "\"client\""
+param **.client.app[*].localPort -1
+param **.client.app[*].connectAddress "\"server\""
+param **.client.app[0].connectPort 80
+param **.client.app[*].startTime 0s
+param **.client.app[*].idleInterval 10s
+param **.client.app[*].isLongFlow false
+param **.client.app[*].numSymbolsToSend 50
+param **.client.ppp[*].queue.typename "\"\""
+param **.client2.numApps 1
+param **.client2.app[*].typename "\"NdpBasicClientApp\""
+param **.client2.app[*].localAddress "\"client2\""
+param **.client2.app[*].localPort -1
+param **.client2.app[*].connectAddress "\"server\""
+param **.client2.app[0].connectPort 81
+param **.client2.app[*].startTime 0s
+param **.client2.app[*].idleInterval 10s
+param **.client2.app[*].isLongFlow false
+param **.client2.app[*].numSymbolsToSend 50
+param **.client2.ppp[*].queue.typename "\"\""
+param **.initialWindow 14
+param **.server.numApps 2
+param **.server.app[*].typename "\"NdpSinkApp\""
+param **.server.app[*].localAddress "\"server\""
+param **.server.app[0].localPort 80
+param **.server.app[1].localPort 81
+param myexample.router.ppp[*].ppp.queue.typename "\"NDPQueue\""
+param myexample.router.ppp[*].ppp.queue.packetCapacity 1
+param **.networkLayer.configurator.networkConfiguratorModule "\"\""
+
+scalar myexample.router.ppp[0].ppp.queue "packetCapacity= " 1
+scalar myexample.router.ppp[1].ppp.queue "packetCapacity= " 1
+scalar myexample.router.ppp[2].ppp.queue "packetCapacity= " 1
+scalar myexample.server.ndp initialWindow= 14
+scalar myexample.server.ndp initialWindow= 14
+scalar myexample.client.ndp initialWindow= 14
+scalar myexample.client2.ndp initialWindow= 14
+scalar myexample.client.lo[0].lo rcvdPkFromHl:count 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.client.lo[0].lo rcvdPkFromHl:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.client.lo[0].lo passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.client.lo[0].lo passedUpPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp.queue packetPopped:count 5
+attr interpolationmode none
+attr title "packet popped, count"
+scalar myexample.client.ppp[0].ppp.queue packetPopped:sum(packetBytes) 200
+attr interpolationmode none
+attr title "packet popped, sum(packetBytes)"
+statistic myexample.client.ppp[0].ppp.queue queueingTime:histogram
+field count 5
+field mean 7.52e-07
+field stddev 5.9450820011166e-07
+field min 0
+field max 1.504e-06
+field sum 3.76e-06
+field sqrsum 4.24128e-12
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, histogram"
+attr unit s
+bin	-inf	0
+bin	0	1
+bin	2e-08	0
+bin	4e-08	0
+bin	6e-08	0
+bin	8e-08	0
+bin	1e-07	0
+bin	1.2e-07	0
+bin	1.4e-07	0
+bin	1.6e-07	0
+bin	1.8e-07	0
+bin	2e-07	0
+bin	2.2e-07	0
+bin	2.4e-07	0
+bin	2.6e-07	0
+bin	2.8e-07	0
+bin	3e-07	0
+bin	3.2e-07	0
+bin	3.4e-07	0
+bin	3.6e-07	1
+bin	3.8e-07	0
+bin	4e-07	0
+bin	4.2e-07	0
+bin	4.4e-07	0
+bin	4.6e-07	0
+bin	4.8e-07	0
+bin	5e-07	0
+bin	5.2e-07	0
+bin	5.4e-07	0
+bin	5.6e-07	0
+bin	5.8e-07	0
+bin	6e-07	0
+bin	6.2e-07	0
+bin	6.4e-07	0
+bin	6.6e-07	0
+bin	6.8e-07	0
+bin	7e-07	0
+bin	7.2e-07	0
+bin	7.4e-07	1
+bin	7.6e-07	0
+bin	7.8e-07	0
+bin	8e-07	0
+bin	8.2e-07	0
+bin	8.4e-07	0
+bin	8.6e-07	0
+bin	8.8e-07	0
+bin	9e-07	0
+bin	9.2e-07	0
+bin	9.4e-07	0
+bin	9.6e-07	0
+bin	9.8e-07	0
+bin	1e-06	0
+bin	1.02e-06	0
+bin	1.04e-06	0
+bin	1.06e-06	0
+bin	1.08e-06	0
+bin	1.1e-06	0
+bin	1.12e-06	1
+bin	1.14e-06	0
+bin	1.16e-06	0
+bin	1.18e-06	0
+bin	1.2e-06	0
+bin	1.22e-06	0
+bin	1.24e-06	0
+bin	1.26e-06	0
+bin	1.28e-06	0
+bin	1.3e-06	0
+bin	1.32e-06	0
+bin	1.34e-06	0
+bin	1.36e-06	0
+bin	1.38e-06	0
+bin	1.4e-06	0
+bin	1.42e-06	0
+bin	1.44e-06	0
+bin	1.46e-06	0
+bin	1.48e-06	0
+bin	1.5e-06	1
+bin	1.52e-06	0
+bin	1.54e-06	0
+bin	1.56e-06	0
+bin	1.58e-06	0
+bin	1.6e-06	0
+bin	1.62e-06	0
+bin	1.64e-06	0
+bin	1.66e-06	0
+bin	1.68e-06	0
+bin	1.7e-06	0
+bin	1.72e-06	0
+bin	1.74e-06	0
+bin	1.76e-06	0
+bin	1.78e-06	0
+bin	1.8e-06	0
+bin	1.82e-06	0
+bin	1.84e-06	0
+bin	1.86e-06	0
+bin	1.88e-06	0
+scalar myexample.client.ppp[0].ppp.queue queueLength:max 4
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, max"
+scalar myexample.client.ppp[0].ppp.queue queueLength:timeavg 0.083764034931385
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, timeavg"
+scalar myexample.client.ppp[0].ppp.queue packetPushed:count 5
+attr interpolationmode none
+attr title "packet pushed, count"
+scalar myexample.client.ppp[0].ppp.queue packetPushed:sum(packetBytes) 200
+attr interpolationmode none
+attr title "packet pushed, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp.queue packetDropQueueOverflow:count 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, count"
+scalar myexample.client.ppp[0].ppp.queue packetDropQueueOverflow:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp.queue packetRemoved:count 0
+attr interpolationmode none
+attr title "packets removed, count"
+scalar myexample.client.ppp[0].ppp.queue packetRemoved:sum(packetBytes) 0
+attr interpolationmode none
+attr title "packets removed, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp transmissionState:timeavg 0.041882017465692
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.client.ppp[0].ppp rxPkOk:count 5
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.client.ppp[0].ppp rxPkOk:sum(packetBytes) 235
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp txPk:count 5
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.client.ppp[0].ppp txPk:sum(packetBytes) 235
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp rcvdPkFromHl:count 5
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.client.ppp[0].ppp rcvdPkFromHl:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp passedUpPk:count 5
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.client.ppp[0].ppp passedUpPk:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.client.ppp[0].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.client.ppp[0].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.client.ppp[0].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropAddressResolutionFailed:count 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, count"
+scalar myexample.client.ipv4.ip packetDropAddressResolutionFailed:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropHopLimitReached:count 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, count"
+scalar myexample.client.ipv4.ip packetDropHopLimitReached:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropForwardingDisabled:count 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, count"
+scalar myexample.client.ipv4.ip packetDropForwardingDisabled:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropNoInterfaceFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, count"
+scalar myexample.client.ipv4.ip packetDropNoInterfaceFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropNoRouteFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, count"
+scalar myexample.client.ipv4.ip packetDropNoRouteFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, sum(packetBytes)"
+scalar myexample.client.ipv4.ip packetDropUndefined:count 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, count"
+scalar myexample.client.ipv4.ip packetDropUndefined:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, sum(packetBytes)"
+scalar myexample.client.ipv4.arp arpResolutionFailed:count 0
+attr title "ARP failed resolutions, count"
+scalar myexample.client.ipv4.arp arpResolutionCompleted:count 0
+attr title "ARP completed resolutions, count"
+scalar myexample.client.ipv4.arp arpResolutionInitiated:count 0
+attr title "ARP initiated resolutions, count"
+scalar myexample.client.ipv4.arp arpReplySent:count 0
+attr source arpReplySent
+attr title "ARP replies sent, count"
+scalar myexample.client.ipv4.arp arpReplySent:sum(packetBytes) 0
+attr source arpReplySent
+attr title "ARP replies sent, sum(packetBytes)"
+scalar myexample.client.ipv4.arp arpRequestSent:count 0
+attr source arpRequestSent
+attr title "ARP request sent, count"
+scalar myexample.client.ipv4.arp arpRequestSent:sum(packetBytes) 0
+attr source arpRequestSent
+attr title "ARP request sent, sum(packetBytes)"
+scalar myexample.client.udp packetReceived:count 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, count"
+scalar myexample.client.udp packetReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, sum(packetBytes)"
+scalar myexample.client.udp packetSent:count 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, count"
+scalar myexample.client.udp packetSent:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, sum(packetBytes)"
+scalar myexample.client.udp passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed up, count"
+scalar myexample.client.udp droppedPkWrongPort:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+scalar myexample.client.udp droppedPkBadChecksum:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+scalar myexample.client.app[0] rcvdPacketSignal:count 0
+attr interpolationmode none
+attr source rcvdPacketSignal
+attr title "packets received, count"
+scalar myexample.client.app[0] rcvdPacketSignal:sum(packetBytes) 0
+attr interpolationmode none
+attr source rcvdPacketSignal
+attr title "packets received, sum(packetBytes)"
+scalar myexample.client2.lo[0].lo rcvdPkFromHl:count 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.client2.lo[0].lo rcvdPkFromHl:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.client2.lo[0].lo passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.client2.lo[0].lo passedUpPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp.queue packetPopped:count 5
+attr interpolationmode none
+attr title "packet popped, count"
+scalar myexample.client2.ppp[0].ppp.queue packetPopped:sum(packetBytes) 200
+attr interpolationmode none
+attr title "packet popped, sum(packetBytes)"
+statistic myexample.client2.ppp[0].ppp.queue queueingTime:histogram
+field count 5
+field mean 7.52e-07
+field stddev 5.9450820011166e-07
+field min 0
+field max 1.504e-06
+field sum 3.76e-06
+field sqrsum 4.24128e-12
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, histogram"
+attr unit s
+bin	-inf	0
+bin	0	1
+bin	2e-08	0
+bin	4e-08	0
+bin	6e-08	0
+bin	8e-08	0
+bin	1e-07	0
+bin	1.2e-07	0
+bin	1.4e-07	0
+bin	1.6e-07	0
+bin	1.8e-07	0
+bin	2e-07	0
+bin	2.2e-07	0
+bin	2.4e-07	0
+bin	2.6e-07	0
+bin	2.8e-07	0
+bin	3e-07	0
+bin	3.2e-07	0
+bin	3.4e-07	0
+bin	3.6e-07	1
+bin	3.8e-07	0
+bin	4e-07	0
+bin	4.2e-07	0
+bin	4.4e-07	0
+bin	4.6e-07	0
+bin	4.8e-07	0
+bin	5e-07	0
+bin	5.2e-07	0
+bin	5.4e-07	0
+bin	5.6e-07	0
+bin	5.8e-07	0
+bin	6e-07	0
+bin	6.2e-07	0
+bin	6.4e-07	0
+bin	6.6e-07	0
+bin	6.8e-07	0
+bin	7e-07	0
+bin	7.2e-07	0
+bin	7.4e-07	1
+bin	7.6e-07	0
+bin	7.8e-07	0
+bin	8e-07	0
+bin	8.2e-07	0
+bin	8.4e-07	0
+bin	8.6e-07	0
+bin	8.8e-07	0
+bin	9e-07	0
+bin	9.2e-07	0
+bin	9.4e-07	0
+bin	9.6e-07	0
+bin	9.8e-07	0
+bin	1e-06	0
+bin	1.02e-06	0
+bin	1.04e-06	0
+bin	1.06e-06	0
+bin	1.08e-06	0
+bin	1.1e-06	0
+bin	1.12e-06	1
+bin	1.14e-06	0
+bin	1.16e-06	0
+bin	1.18e-06	0
+bin	1.2e-06	0
+bin	1.22e-06	0
+bin	1.24e-06	0
+bin	1.26e-06	0
+bin	1.28e-06	0
+bin	1.3e-06	0
+bin	1.32e-06	0
+bin	1.34e-06	0
+bin	1.36e-06	0
+bin	1.38e-06	0
+bin	1.4e-06	0
+bin	1.42e-06	0
+bin	1.44e-06	0
+bin	1.46e-06	0
+bin	1.48e-06	0
+bin	1.5e-06	1
+bin	1.52e-06	0
+bin	1.54e-06	0
+bin	1.56e-06	0
+bin	1.58e-06	0
+bin	1.6e-06	0
+bin	1.62e-06	0
+bin	1.64e-06	0
+bin	1.66e-06	0
+bin	1.68e-06	0
+bin	1.7e-06	0
+bin	1.72e-06	0
+bin	1.74e-06	0
+bin	1.76e-06	0
+bin	1.78e-06	0
+bin	1.8e-06	0
+bin	1.82e-06	0
+bin	1.84e-06	0
+bin	1.86e-06	0
+bin	1.88e-06	0
+scalar myexample.client2.ppp[0].ppp.queue queueLength:max 4
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, max"
+scalar myexample.client2.ppp[0].ppp.queue queueLength:timeavg 0.083764034931385
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, timeavg"
+scalar myexample.client2.ppp[0].ppp.queue packetPushed:count 5
+attr interpolationmode none
+attr title "packet pushed, count"
+scalar myexample.client2.ppp[0].ppp.queue packetPushed:sum(packetBytes) 200
+attr interpolationmode none
+attr title "packet pushed, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp.queue packetDropQueueOverflow:count 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, count"
+scalar myexample.client2.ppp[0].ppp.queue packetDropQueueOverflow:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp.queue packetRemoved:count 0
+attr interpolationmode none
+attr title "packets removed, count"
+scalar myexample.client2.ppp[0].ppp.queue packetRemoved:sum(packetBytes) 0
+attr interpolationmode none
+attr title "packets removed, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp transmissionState:timeavg 0.041882017465692
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.client2.ppp[0].ppp rxPkOk:count 5
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.client2.ppp[0].ppp rxPkOk:sum(packetBytes) 235
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp txPk:count 5
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.client2.ppp[0].ppp txPk:sum(packetBytes) 235
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp rcvdPkFromHl:count 5
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.client2.ppp[0].ppp rcvdPkFromHl:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp passedUpPk:count 5
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.client2.ppp[0].ppp passedUpPk:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.client2.ppp[0].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.client2.ppp[0].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.client2.ppp[0].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropAddressResolutionFailed:count 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, count"
+scalar myexample.client2.ipv4.ip packetDropAddressResolutionFailed:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropHopLimitReached:count 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, count"
+scalar myexample.client2.ipv4.ip packetDropHopLimitReached:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropForwardingDisabled:count 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, count"
+scalar myexample.client2.ipv4.ip packetDropForwardingDisabled:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropNoInterfaceFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, count"
+scalar myexample.client2.ipv4.ip packetDropNoInterfaceFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropNoRouteFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, count"
+scalar myexample.client2.ipv4.ip packetDropNoRouteFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, sum(packetBytes)"
+scalar myexample.client2.ipv4.ip packetDropUndefined:count 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, count"
+scalar myexample.client2.ipv4.ip packetDropUndefined:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, sum(packetBytes)"
+scalar myexample.client2.ipv4.arp arpResolutionFailed:count 0
+attr title "ARP failed resolutions, count"
+scalar myexample.client2.ipv4.arp arpResolutionCompleted:count 0
+attr title "ARP completed resolutions, count"
+scalar myexample.client2.ipv4.arp arpResolutionInitiated:count 0
+attr title "ARP initiated resolutions, count"
+scalar myexample.client2.ipv4.arp arpReplySent:count 0
+attr source arpReplySent
+attr title "ARP replies sent, count"
+scalar myexample.client2.ipv4.arp arpReplySent:sum(packetBytes) 0
+attr source arpReplySent
+attr title "ARP replies sent, sum(packetBytes)"
+scalar myexample.client2.ipv4.arp arpRequestSent:count 0
+attr source arpRequestSent
+attr title "ARP request sent, count"
+scalar myexample.client2.ipv4.arp arpRequestSent:sum(packetBytes) 0
+attr source arpRequestSent
+attr title "ARP request sent, sum(packetBytes)"
+scalar myexample.client2.udp packetReceived:count 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, count"
+scalar myexample.client2.udp packetReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, sum(packetBytes)"
+scalar myexample.client2.udp packetSent:count 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, count"
+scalar myexample.client2.udp packetSent:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, sum(packetBytes)"
+scalar myexample.client2.udp passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed up, count"
+scalar myexample.client2.udp droppedPkWrongPort:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+scalar myexample.client2.udp droppedPkBadChecksum:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+scalar myexample.client2.app[0] rcvdPacketSignal:count 0
+attr interpolationmode none
+attr source rcvdPacketSignal
+attr title "packets received, count"
+scalar myexample.client2.app[0] rcvdPacketSignal:sum(packetBytes) 0
+attr interpolationmode none
+attr source rcvdPacketSignal
+attr title "packets received, sum(packetBytes)"
+scalar myexample.server.lo[0].lo rcvdPkFromHl:count 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.server.lo[0].lo rcvdPkFromHl:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.server.lo[0].lo passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.server.lo[0].lo passedUpPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp.queue packetPopped:count 10
+attr interpolationmode none
+attr title "packet popped, count"
+scalar myexample.server.ppp[0].ppp.queue packetPopped:sum(packetBytes) 400
+attr interpolationmode none
+attr title "packet popped, sum(packetBytes)"
+statistic myexample.server.ppp[0].ppp.queue queueingTime:histogram
+field count 10
+field mean 0
+field stddev 0
+field min 0
+field max 0
+field sum 0
+field sqrsum 0
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, histogram"
+attr unit s
+bin	-inf	0
+bin	-0.5	0
+bin	-0.48	0
+bin	-0.46	0
+bin	-0.44	0
+bin	-0.42	0
+bin	-0.4	0
+bin	-0.38	0
+bin	-0.36	0
+bin	-0.34	0
+bin	-0.32	0
+bin	-0.3	0
+bin	-0.28	0
+bin	-0.26	0
+bin	-0.24	0
+bin	-0.22	0
+bin	-0.2	0
+bin	-0.18	0
+bin	-0.16	0
+bin	-0.14	0
+bin	-0.12	0
+bin	-0.1	0
+bin	-0.08	0
+bin	-0.06	0
+bin	-0.04	0
+bin	-0.02	0
+bin	0	10
+bin	0.02	0
+bin	0.04	0
+bin	0.06	0
+bin	0.08	0
+bin	0.1	0
+bin	0.12	0
+bin	0.14	0
+bin	0.16	0
+bin	0.18	0
+bin	0.2	0
+bin	0.22	0
+bin	0.24	0
+bin	0.26	0
+bin	0.28	0
+bin	0.3	0
+bin	0.32	0
+bin	0.34	0
+bin	0.36	0
+bin	0.38	0
+bin	0.4	0
+bin	0.42	0
+bin	0.44	0
+bin	0.46	0
+bin	0.48	0
+bin	0.5	0
+scalar myexample.server.ppp[0].ppp.queue queueLength:max 1
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, max"
+scalar myexample.server.ppp[0].ppp.queue queueLength:timeavg 0
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, timeavg"
+scalar myexample.server.ppp[0].ppp.queue packetPushed:count 10
+attr interpolationmode none
+attr title "packet pushed, count"
+scalar myexample.server.ppp[0].ppp.queue packetPushed:sum(packetBytes) 400
+attr interpolationmode none
+attr title "packet pushed, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp.queue packetDropQueueOverflow:count 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, count"
+scalar myexample.server.ppp[0].ppp.queue packetDropQueueOverflow:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsQueueOverflow(packetDropped)
+attr title "packet drops: queue overflow, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp.queue packetRemoved:count 0
+attr interpolationmode none
+attr title "packets removed, count"
+scalar myexample.server.ppp[0].ppp.queue packetRemoved:sum(packetBytes) 0
+attr interpolationmode none
+attr title "packets removed, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp transmissionState:timeavg 0.083764034931385
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.server.ppp[0].ppp rxPkOk:count 10
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.server.ppp[0].ppp rxPkOk:sum(packetBytes) 470
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp txPk:count 10
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.server.ppp[0].ppp txPk:sum(packetBytes) 470
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp rcvdPkFromHl:count 10
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.server.ppp[0].ppp rcvdPkFromHl:sum(packetBytes) 400
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp passedUpPk:count 10
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.server.ppp[0].ppp passedUpPk:sum(packetBytes) 400
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.server.ppp[0].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.server.ppp[0].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.server.ppp[0].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropAddressResolutionFailed:count 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, count"
+scalar myexample.server.ipv4.ip packetDropAddressResolutionFailed:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropHopLimitReached:count 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, count"
+scalar myexample.server.ipv4.ip packetDropHopLimitReached:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropForwardingDisabled:count 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, count"
+scalar myexample.server.ipv4.ip packetDropForwardingDisabled:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropNoInterfaceFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, count"
+scalar myexample.server.ipv4.ip packetDropNoInterfaceFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropNoRouteFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, count"
+scalar myexample.server.ipv4.ip packetDropNoRouteFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, sum(packetBytes)"
+scalar myexample.server.ipv4.ip packetDropUndefined:count 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, count"
+scalar myexample.server.ipv4.ip packetDropUndefined:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, sum(packetBytes)"
+scalar myexample.server.ipv4.arp arpResolutionFailed:count 0
+attr title "ARP failed resolutions, count"
+scalar myexample.server.ipv4.arp arpResolutionCompleted:count 0
+attr title "ARP completed resolutions, count"
+scalar myexample.server.ipv4.arp arpResolutionInitiated:count 0
+attr title "ARP initiated resolutions, count"
+scalar myexample.server.ipv4.arp arpReplySent:count 0
+attr source arpReplySent
+attr title "ARP replies sent, count"
+scalar myexample.server.ipv4.arp arpReplySent:sum(packetBytes) 0
+attr source arpReplySent
+attr title "ARP replies sent, sum(packetBytes)"
+scalar myexample.server.ipv4.arp arpRequestSent:count 0
+attr source arpRequestSent
+attr title "ARP request sent, count"
+scalar myexample.server.ipv4.arp arpRequestSent:sum(packetBytes) 0
+attr source arpRequestSent
+attr title "ARP request sent, sum(packetBytes)"
+scalar myexample.server.udp packetReceived:count 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, count"
+scalar myexample.server.udp packetReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceived
+attr title "packets received, sum(packetBytes)"
+scalar myexample.server.udp packetSent:count 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, count"
+scalar myexample.server.udp packetSent:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSent
+attr title "packets sent, sum(packetBytes)"
+scalar myexample.server.udp passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed up, count"
+scalar myexample.server.udp droppedPkWrongPort:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoPortFound(packetDropped)
+attr title "packets dropped (wrong port), count"
+scalar myexample.server.udp droppedPkBadChecksum:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packets dropped (checksum error), count"
+scalar myexample.server.app[0] numRcvTrimmedHeaderSigNdp:last nan
+attr source numRcvTrimmedHeaderSigNdp
+attr title "numRcvTrimmedHeaderNdp, last"
+attr unit s
+scalar myexample.server.app[0] multisourceGroupIdSignal:last nan
+attr source multisourceGroupIdSignal
+attr title "multisourceGroupIdSignal , last"
+attr unit s
+scalar myexample.server.app[0] multicastGroupIdSignal:last nan
+attr source multicastGroupIdSignal
+attr title "multicastGroupIdSignal , last"
+attr unit s
+scalar myexample.server.app[0] fctRecordv3:last nan
+attr source fctRecordv3
+attr title "NDP Sesssion's flow completion time, last"
+attr unit s
+scalar myexample.server.app[0] rcvdPk:count 0
+attr interpolationmode none
+attr source rcvdPk
+attr title "packets (symbols) received, count"
+scalar myexample.server.app[0] rcvdPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source rcvdPk
+attr title "packets (symbols) received, sum(packetBytes)"
+scalar myexample.server.app[1] numRcvTrimmedHeaderSigNdp:last nan
+attr source numRcvTrimmedHeaderSigNdp
+attr title "numRcvTrimmedHeaderNdp, last"
+attr unit s
+scalar myexample.server.app[1] multisourceGroupIdSignal:last nan
+attr source multisourceGroupIdSignal
+attr title "multisourceGroupIdSignal , last"
+attr unit s
+scalar myexample.server.app[1] multicastGroupIdSignal:last nan
+attr source multicastGroupIdSignal
+attr title "multicastGroupIdSignal , last"
+attr unit s
+scalar myexample.server.app[1] fctRecordv3:last nan
+attr source fctRecordv3
+attr title "NDP Sesssion's flow completion time, last"
+attr unit s
+scalar myexample.server.app[1] rcvdPk:count 0
+attr interpolationmode none
+attr source rcvdPk
+attr title "packets (symbols) received, count"
+scalar myexample.server.app[1] rcvdPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source rcvdPk
+attr title "packets (symbols) received, sum(packetBytes)"
+scalar myexample.router.lo[0].lo rcvdPkFromHl:count 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.router.lo[0].lo rcvdPkFromHl:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.router.lo[0].lo passedUpPk:count 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.router.lo[0].lo passedUpPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp.queue "numTrimmedPkt " 0
+scalar myexample.router.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar myexample.router.ppp[0].ppp.queue headersQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[0].ppp.queue headersQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+scalar myexample.router.ppp[0].ppp.queue dataQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[0].ppp.queue dataQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+statistic myexample.router.ppp[0].ppp.queue queueingTime:histogram
+field count 0
+field mean -nan
+field stddev -nan
+field min -nan
+field max -nan
+field sum 0
+field sqrsum 0
+attr interpolationmode none
+attr title "queueing time, histogram"
+bin	-inf	0
+bin	0	0
+bin	1	0
+scalar myexample.router.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar myexample.router.ppp[0].ppp.queue dropPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar myexample.router.ppp[0].ppp.queue rcvdPk:sum(packetBytes) 0
+attr interpolationmode none
+attr title "received packets, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp transmissionState:timeavg 0.083764034931385
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.router.ppp[0].ppp rxPkOk:count 10
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.router.ppp[0].ppp rxPkOk:sum(packetBytes) 470
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp txPk:count 10
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.router.ppp[0].ppp txPk:sum(packetBytes) 470
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp rcvdPkFromHl:count 10
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.router.ppp[0].ppp rcvdPkFromHl:sum(packetBytes) 400
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp passedUpPk:count 10
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.router.ppp[0].ppp passedUpPk:sum(packetBytes) 400
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.router.ppp[0].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.router.ppp[0].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.router.ppp[0].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp.queue "numTrimmedPkt " 0
+scalar myexample.router.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar myexample.router.ppp[1].ppp.queue headersQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[1].ppp.queue headersQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+scalar myexample.router.ppp[1].ppp.queue dataQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[1].ppp.queue dataQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+statistic myexample.router.ppp[1].ppp.queue queueingTime:histogram
+field count 0
+field mean -nan
+field stddev -nan
+field min -nan
+field max -nan
+field sum 0
+field sqrsum 0
+attr interpolationmode none
+attr title "queueing time, histogram"
+bin	-inf	0
+bin	0	0
+bin	1	0
+scalar myexample.router.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar myexample.router.ppp[1].ppp.queue dropPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar myexample.router.ppp[1].ppp.queue rcvdPk:sum(packetBytes) 0
+attr interpolationmode none
+attr title "received packets, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp transmissionState:timeavg 0.041882017465692
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.router.ppp[1].ppp rxPkOk:count 5
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.router.ppp[1].ppp rxPkOk:sum(packetBytes) 235
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp txPk:count 5
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.router.ppp[1].ppp txPk:sum(packetBytes) 235
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp rcvdPkFromHl:count 5
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.router.ppp[1].ppp rcvdPkFromHl:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp passedUpPk:count 5
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.router.ppp[1].ppp passedUpPk:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.router.ppp[1].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.router.ppp[1].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.router.ppp[1].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp.queue "numTrimmedPkt " 0
+scalar myexample.router.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar myexample.router.ppp[2].ppp.queue headersQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[2].ppp.queue headersQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+scalar myexample.router.ppp[2].ppp.queue dataQueueLength:max -nan
+attr interpolationmode sample-hold
+attr title "queue length, max"
+scalar myexample.router.ppp[2].ppp.queue dataQueueLength:timeavg -nan
+attr interpolationmode sample-hold
+attr title "queue length, timeavg"
+statistic myexample.router.ppp[2].ppp.queue queueingTime:histogram
+field count 0
+field mean -nan
+field stddev -nan
+field min -nan
+field max -nan
+field sum 0
+field sqrsum 0
+attr interpolationmode none
+attr title "queueing time, histogram"
+bin	-inf	0
+bin	0	0
+bin	1	0
+scalar myexample.router.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar myexample.router.ppp[2].ppp.queue dropPk:sum(packetBytes) 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar myexample.router.ppp[2].ppp.queue rcvdPk:sum(packetBytes) 0
+attr interpolationmode none
+attr title "received packets, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp transmissionState:timeavg 0.041882017465692
+attr interpolationmode sample-hold
+attr source transmissionStateChanged
+attr title "tx state, timeavg"
+scalar myexample.router.ppp[2].ppp rxPkOk:count 5
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, count"
+scalar myexample.router.ppp[2].ppp rxPkOk:sum(packetBytes) 235
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp txPk:count 5
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, count"
+scalar myexample.router.ppp[2].ppp txPk:sum(packetBytes) 235
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp rcvdPkFromHl:count 5
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, count"
+scalar myexample.router.ppp[2].ppp rcvdPkFromHl:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp passedUpPk:count 5
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, count"
+scalar myexample.router.ppp[2].ppp passedUpPk:sum(packetBytes) 200
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp packetDropIncorrectlyReceived:count 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, count"
+scalar myexample.router.ppp[2].ppp packetDropIncorrectlyReceived:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsIncorrectlyReceived(packetDropped)
+attr title "packet drop: incorrectly received, sum(packetBytes)"
+scalar myexample.router.ppp[2].ppp packetDropInterfaceDown:count 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, count"
+scalar myexample.router.ppp[2].ppp packetDropInterfaceDown:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsInterfaceDown(packetDropped)
+attr title "packet drop: interface down, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropAddressResolutionFailed:count 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, count"
+scalar myexample.router.ipv4.ip packetDropAddressResolutionFailed:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsAddressResolutionFailed(packetDropped)
+attr title "packet drop: address resolution failed, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropHopLimitReached:count 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, count"
+scalar myexample.router.ipv4.ip packetDropHopLimitReached:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsHopLimitReached(packetDropped)
+attr title "packet drop: hop limit reached, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropForwardingDisabled:count 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, count"
+scalar myexample.router.ipv4.ip packetDropForwardingDisabled:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsForwardingDisabled(packetDropped)
+attr title "packet drop: forwarding disabled, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropNoInterfaceFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, count"
+scalar myexample.router.ipv4.ip packetDropNoInterfaceFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoInterfaceFound(packetDropped)
+attr title "packet drop: no interface found, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropNoRouteFound:count 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, count"
+scalar myexample.router.ipv4.ip packetDropNoRouteFound:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsNoRouteFound(packetDropped)
+attr title "packet drop: no route found, sum(packetBytes)"
+scalar myexample.router.ipv4.ip packetDropUndefined:count 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, count"
+scalar myexample.router.ipv4.ip packetDropUndefined:sum(packetBytes) 0
+attr interpolationmode none
+attr source packetDropReasonIsUndefined(packetDropped)
+attr title "packet drop: undefined, sum(packetBytes)"
+scalar myexample.router.ipv4.arp arpResolutionFailed:count 0
+attr title "ARP failed resolutions, count"
+scalar myexample.router.ipv4.arp arpResolutionCompleted:count 0
+attr title "ARP completed resolutions, count"
+scalar myexample.router.ipv4.arp arpResolutionInitiated:count 0
+attr title "ARP initiated resolutions, count"
+scalar myexample.router.ipv4.arp arpReplySent:count 0
+attr source arpReplySent
+attr title "ARP replies sent, count"
+scalar myexample.router.ipv4.arp arpReplySent:sum(packetBytes) 0
+attr source arpReplySent
+attr title "ARP replies sent, sum(packetBytes)"
+scalar myexample.router.ipv4.arp arpRequestSent:count 0
+attr source arpRequestSent
+attr title "ARP request sent, count"
+scalar myexample.router.ipv4.arp arpRequestSent:sum(packetBytes) 0
+attr source arpRequestSent
+attr title "ARP request sent, sum(packetBytes)"
+

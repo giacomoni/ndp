@@ -39,13 +39,17 @@ OBJS = \
     $O/application/ndpapp/NdpSinkApp.o \
     $O/common/ProtocolGroupNdp.o \
     $O/common/ProtocolNdp.o \
+    $O/common/TopologyEcmp.o \
     $O/common/queue/NDPQueue.o \
     $O/common/scheduler/CentralSchedulerNdp.o \
     $O/networklayer/ipv4/IcmpNdp.o \
+    $O/networklayer/ipv4/Igmpv2Ndp.o \
     $O/networklayer/ipv4/Ipv4FragBufNdp.o \
+    $O/networklayer/ipv4/Ipv4HeaderNdp.o \
     $O/networklayer/ipv4/Ipv4NatTableNdp.o \
     $O/networklayer/ipv4/Ipv4Ndp.o \
     $O/networklayer/ipv4/Ipv4NetworkLayerNdp.o \
+    $O/networklayer/ipv4/Ipv4RoutingTableEcmp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NDPConnectionBase.o \
     $O/transportlayer/Ndp/NDPConnectionEventProc.o \
@@ -62,6 +66,8 @@ OBJS = \
     $O/application/base/ApplicationPacketNdp_m.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
     $O/common/ProtocolNdp_m.o \
+    $O/networklayer/ipv4/Ipv4HeaderNdp_m.o \
+    $O/networklayer/ipv4/Ipv4OptionsTagNdp_m.o \
     $O/transportlayer/Ndp/NDPConnection_m.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader_m.o \
     $O/transportlayer/contract/ndp/NDPCommand_m.o
@@ -71,6 +77,8 @@ MSGFILES = \
     application/base/ApplicationPacketNdp.msg \
     application/ndpapp/GenericAppMsgNdp.msg \
     common/ProtocolNdp.msg \
+    networklayer/ipv4/Ipv4HeaderNdp.msg \
+    networklayer/ipv4/Ipv4OptionsTagNdp.msg \
     transportlayer/Ndp/NDPConnection.msg \
     transportlayer/Ndp/ndp_common/NdpHeader.msg \
     transportlayer/contract/ndp/NDPCommand.msg

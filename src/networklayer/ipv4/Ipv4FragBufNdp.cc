@@ -20,7 +20,7 @@
 
 #include "IcmpNdp.h"
 #include "Ipv4FragBufNdp.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "Ipv4HeaderNdp_m.h"
 
 namespace inet {
 
@@ -42,7 +42,7 @@ void Ipv4FragBufNdp::flush()
 
 Packet *Ipv4FragBufNdp::addFragment(Packet *packet, simtime_t now)
 {
-    const auto& ipv4Header = packet->peekAtFront<Ipv4Header>();
+    const auto& ipv4Header = packet->peekAtFront<Ipv4HeaderNdp>();
     // find datagram buffer
     Key key;
     key.id = ipv4Header->getIdentification();
@@ -85,7 +85,7 @@ Packet *Ipv4FragBufNdp::addFragment(Packet *packet, simtime_t now)
         std::size_t found = pkName.find("-frag-");
         if (found != std::string::npos)
             pkName.resize(found);
-        auto hdr = Ptr<Ipv4Header>(curBuf->packet->peekAtFront<Ipv4Header>()->dup());
+        auto hdr = Ptr<Ipv4HeaderNdp>(curBuf->packet->peekAtFront<Ipv4HeaderNdp>()->dup());
         Packet *pk = curBuf->packet;
         pk->setName(pkName.c_str());
         pk->removeAll();

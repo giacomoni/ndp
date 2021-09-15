@@ -20,13 +20,13 @@ moduleinterface IIpv4Ndp
     gates:
         input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
         output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
-        input queueIn @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
-        output queueOut @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
+        input queueIn @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
+        output queueOut @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
 }
 
 //
 // Implements the IPv4 protocol. The protocol header is represented
-// by the ~Ipv4Header message class.
+// by the ~Ipv4HeaderNdp message class.
 //
 // <b>Interfacing with higher layer protocols</b>
 //
@@ -107,9 +107,9 @@ simple Ipv4Ndp like IIpv4Ndp
         @signal[packetSentToLower](type=cPacket);
         @signal[packetReceivedFromLower](type=cPacket);
         @signal[packetDropped](type=cPacket);
-        @signal[ipv4NewMulticast](type=inet::Ipv4Header);
-        @signal[ipv4DataOnNonrpf](type=inet::Ipv4Header);
-        @signal[ipv4DataOnRpf](type=inet::Ipv4Header);
+        @signal[ipv4NewMulticast](type=inet::Ipv4HeaderNdp);
+        @signal[ipv4DataOnNonrpf](type=inet::Ipv4HeaderNdp);
+        @signal[ipv4DataOnRpf](type=inet::Ipv4HeaderNdp);
         @signal[ipv4MdataRegister](type=inet::Packet);
         @statistic[packetDropAddressResolutionFailed](title="packet drop: address resolution failed"; source=packetDropReasonIsAddressResolutionFailed(packetDropped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
         @statistic[packetDropHopLimitReached](title="packet drop: hop limit reached"; source=packetDropReasonIsHopLimitReached(packetDropped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
@@ -120,6 +120,6 @@ simple Ipv4Ndp like IIpv4Ndp
     gates:
         input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
         output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
-        input queueIn @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
-        output queueOut @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
+        input queueIn @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
+        output queueOut @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
 }

@@ -32,7 +32,7 @@
 #include "IcmpNdp.h"
 #include "inet/networklayer/ipv4/Ipv4FragBuf.h"
 #include "Ipv4FragBufNdp.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "Ipv4HeaderNdp_m.h"
 
 namespace inet {
 
@@ -118,7 +118,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     virtual Ipv4Address getNextHop(Packet *packet);
 
     // utility: look up route to the source of the datagram and return its interface
-    virtual const InterfaceEntry *getShortestPathInterfaceToSource(const Ptr<const Ipv4Header>& ipv4Header) const;
+    virtual const InterfaceEntry *getShortestPathInterfaceToSource(const Ptr<const Ipv4HeaderNdp>& ipv4Header) const;
 
     // utility: show current statistics above the icon
     virtual void refreshDisplay() const override;
@@ -130,13 +130,13 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     void arpResolutionTimedOut(IArp::Notification *entry);
 
     // utility: verifying CRC
-    bool verifyCrc(const Ptr<const Ipv4Header>& ipv4Header);
+    bool verifyCrc(const Ptr<const Ipv4HeaderNdp>& ipv4Header);
 
     // utility: calculate and set CRC
-    void setComputedCrc(Ptr<Ipv4Header>& ipv4Header);
+    void setComputedCrc(Ptr<Ipv4HeaderNdp>& ipv4Header);
 
   public:
-    static void insertCrc(const Ptr<Ipv4Header>& ipv4Header);
+    static void insertCrc(const Ptr<Ipv4HeaderNdp>& ipv4Header);
 
   protected:
     /**
@@ -185,7 +185,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     /**
      * Determines the output interface for the given multicast datagram.
      */
-    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4Header>& ipv4Header, const InterfaceEntry *multicastIFOption);
+    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4HeaderNdp>& ipv4Header, const InterfaceEntry *multicastIFOption);
 
     /**
      * Forwards packets to all multicast destinations, using fragmentAndSend().

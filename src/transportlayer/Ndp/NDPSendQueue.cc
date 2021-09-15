@@ -78,7 +78,7 @@ uint32 NDPSendQueue::getBufferEndSeq()
 }
 
 const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
-{
+{ //TODO
 
 //    ASSERT(seqLE(begin, fromSeq) && seqLE(fromSeq + numBytes, end));
     if (dataToSendQueue.getLength() > B(0)) {

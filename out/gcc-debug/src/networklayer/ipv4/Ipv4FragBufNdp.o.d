@@ -55,13 +55,14 @@
  networklayer/ipv4/Ipv4FragBufNdp.h \
  ../../inet4/src/inet/common/packet/ReassemblyBuffer.h \
  ../../inet4/src/inet/common/packet/ChunkBuffer.h \
- ../../inet4/src/inet/networklayer/ipv4/Ipv4Header_m.h \
+ networklayer/ipv4/Ipv4HeaderNdp_m.h \
  ../../inet4/src/inet/common/TlvOptions_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h \
- ../../inet4/src/inet/common/ProtocolGroup.h
+ networklayer/ipv4/../../common/ProtocolGroupNdp.h \
+ networklayer/ipv4/../../common/ProtocolNdp.h
 
 networklayer/ipv4/IcmpNdp.h:
 
@@ -177,7 +178,7 @@ networklayer/ipv4/Ipv4FragBufNdp.h:
 
 ../../inet4/src/inet/common/packet/ChunkBuffer.h:
 
-../../inet4/src/inet/networklayer/ipv4/Ipv4Header_m.h:
+networklayer/ipv4/Ipv4HeaderNdp_m.h:
 
 ../../inet4/src/inet/common/TlvOptions_m.h:
 
@@ -189,4 +190,6 @@ networklayer/ipv4/Ipv4FragBufNdp.h:
 
 ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h:
 
-../../inet4/src/inet/common/ProtocolGroup.h:
+networklayer/ipv4/../../common/ProtocolGroupNdp.h:
+
+networklayer/ipv4/../../common/ProtocolNdp.h:

@@ -10,6 +10,7 @@ import ndp.node.StandardHostNdp;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import inet.node.inet.Router;
+import ndp.base.RouterNdp;
 //import inet.node.inet.StandardHost;
 import ned.DatarateChannel;
 import ned.IBidirectionalChannel;
@@ -35,7 +36,7 @@ network myexample
         server: StandardHostNdp {
             @display("p=431,190");
         }
-        router: Router {
+        router: RouterNdp {
             @display("p=252,256");
         }
     connections:

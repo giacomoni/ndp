@@ -63,12 +63,11 @@
  ../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h \
  ../../inet4/src/inet/networklayer/ipv4/IcmpHeader_m.h \
  ../../inet4/src/inet/transportlayer/common/CrcMode_m.h \
- ../../inet4/src/inet/networklayer/ipv4/Ipv4Header_m.h \
+ networklayer/ipv4/Ipv4HeaderNdp_m.h \
  ../../inet4/src/inet/common/TlvOptions_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
  ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h \
- ../../inet4/src/inet/common/ProtocolGroup.h \
  ../../inet4/src/inet/networklayer/ipv4/Ipv4InterfaceData.h
 
 ../../inet4/src/inet/common/IProtocolRegistrationListener.h:
@@ -199,7 +198,7 @@ networklayer/ipv4/IcmpNdp.h:
 
 ../../inet4/src/inet/transportlayer/common/CrcMode_m.h:
 
-../../inet4/src/inet/networklayer/ipv4/Ipv4Header_m.h:
+networklayer/ipv4/Ipv4HeaderNdp_m.h:
 
 ../../inet4/src/inet/common/TlvOptions_m.h:
 
@@ -208,7 +207,5 @@ networklayer/ipv4/IcmpNdp.h:
 ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h:
 
 ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h:
-
-../../inet4/src/inet/common/ProtocolGroup.h:
 
 ../../inet4/src/inet/networklayer/ipv4/Ipv4InterfaceData.h:

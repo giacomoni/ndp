@@ -1,15 +1,15 @@
-                                                                
+file 16386 1631713172                                           
 version 2
-run General-0-20210914-16:54:47-46716
+run General-0-20210915-14:37:28-32949
 attr configname General
-attr datetime 20210914-16:54:47
+attr datetime 20210915-14:37:28
 attr experiment General
 attr inifile omnetpp.ini
 attr iterationvars ""
 attr iterationvarsf ""
 attr measurement ""
 attr network myexample
-attr processid 46716
+attr processid 32949
 attr repetition 0
 attr replication #0
 attr resultdir results
@@ -99,4 +99,165 @@ attr unit s
 vector 11 myexample.client.ppp[0].ppp txPk:vector(packetBytes) ETV
 attr interpolationmode none
 attr source packetSentToLower
-attr title "pac
+attr title "packets transmitted, vector(packetBytes)"
+vector 12 myexample.client2.ppp[0].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 13 myexample.client2.ppp[0].ppp.queue packetPushed:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet pushed, vector(packetBytes)"
+vector 14 myexample.client2.ppp[0].ppp.queue queueLength:vector ETV
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, vector"
+vector 15 myexample.client2.ppp[0].ppp.queue packetPopped:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet popped, vector(packetBytes)"
+vector 16 myexample.client2.ppp[0].ppp.queue queueingTime:vector ETV
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, vector"
+attr unit s
+vector 17 myexample.client2.ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, vector(packetBytes)"
+vector 18 myexample.router.ppp[1].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 19 myexample.router.ppp[1].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+vector 20 myexample.router.ppp[2].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 21 myexample.router.ppp[2].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+vector 22 myexample.router.ppp[0].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 23 myexample.router.ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, vector(packetBytes)"
+vector 24 myexample.server.ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 25 myexample.server.ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+vector 26 myexample.server.ppp[0].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 27 myexample.server.ppp[0].ppp.queue packetPushed:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet pushed, vector(packetBytes)"
+vector 28 myexample.server.ppp[0].ppp.queue queueLength:vector ETV
+attr interpolationmode sample-hold
+attr source "count(packetPushed) - count(packetPopped) - count(packetRemoved) - count(packetDropped)"
+attr title "queue length, vector"
+vector 29 myexample.server.ppp[0].ppp.queue packetPopped:vector(packetBytes) ETV
+attr interpolationmode none
+attr title "packet popped, vector(packetBytes)"
+vector 30 myexample.server.ppp[0].ppp.queue queueingTime:vector ETV
+attr interpolationmode none
+attr source queueingTime(packetPopped)
+attr title "queueing times, vector"
+attr unit s
+vector 31 myexample.server.ppp[0].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, vector(packetBytes)"
+vector 32 myexample.router.ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 33 myexample.router.ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+vector 34 myexample.router.ppp[1].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 35 myexample.router.ppp[1].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, vector(packetBytes)"
+vector 36 myexample.router.ppp[2].ppp rcvdPkFromHl:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetReceivedFromUpper
+attr title "packets received from higher layer, vector(packetBytes)"
+vector 37 myexample.router.ppp[2].ppp txPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToLower
+attr title "packets transmitted, vector(packetBytes)"
+vector 38 myexample.client.ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 39 myexample.client.ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+vector 40 myexample.client2.ppp[0].ppp rxPkOk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source rxPkOk
+attr title "packets received OK, vector(packetBytes)"
+vector 41 myexample.client2.ppp[0].ppp passedUpPk:vector(packetBytes) ETV
+attr interpolationmode none
+attr source packetSentToUpper
+attr title "packets passed to higher layer, vector(packetBytes)"
+0	9679 187 0 37 0 0.00000188 11 0 1 5 5
+1	9866 187 0 38 0 0.00000188 11 0 1 5 5
+2	10053 398 0 138 0 0.000024512 21 0 1 10 10
+3	10451 384 0 78 0 0.000014136 21 0 1 10 10
+4	10835 206 0 175 0 0.000034512 11 0 1 5 5
+5	11041 206 0 178 0 0.000034888 11 0 1 5 5
+6	11247 50 19 23 0 0 5 40 40 200 8000
+7	11297 50 19 23 0 0 5 40 40 200 8000
+8	11347 130 19 35 0 0.000001504 10 0 4 17 45
+9	11477 90 19 35 0 0.000001504 5 40 40 200 8000
+10	11567 120 19 35 0 0.000001504 5 0 1.504e-06 3.76e-06 4.24128e-12
+11	11687 95 19 35 0 0.000001504 5 47 47 235 11045
+12	11782 55 24 28 0 0 5 40 40 200 8000
+13	11837 55 24 28 0 0 5 40 40 200 8000
+14	11892 140 24 36 0 0.000001504 10 0 4 17 45
+15	12032 95 24 36 0 0.000001504 5 40 40 200 8000
+16	12127 120 24 36 0 0.000001504 5 0 1.504e-06 3.76e-06 4.24128e-12
+17	12247 95 24 36 0 0.000001504 5 47 47 235 11045
+18	12342 104 39 66 0.000010376 0.00001188 5 47 47 235 11045
+19	12446 104 39 66 0.000010376 0.00001188 5 40 40 200 8000
+20	12550 104 40 67 0.000010376 0.00001188 5 47 47 235 11045
+21	12654 104 40 67 0.000010376 0.00001188 5 40 40 200 8000
+22	12758 208 43 72 0.000010376 0.00001188 10 40 40 400 16000
+23	12966 208 43 77 0.000010376 0.00001376 10 47 47 470 22090
+24	13174 214 79 132 0.000020752 0.000024136 10 47 47 470 22090
+25	13388 214 79 132 0.000020752 0.000024136 10 40 40 400 16000
+26	13602 215 83 137 0.000020752 0.000024136 10 40 40 400 16000
+27	13817 215 83 137 0.000020752 0.000024136 10 40 40 400 16000
+28	14032 410 83 137 0.000020752 0.000024136 20 0 1 10 10
+29	14442 215 83 137 0.000020752 0.000024136 10 40 40 400 16000
+30	14657 205 83 137 0.000020752 0.000024136 10 0 0 0 0
+31	14862 215 83 137 0.000020752 0.000024136 10 47 47 470 22090
+32	15077 218 139 174 0.000031128 0.000034512 10 47 47 470 22090
+33	15295 218 139 174 0.000031128 0.000034512 10 40 40 400 16000
+34	15513 109 141 173 0.000031128 0.000034136 5 40 40 200 8000
+35	15622 109 141 173 0.000031128 0.000034136 5 47 47 235 11045
+36	15731 109 145 177 0.000031504 0.000034512 5 40 40 200 8000
+37	15840 109 145 177 0.000031504 0.000034512 5 47 47 235 11045
+38	15949 109 179 203 0.000041504 0.000044512 5 47 47 235 11045
+39	16058 109 179 203 0.000041504 0.000044512 5 40 40 200 8000
+40	16167 109 182 206 0.00004188 0.000044888 5 47 47 235 11045
+41	16276 109 182 206 0.00004188 0.000044888 5 40 40 200 8000
+

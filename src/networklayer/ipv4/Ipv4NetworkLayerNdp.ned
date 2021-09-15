@@ -24,6 +24,7 @@ import ndp.networklayer.ipv4.Ipv4NatTableNdp;
 import inet.networklayer.ipv4.IIgmp;
 import inet.networklayer.ipv4.Icmp;
 import ndp.networklayer.ipv4.IcmpNdp;
+import ndp.networklayer.ipv4.Igmpv2Ndp;
 import inet.networklayer.ipv4.IIpv4;
 import ndp.networklayer.ipv4.IIpv4Ndp;
 //
@@ -69,7 +70,7 @@ module Ipv4NetworkLayerNdp like INetworkLayer
             parameters:
                 @display("p=550,100;b=600,5");
         }
-        igmp: <default("Igmpv2")> like IIgmp {
+        igmp: Igmpv2Ndp {
             parameters:
                 @display("p=400,200");
         }

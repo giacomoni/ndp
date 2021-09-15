@@ -29,7 +29,7 @@
 #include "inet/queueing/queue/CompoundPacketQueue.h"
 #include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 #include "../../networklayer/ipv4/Ipv4Ndp.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "../../networklayer/ipv4/Ipv4HeaderNdp_m.h"
 
 #include "../../common/ProtocolNdp.h"
 #include "inet/networklayer/common/L3Tools.h"
@@ -135,7 +135,7 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
     EV_INFO << "\nPACKET STRING" << packet->str() << std::endl;
-    auto& ipv4Header = removeNetworkProtocolHeader<Ipv4Header>(packet);
+    auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
     auto& ndpHeader = removeTransportProtocolHeader<ndp::NdpHeader>(packet);
     EV_INFO << "\nENCAPSULATED PACKET STRING" << ipv4Header->str() << std::endl;
     EV_INFO << "\nENCAPSULATED PACKET STRING" << ndpHeader->str() << std::endl;

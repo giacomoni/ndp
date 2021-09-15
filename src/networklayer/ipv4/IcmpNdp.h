@@ -28,7 +28,7 @@
 
 namespace inet {
 
-class Ipv4Header;
+class Ipv4HeaderNdp;
 
 /**
  * Icmp module.

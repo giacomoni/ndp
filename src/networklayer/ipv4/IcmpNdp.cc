@@ -31,7 +31,7 @@
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "IcmpNdp.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "Ipv4HeaderNdp_m.h"
 #include "inet/networklayer/ipv4/Ipv4InterfaceData.h"
 
 namespace inet {
@@ -69,7 +69,7 @@ void IcmpNdp::sendErrorMessage(Packet *packet, int inputInterfaceId, IcmpType ty
 {
     Enter_Method("sendErrorMessage(datagram, type=%d, code=%d)", type, code);
 
-    const auto& ipv4Header = packet->peekAtFront<Ipv4Header>();
+    const auto& ipv4Header = packet->peekAtFront<Ipv4HeaderNdp>();
     Ipv4Address origSrcAddr = ipv4Header->getSrcAddress();
     Ipv4Address origDestAddr = ipv4Header->getDestAddress();
 
@@ -197,7 +197,7 @@ void IcmpNdp::processICMPMessage(Packet *packet)
         case ICMP_TIME_EXCEEDED:
         case ICMP_PARAMETER_PROBLEM: {
             // ICMP errors are delivered to the appropriate higher layer protocol
-            const auto& bogusL3Packet = packet->peekDataAt<Ipv4Header>(icmpmsg->getChunkLength());
+            const auto& bogusL3Packet = packet->peekDataAt<Ipv4HeaderNdp>(icmpmsg->getChunkLength());
             int transportProtocol = bogusL3Packet->getProtocolId();
             if (transportProtocol == IP_PROT_ICMP) {
                 // received ICMP error answer to an ICMP packet:

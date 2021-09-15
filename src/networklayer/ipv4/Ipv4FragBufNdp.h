@@ -26,7 +26,7 @@
 namespace inet {
 
 class IcmpNdp;
-class Ipv4Header;
+class Ipv4HeaderNdp;
 
 /**
  * Reassembly buffer for fragmented Ipv4 datagrams.

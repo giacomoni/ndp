@@ -16,7 +16,7 @@
 #include "inet/common/ModuleAccess.h"
 #include "inet/linklayer/common/InterfaceTag_m.h"
 #include "inet/networklayer/common/L3Tools.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include "Ipv4HeaderNdp_m.h"
 #include "Ipv4NatTableNdp.h"
 #include "../../transportlayer/common/L4ToolsNdp.h"
 
@@ -117,7 +117,7 @@ INetfilter::IHook::Result Ipv4NatTableNdp::processPacket(Packet *packet, INetfil
         const auto& natEntry = lt->second.second;
         // TODO: this might be slow for too many filters
         if (packetFilter->matches(packet)) {
-            auto& ipv4Header = removeNetworkProtocolHeader<Ipv4Header>(packet);
+            auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
             if (!natEntry.getDestAddress().isUnspecified())
                 ipv4Header->setDestAddress(natEntry.getDestAddress());
             if (!natEntry.getSrcAddress().isUnspecified())
