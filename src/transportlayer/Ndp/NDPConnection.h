@@ -119,7 +119,7 @@ public:
 
 public:
     bool active;    // set if the connection was initiated by an active open
-    bool fork;
+    //bool fork;
 
     unsigned int request_id;
     unsigned int internal_request_id;
@@ -285,6 +285,11 @@ protected:
    // MOH
     virtual void process_TIMEOUT_REQUEST_REXMIT();
 
+    /** Utility: clone a listening connection. Used for forking. */
+    //virtual NDPConnection *cloneListeningConnection();
+
+    //virtual void initClonedConnection(NDPConnection *listenerConn);
+
     /** Utility: creates send/receive queues and NDPAlgorithm */
     virtual void initConnection(NDPOpenCommand *openCmd);
 
@@ -378,6 +383,9 @@ protected:
 
     /** Utility: sends status indication (NDP_I_xxx) to application */
     virtual void sendIndicationToApp(int code, const int id = 0);
+
+    /** Utility: sends NDP_I_AVAILABLE indication with NDPAvailableInfo to application */
+    //virtual void sendAvailableIndicationToApp();
 
     /** Utility: sends NDP_I_ESTABLISHED indication with NDPConnectInfo to application */
     virtual void sendEstabIndicationToApp();

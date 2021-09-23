@@ -28,7 +28,7 @@
 #include "inet/networklayer/contract/IArp.h"
 #include "inet/networklayer/contract/INetfilter.h"
 #include "inet/networklayer/contract/INetworkProtocol.h"
-#include "inet/networklayer/ipv4/Icmp.h"
+//#include "inet/networklayer/ipv4/Icmp.h"
 #include "IcmpNdp.h"
 #include "inet/networklayer/ipv4/Ipv4FragBuf.h"
 #include "Ipv4FragBufNdp.h"
@@ -74,7 +74,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     };
 
   protected:
-    IIpv4RoutingTable *rt = nullptr;
+    IIpv4RoutingTable *rt = nullptr;  //TODO CHANGE BACK
     IInterfaceTable *ift = nullptr;
     IArp *arp = nullptr;
     IcmpNdp *icmp = nullptr;

@@ -20,6 +20,7 @@ import inet.networklayer.configurator.contract.IIpv4NodeConfigurator;
 import inet.networklayer.contract.IArp;
 import inet.networklayer.contract.INetworkLayer;
 import inet.networklayer.ipv4.Ipv4RoutingTable;
+import ndp.networklayer.ipv4.Ipv4RoutingTableEcmp;
 import ndp.networklayer.ipv4.Ipv4NatTableNdp;
 import inet.networklayer.ipv4.IIgmp;
 import inet.networklayer.ipv4.Icmp;
@@ -34,6 +35,7 @@ import ndp.networklayer.ipv4.IIpv4Ndp;
 module Ipv4NetworkLayerNdp like INetworkLayer
 {
     parameters:
+        @class("inet::Ipv4NetworkLayerNdp");
         bool forwarding = default(false);
         bool multicastForwarding = default(false);
         string interfaceTableModule;
@@ -58,7 +60,7 @@ module Ipv4NetworkLayerNdp like INetworkLayer
             parameters:
                 @display("p=100,100;is=s");
         }
-        routingTable: Ipv4RoutingTable {
+        routingTable: Ipv4RoutingTableEcmp {
             parameters:
                 @display("p=100,200;is=s");
         }

@@ -32,6 +32,13 @@
 #include "inet/networklayer/ipv4/Ipv4Route.h"
 #include "Ipv4RoutingTableEcmp.h"
 #include "inet/networklayer/ipv4/RoutingTableParser.h"
+#include "inet/common/packet/Packet.h"
+
+#include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
+#include "Ipv4HeaderNdp_m.h"
+
+#include "inet/networklayer/common/L3Tools.h"
+#include "../../transportlayer/common/L4ToolsNdp.h"
 
 namespace inet {
 
@@ -410,28 +417,75 @@ void Ipv4RoutingTableEcmp::purge()
 
 Ipv4Route *Ipv4RoutingTableEcmp::findBestMatchingRoute(const Ipv4Address& dest) const
 {
-    Enter_Method("findBestMatchingRoute(%u.%u.%u.%u)", dest.getDByte(0), dest.getDByte(1), dest.getDByte(2), dest.getDByte(3));    // note: str().c_str() too slow here
-
-    auto it = routingCache.find(dest);
-    if (it != routingCache.end()) {
-        if (it->second == nullptr || it->second->isValid())
-            return it->second;
-    }
-
-    // find best match (one with longest prefix)
-    // default route has zero prefix length, so (if exists) it'll be selected as last resort
     Ipv4Route *bestRoute = nullptr;
-    for (auto e : routes) {
-        if (e->isValid()) {
-            if (Ipv4Address::maskedAddrAreEqual(dest, e->getDestination(), e->getNetmask())) {    // match
-                bestRoute = const_cast<Ipv4Route *>(e);
-                break;
+    return bestRoute;
+}
+
+Ipv4Route *Ipv4RoutingTableEcmp::findBestMatchingRouteEcmp(Packet *packet, const Ipv4Address& dest)
+{
+    //Hashing was initially implemented, but was not even used therefore it was ignored.
+    Enter_Method("findBestMatchingRoute(%u.%u.%u.%u)", dest.getDByte(0), dest.getDByte(1), dest.getDByte(2), dest.getDByte(3)); // note: str().c_str() too slow here
+    //auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
+    //auto& ndpHeader = removeTransportProtocolHeader<ndp::NdpHeader>(packet);
+    //Added MOH ==> 5 tuple hashing
+    //const auto& ipv4Header = packet->peekAtFront<Ipv4HeaderNdp>();
+    //const auto ndpHeader = packet->peekAtFront<ndp::NdpHeader>();
+    //Ipv4Address destAddr = ipv4Header->getDestAddress();
+    //Ipv4Address srcAddr = ipv4Header->getSrcAddress();
+    //     MOH: TODO: cast RQSegment to get SrcPort and DestPort
+    //     tcp::TCPSegment *tcpseg = check_and_cast<tcp::TCPSegment *>(datagram->getEncapsulatedPacket());
+    //ndp::NDPSegment *tcpseg = check_and_cast<ndp::NDPSegment *>(datagram->getEncapsulatedPacket());
+    //unsigned int srcPort=ndpHeader->getSourcePort();  //>peekAtFront<Ipv4HeaderNdp>() TODO
+    //unsigned int destPort=ndpHeader->getDestinationPort();
+
+    std::string routerName = getSimulation()->getContextModule()->getFullPath();
+    //int transportProtocol = ipv4Header->getProtocolId();
+
+    //std::hash<std::string> hash;
+    //concatenation
+    //std::string key = srcAddr.str() + destAddr.str() + std::to_string(srcPort)+ std::to_string(destPort) + std::to_string(transportProtocol)+routerName;
+    //size_t hashValue = hash(key);
+
+    Ipv4Route *bestRoute = nullptr;
+    range = routingCache.equal_range(dest);                     // slower
+    int numPossibleEcmpRoutesCaches = std::distance(range.first, range.second);// faster
+    if (numPossibleEcmpRoutesCaches == 0) {
+        for (auto e : routes) {
+            if (e->isValid()) {
+                EV_DETAIL << "hiiii find best match" << e->getDestination() << "\n";
+                if (Ipv4Address::maskedAddrAreEqual(dest, e->getDestination(), e->getNetmask())) { // match
+                    bestRoute = const_cast<Ipv4Route *>(e);
+                    routingCache.insert (std::pair<Ipv4Address, Ipv4Route *>(dest,bestRoute));
+                    // MOH: at the edge router  the routing table has two options either to route to the client ip address(10.0.0.1) or to the client's subnet address (10.0.0.0)
+                    // both routes are through the same interface and they have unspecified gateway
+                    // so if the gateway is unspecified just consider one of the above routes as we need don't want  this case to be considered as a multiple paths
+                    // TODO: can be improved
+                    //if (e->getGateway().isUnspecified()) break;// just take the already found route (e.g. dest addrs= 10.0.0.1, gateway=unspecified , Iface = ppp1 )
+                }
             }
         }
-    }
 
-    routingCache[dest] = bestRoute;
-    return bestRoute;
+        range = routingCache.equal_range(dest);
+        numPossibleEcmpRoutesCaches= routingCache.count(dest);
+    }
+    if(numPossibleEcmpRoutesCaches==1) {
+         auto it = range.first;
+         return it->second; // or return range.first->second;
+    }
+    if (numPossibleEcmpRoutesCaches > 1) {
+        //unsigned  int hashValueIII = static_cast<int>(hashValue) ;
+        int selected = ((rand() % numPossibleEcmpRoutesCaches) ); // per-packet ECMP spraying pkts
+        int i=0;
+        for (auto it = range.first; it != range.second; ++it) {
+            if ( i == selected) {
+                return it->second;
+            }
+            i++;
+        }
+    }
+    //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+    //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+    return bestRoute; // shouldn't be reached
 }
 
 InterfaceEntry *Ipv4RoutingTableEcmp::getInterfaceForDestAddr(const Ipv4Address& dest) const

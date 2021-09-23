@@ -80,7 +80,13 @@
  ../../inet4/src/inet/common/packet/ReorderBuffer.h \
  ../../inet4/src/inet/common/packet/ChunkBuffer.h \
  transportlayer/Ndp/NDPSendQueue.h \
- transportlayer/Ndp/../../application/ndpapp/GenericAppMsgNdp_m.h
+ transportlayer/Ndp/../../application/ndpapp/GenericAppMsgNdp_m.h \
+ transportlayer/Ndp/../../networklayer/ipv4/Ipv4HeaderNdp_m.h \
+ ../../inet4/src/inet/common/TlvOptions_m.h \
+ ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
+ ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h \
+ transportlayer/Ndp/../../networklayer/ipv4/../../common/ProtocolGroupNdp.h \
+ transportlayer/Ndp/../../networklayer/ipv4/../../common/ProtocolNdp.h
 
 ../../inet4/src/inet/applications/common/SocketTag_m.h:
 
@@ -247,3 +253,15 @@ transportlayer/Ndp/NDPReceiveQueue.h:
 transportlayer/Ndp/NDPSendQueue.h:
 
 transportlayer/Ndp/../../application/ndpapp/GenericAppMsgNdp_m.h:
+
+transportlayer/Ndp/../../networklayer/ipv4/Ipv4HeaderNdp_m.h:
+
+../../inet4/src/inet/common/TlvOptions_m.h:
+
+../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h:
+
+../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h:
+
+transportlayer/Ndp/../../networklayer/ipv4/../../common/ProtocolGroupNdp.h:
+
+transportlayer/Ndp/../../networklayer/ipv4/../../common/ProtocolNdp.h:

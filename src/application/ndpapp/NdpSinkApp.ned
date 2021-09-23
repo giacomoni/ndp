@@ -6,6 +6,7 @@ import ndp.application.ndpapp.NdpServerHostApp;
 simple NdpSinkApp extends NdpServerHostApp
 {
     parameters:
+        serverThreadModuleType = default("ndp.application.ndpapp.NdpSinkAppThread");
         @class("inet::NdpSinkApp");
          @display("i=block/sink");
         int multiCastGroupId = default(-1);
@@ -35,4 +36,9 @@ simple NdpSinkApp extends NdpServerHostApp
 
         @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(rcvdPk)"; unit=bps; record=mean);
 }
+
+simple NdpSinkAppThread
+{
+     @display("i=block/sink");
+}    
 

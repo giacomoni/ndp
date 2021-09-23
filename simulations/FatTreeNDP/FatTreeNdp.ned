@@ -4,6 +4,7 @@ import inet.networklayer.contract.INetworkLayer;
 import ndp.node.StandardHostNdp;
 import ndp.common.scheduler.CentralSchedulerNdp;
 import inet.node.inet.Router;
+import ndp.base.RouterNdp;
 import ndp.base.Pod;
 import ndp.base.Rack;
 import inet.node.ethernet.Eth100M;
@@ -46,7 +47,7 @@ network FatTreeNdp
         }
 
 		// (k/2)^2 core routers.
-        CoreRouter[kCore]: Router {
+        CoreRouter[kCore]: RouterNdp {
             //   k = k;
             //          position = index;
             @display("p=337.736,87.024,m,$kCore,120,150");

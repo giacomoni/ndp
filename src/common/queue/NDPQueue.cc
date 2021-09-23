@@ -135,30 +135,36 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
     EV_INFO << "\nPACKET STRING" << packet->str() << std::endl;
-    auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
-    auto& ndpHeader = removeTransportProtocolHeader<ndp::NdpHeader>(packet);
-    EV_INFO << "\nENCAPSULATED PACKET STRING" << ipv4Header->str() << std::endl;
-    EV_INFO << "\nENCAPSULATED PACKET STRING" << ndpHeader->str() << std::endl;
+    auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
+    auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
+    //auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
+    //auto& ndpHeader = removeTransportProtocolHeader<ndp::NdpHeader>(packet);
+    //EV_INFO << "\nENCAPSULATED PACKET STRING" << ipv4Header->str() << std::endl;
+    //EV_INFO << "\nENCAPSULATED PACKET STRING" << ndpHeader->str() << std::endl;
     //auto ipv4Header = Ipv4::removeNetworkProtocolHeader<Ipv4Header>(packet);
     EV_INFO << "Pushing packet " << packet->getName() << " into the queue." << endl;
     if ( ndpHeader->getAckBit()==true || ndpHeader->getSynBit()==true || ndpHeader->getNackBit()==true) {
-       insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-       insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+       //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+       //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+       packet->insertAtFront(ndpHeader);
+       packet->insertAtFront(ipv4Header);
        synAckQueue.insert(packet);
        synAckQueueLength=synAckQueue.getLength();
        //emit(packetPushedSynAckQueueSignal, packet);
        //emit(synAckQueueLengthSignal, cPar(synAckQueue.getLength()));
     }
     else if (ndpHeader->isHeader() == true ) {
-        insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         emit(packetPushedHeadersQueueSignal, packet);
     }
     else if (ndpHeader->isPullPacket() == true ) {
-        insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        packet->insertAtFront(ndpHeader);
+        packet->insertAtFront(ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         //emit(packetPushedHeadersQueueSignal, packet);
@@ -178,8 +184,10 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
             EV << "   hhh   " << destPort << "\n\n\n\n";
             EV << "   hhh   " << ndpHeader->getFullName() << "\n\n\n\n";
         }
-        insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        packet->insertAtFront(ndpHeader);
+        packet->insertAtFront(ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength=headersQueue.getLength();
         emit(packetPushedHeadersQueueSignal, packet);
@@ -188,8 +196,10 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         //emit(numTrimmedPktSig, numTrimmedPkt);       TODO EMIT
         }
     else {
-        insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
+        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
+        packet->insertAtFront(ndpHeader);
+        packet->insertAtFront(ipv4Header);
        // dataQueue is not full ==> insert the incoming packet in the dataQueue
         dataQueue.insert(packet);
         //emit(packetPushedDataQueueSignal, packet);

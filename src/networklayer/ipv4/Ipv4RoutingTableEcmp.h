@@ -30,8 +30,9 @@
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/networklayer/contract/ipv4/Ipv4Address.h"
+//#include "IIpv4RoutingTableEcmp.h"
 #include "inet/networklayer/ipv4/IIpv4RoutingTable.h"
-
+#include "inet/common/packet/Packet.h"
 namespace inet {
 
 class IInterfaceTable;
@@ -85,8 +86,12 @@ class INET_API Ipv4RoutingTableEcmp : public cSimpleModule, public IIpv4RoutingT
     typedef Ipv4MulticastRoute::OutInterfaceVector OutInterfaceVector;
 
     // routing cache: maps destination address to the route
-    typedef std::map<Ipv4Address, Ipv4Route *> RoutingCache;
+    typedef std::multimap<Ipv4Address, Ipv4Route *> RoutingCache; // MOH: modified use multimap instead of map
     mutable RoutingCache routingCache;
+
+    typedef std::multimap<Ipv4Address, Ipv4Route *> t;                // MOH: added
+    std::pair<t::iterator, t::iterator> range;                        // MOH: added
+    // MOH: range.equal_range(k) Get range of equal elements. Returns the bounds of a range that includes all the elements in the container which have a key equivalent to k.
 
     // local addresses cache (to speed up isLocalAddress())
     typedef std::set<Ipv4Address> AddressSet;
@@ -238,6 +243,8 @@ class INET_API Ipv4RoutingTableEcmp : public cSimpleModule, public IIpv4RoutingT
      */
     virtual Ipv4Route *findBestMatchingRoute(const Ipv4Address& dest) const override;
 
+    //MOH: Added
+    virtual Ipv4Route *findBestMatchingRouteEcmp(Packet *packet, const Ipv4Address& dest);//   override;
     /**
      * Convenience function based on findBestMatchingRoute().
      *
@@ -375,6 +382,7 @@ class INET_API Ipv4RoutingTableEcmp : public cSimpleModule, public IIpv4RoutingT
     virtual bool isLocalAddress(const L3Address& dest) const override { return isLocalAddress(dest.toIpv4()); }
     virtual InterfaceEntry *getInterfaceByAddress(const L3Address& address) const override { return getInterfaceByAddress(address.toIpv4()); }
     virtual IRoute *findBestMatchingRoute(const L3Address& dest) const override { return findBestMatchingRoute(dest.toIpv4()); }
+    virtual IRoute *findBestMatchingRouteEcmp(Packet *packet, const L3Address& dest) { return findBestMatchingRouteEcmp(packet, dest.toIpv4()); }
     virtual InterfaceEntry *getOutputInterfaceForDestination(const L3Address& dest) const override { return getInterfaceForDestAddr(dest.toIpv4()); }    //XXX inconsistent names
     virtual L3Address getNextHopForDestination(const L3Address& dest) const override { return getGatewayForDestAddr(dest.toIpv4()); }    //XXX inconsistent names
     virtual bool isLocalMulticastAddress(const L3Address& dest) const override { return isLocalMulticastAddress(dest.toIpv4()); }

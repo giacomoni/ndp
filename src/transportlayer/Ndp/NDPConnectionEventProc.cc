@@ -52,7 +52,7 @@ void NDPConnection::process_OPEN_ACTIVE(NDPEventCode& event, NDPCommand *ndpComm
                 EV_DETAIL << "Assigned ephemeral port " << localPort << "\n";
             }
 
-            EV_DETAIL << "process_OPEN_ACTIVE OPEN: " << localAddr << ":" << localPort << " --> " << remoteAddr << ":" << remotePort << "\n";
+            EV_DETAIL << "\nprocess_OPEN_ACTIVE OPEN: " << localAddr << ":" << localPort << " --> " << remoteAddr << ":" << remotePort << "\n";
 
              ndpMain->addSockPair(this, localAddr, remoteAddr, localPort, remotePort);
 
@@ -96,6 +96,7 @@ void NDPConnection::process_OPEN_PASSIVE(NDPEventCode& event, NDPCommand *ndpCom
 //             std::cout << "NDPConnection::process_OPEN_PASSIVE Starting to listen on: " << localAddr << ":" << localPort << "\n";
 
             ndpMain->addSockPair(this, localAddr, L3Address(), localPort, -1);
+            //ndpMain->addSockPair(this, localAddr, L3Address(), localPort, 69);
             break;
 
         default:

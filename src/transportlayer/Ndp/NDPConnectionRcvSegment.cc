@@ -54,9 +54,11 @@ void NDPConnection::sendInitialWindow() {
 
             // create a segment for the Packet that will be sent
             //NdpHeader *ndpseg = new NdpHeader();
-            const auto& ndpseg = makeShared<NdpHeader>();
+            //const auto& ndpseg = makeShared<NdpHeader>();
 //            ++state->sequenceNumber;
-            //ndpseg = sendQueue->getNdpHeader();
+            std::tuple<Ptr<NdpHeader>, Packet*> packSeg = sendQueue->getNdpHeader();
+            auto ndpseg = std::get<0>(packSeg);
+            auto fp = std::get<1>(packSeg);
             if (ndpseg) {
                 ndpseg->setIsDataPacket(true);
                 ndpseg->setIsPullPacket(false);
@@ -70,7 +72,7 @@ void NDPConnection::sendInitialWindow() {
                 ndpseg->setPriorityValue(state->priorityValue);
 //                ndpseg->setIsLastPacketToSend(false);
 //                ndpseg->setDataSequenceNumber(state->sequenceNumber);
-                Packet *fp = new Packet("Init-Win Packet");
+                //Packet *fp = new Packet("Init-Win Packet");
                 sendToIP(fp, ndpseg);
             }
         }
@@ -82,7 +84,7 @@ void NDPConnection::sendInitialWindow() {
 NDPEventCode NDPConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest) {
     EV_INFO << "Seg arrived: ";
     printSegmentBrief(packet, ndpseg);
-    EV_DETAIL << "TCB: " << state->info() << "\n";
+    EV_DETAIL << "TCB: " << state->str() << "\n";
 
     NDPEventCode event;
     if (fsm.getState() == NDP_S_LISTEN) {
@@ -305,8 +307,9 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         //  send any received Packet to the app
         Ptr<Chunk> msgRx;
-        uint32 endSeqNo;
-        msgRx = packet->removeAtFront(b(endSeqNo),0); // each segment has just one packet
+       // uint32 endSeqNo;
+        //msgRx = packet->removeAtFront(b(endSeqNo),0);
+        msgRx = packet->removeAll(); // each segment has just one packet
 //        MY_COUT << " endSeqNo " << endSeqNo << "\n";
 
         if (state->connFinished == false && isLongFlowPacket == false) {
@@ -325,7 +328,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             NDPCommand *cmd = new NDPCommand();
             //cmd->setConnId(socketId);
             newPacket->addTag<SocketInd>()->setSocketId(socketId);
-            newPacket->setControlInfo(cmd);
+            //newPacket->setControlInfo(cmd);
             sendToApp(newPacket);
         }
 
@@ -368,7 +371,7 @@ void NDPConnection::addRequestToPullsQueue(){
     //NdpHeader *ndpseg = createNDPSegment(msgname);
     Packet *ndppack = new Packet(msgname, 0);
     const auto& ndpseg = makeShared<NdpHeader>();
-    ndppack->setByteLength(10); //maybe bit?
+    //ndppack->setByteLength(10); //maybe bit?
     //ndpseg->setPayloadLength(10);
 
 
@@ -472,18 +475,33 @@ NDPEventCode NDPConnection::processSegmentInListen(Packet *packet, const Ptr<con
 
     if (ndpseg->getSynBit()) {
         EV_DETAIL << "\n\n MMMM  SYN bit set: filling in foreign socket\n";
-        ndpMain->updateSockPair(this, destAddr, srcAddr,  ndpseg->getDestPort(), ndpseg->getSrcPort());
+//        if (state->fork) {
+//            NDPConnection *conn = cloneListeningConnection();    // "conn" is the clone which will handle the new connection, while "this" stay LISTENing
+//            ndpMain->addForkedConnection(this, conn, destAddr, srcAddr, ndpseg->getDestPort(), ndpseg->getSrcPort());
+//            EV_DETAIL << "Connection forked: new connection got new socketId=" << conn->socketId << ", "
+//                                                                                           "old connection keeps LISTENing with socketId=" << socketId << "\n";
+//            selectInitialSeqNum();
+//            if (ndpseg->getHeaderLength() > NDP_MIN_HEADER_LENGTH) // Header options present? NDP_HEADER_OCTETS = 20
+//                readHeaderOptions(ndpseg);
+//            // this is a receiver
+//            state->numPacketsToGet = ndpseg->getNumPacketsToSend();
+//            conn->performStateTransition(NDP_E_RCV_SYN);
+//
+//            return NDP_E_IGNORE;
+//        }
+//        else{
+            ndpMain->updateSockPair(this, destAddr, srcAddr,  ndpseg->getDestPort(), ndpseg->getSrcPort());
 
-        selectInitialSeqNum();
+            selectInitialSeqNum();
 
 
-        if (ndpseg->getHeaderLength() > NDP_MIN_HEADER_LENGTH) // Header options present? NDP_HEADER_OCTETS = 20
-            readHeaderOptions(ndpseg);
+            if (ndpseg->getHeaderLength() > NDP_MIN_HEADER_LENGTH) // Header options present? NDP_HEADER_OCTETS = 20
+                readHeaderOptions(ndpseg);
 
-        // this is a receiver
-        state->numPacketsToGet = ndpseg->getNumPacketsToSend();
-
-        return NDP_E_RCV_SYN; // this will take us to SYN_RCVD
+            // this is a receiver
+            state->numPacketsToGet = ndpseg->getNumPacketsToSend();
+            return NDP_E_RCV_SYN; // this will take us to SYN_RCVD
+//        }
     }
 
 

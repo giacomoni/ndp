@@ -42,6 +42,7 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/contract/ipv4/Ipv4SocketCommand_m.h"
 #include "inet/networklayer/ipv4/IIpv4RoutingTable.h"
+#include "Ipv4RoutingTableEcmp.h"
 #include "inet/networklayer/ipv4/IcmpHeader_m.h"
 #include "Ipv4Ndp.h"
 #include "Ipv4HeaderNdp_m.h"
@@ -547,6 +548,7 @@ void Ipv4Ndp::routeUnicastPacket(Packet *packet)
         else if (destIE->isBroadcast()) {
             // if the interface is broadcast we must search the next hop
             const Ipv4Route *re = rt->findBestMatchingRoute(destAddr);
+            //const Ipv4Route *re = rt->findBestMatchingRouteEcmp(datagram, destAddr);
             if (re && re->getInterface() == destIE) {
                 packet->addTagIfAbsent<NextHopAddressReq>()->setNextHopAddress(re->getGateway());
             }
@@ -554,7 +556,9 @@ void Ipv4Ndp::routeUnicastPacket(Packet *packet)
     }
     else {
         // use Ipv4 routing (lookup in routing table)
-        const Ipv4Route *re = rt->findBestMatchingRoute(destAddr);
+        //const Ipv4Route *re = rt->findBestMatchingRoute(destAddr);  // MOH: commented
+        Ipv4RoutingTableEcmp *rtEcmp = dynamic_cast<Ipv4RoutingTableEcmp*>(rt);
+        const Ipv4Route *re = rtEcmp->findBestMatchingRouteEcmp(packet, destAddr);  // MOH: added TODO
         if (re) {
             destIE = re->getInterface();
             packet->addTagIfAbsent<InterfaceReq>()->setInterfaceId(destIE->getInterfaceId());

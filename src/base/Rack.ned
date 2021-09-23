@@ -4,6 +4,7 @@ import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 import inet.node.inet.StandardHost;
 import inet.node.inet.Router;
+import ndp.base.RouterNdp;
 import inet.node.ethernet.EtherLink;
 import ned.DatarateChannel;
 import ned.IBidirectionalChannel;
@@ -44,7 +45,7 @@ module Rack
             @display("i=device/device");
         }
         // One edge or top of rack switch.
-        edgeSwitch: Router { //no from type EdgeRouter.ned, because position is saved in Rack
+        edgeSwitch: RouterNdp { //no from type EdgeRouter.ned, because position is saved in Rack
             @display("p=300,80");
             @display("i=abstract/router");
           //  forwarding = default(true);

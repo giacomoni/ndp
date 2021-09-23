@@ -38,6 +38,7 @@ void NDPSendQueue::init(unsigned int numPacketsToSend , B mss)
         const auto& payload = makeShared<GenericAppMsgNdp>(); // state->iss
         std::string packetName = "DATAPKT-"+std::to_string(i);
         Packet *packet = new Packet(packetName.c_str());
+        payload->setSequenceNumber(i);
         payload->setChunkLength(mss);
         payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
         packet->insertAtBack(payload);
@@ -47,6 +48,7 @@ void NDPSendQueue::init(unsigned int numPacketsToSend , B mss)
         //header->setDataSequenceNumber(i);
         //packet->insertAtFront(header); // insert header into segment
         dataToSendQueue.push((packet->peekDataAt(B(0), packet->getDataLength())));
+        EV_INFO << "\n\n SQN: " << i << " msgName " << packet->str() << "\n";
     }
 }
 
@@ -81,9 +83,12 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
 { //TODO
 
 //    ASSERT(seqLE(begin, fromSeq) && seqLE(fromSeq + numBytes, end));
+    EV_INFO << "\n\n\nDATA QUEUE LENGTH :"<< dataToSendQueue.getLength() << std::endl;
     if (dataToSendQueue.getLength() > B(0)) {
+
         //NdpHeader *ndpseg = new NdpHeader(nullptr);
         const auto& ndpseg = makeShared<NdpHeader>();
+        //dataToSendQueue.begin();
         //char msgname[32];
         //sprintf(msgname, "ndpseg(l=%lu)", numBytes);
         //Packet *packet = new Packet(msgname);
@@ -98,14 +103,24 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
         //ndpseg->addPayloadMessage(iter->msg->dup(), 1);
 
         //ndpseg->setDataSequenceNumber(iter->sequenceNo); PLEASE FIX
-        Packet *packet = createSegmentWithBytes(begin, 1500);
-        packet->setByteLength(1500);
+        auto& appmsg = dataToSendQueue.pop<GenericAppMsgNdp>(b(-1), Chunk::PF_ALLOW_NULLPTR);
+        EV_INFO << "\n\n\nDATA SEQUENCE NUMBER :"<< appmsg->getSequenceNumber() << std::endl;
+        //const auto& appmsg = prevPacket->peekData<GenericAppMsgNdp>;
+        //Packet *packet = createSegmentWithBytes(0, 1500);
+        std::string packetName = "DATAPKT-"+std::to_string(appmsg->getSequenceNumber());
+        Packet *packet = new Packet(packetName.c_str());
+        //packet->insertAtBack(appmsg->getContent());
+        //packet->setByteLength(1500);e
 //        ndpseg->isLastPktToSend(isLastSymbolToSend);
-
+        packet->insertAtBack(appmsg);
+        ndpseg->setDataSequenceNumber(appmsg->getSequenceNumber());
         //EV_INFO << "  \n\n\n\n\n\n getNewNDP segment ........." << iter->sequenceNo << " \n\n\n";
         //removeFromDataQueueToSentQueue(iter);
-        discardUpTo(1500);
-        sentDataQueue.push(packet->peekDataAt(B(0), packet->getDataLength()));
+        //discardUpTo(1500);
+
+
+        Packet * dupPacket = packet->dup();
+        sentDataQueue.push(dupPacket->peekDataAt(B(0), dupPacket->getDataLength()));
         return std::make_tuple(ndpseg,packet);
     } else {
         EV_INFO << " Nothing to send !! \n";

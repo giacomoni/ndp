@@ -25,7 +25,7 @@ struct NdpStateVariables
     @descriptor(readonly);
     
     bool active;
-    bool fork;
+    //bool fork;
     
     unsigned int request_id;
     unsigned int internal_request_id;

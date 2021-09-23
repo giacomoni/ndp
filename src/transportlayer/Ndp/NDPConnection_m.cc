@@ -431,7 +431,6 @@ class NdpStateVariablesDescriptor : public omnetpp::cClassDescriptor
     mutable const char **propertynames;
     enum FieldConstants {
         FIELD_active,
-        FIELD_fork,
         FIELD_request_id,
         FIELD_internal_request_id,
         FIELD_isLongFlow,
@@ -521,7 +520,7 @@ const char *NdpStateVariablesDescriptor::getProperty(const char *propertyname) c
 int NdpStateVariablesDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 27+basedesc->getFieldCount() : 27;
+    return basedesc ? 26+basedesc->getFieldCount() : 26;
 }
 
 unsigned int NdpStateVariablesDescriptor::getFieldTypeFlags(int field) const
@@ -534,7 +533,6 @@ unsigned int NdpStateVariablesDescriptor::getFieldTypeFlags(int field) const
     }
     static unsigned int fieldTypeFlags[] = {
         0,    // FIELD_active
-        0,    // FIELD_fork
         0,    // FIELD_request_id
         0,    // FIELD_internal_request_id
         0,    // FIELD_isLongFlow
@@ -561,7 +559,7 @@ unsigned int NdpStateVariablesDescriptor::getFieldTypeFlags(int field) const
         0,    // FIELD_syn_rexmit_count
         0,    // FIELD_syn_rexmit_timeout
     };
-    return (field >= 0 && field < 27) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 26) ? fieldTypeFlags[field] : 0;
 }
 
 const char *NdpStateVariablesDescriptor::getFieldName(int field) const
@@ -574,7 +572,6 @@ const char *NdpStateVariablesDescriptor::getFieldName(int field) const
     }
     static const char *fieldNames[] = {
         "active",
-        "fork",
         "request_id",
         "internal_request_id",
         "isLongFlow",
@@ -601,7 +598,7 @@ const char *NdpStateVariablesDescriptor::getFieldName(int field) const
         "syn_rexmit_count",
         "syn_rexmit_timeout",
     };
-    return (field >= 0 && field < 27) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 26) ? fieldNames[field] : nullptr;
 }
 
 int NdpStateVariablesDescriptor::findField(const char *fieldName) const
@@ -609,32 +606,31 @@ int NdpStateVariablesDescriptor::findField(const char *fieldName) const
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
     if (fieldName[0] == 'a' && strcmp(fieldName, "active") == 0) return base+0;
-    if (fieldName[0] == 'f' && strcmp(fieldName, "fork") == 0) return base+1;
-    if (fieldName[0] == 'r' && strcmp(fieldName, "request_id") == 0) return base+2;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "internal_request_id") == 0) return base+3;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "isLongFlow") == 0) return base+4;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "isHeader") == 0) return base+5;
-    if (fieldName[0] == 'I' && strcmp(fieldName, "IW") == 0) return base+6;
-    if (fieldName[0] == 'c' && strcmp(fieldName, "connFinished") == 0) return base+7;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToGet") == 0) return base+8;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToSend") == 0) return base+9;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "isSender") == 0) return base+10;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "isReceiver") == 0) return base+11;
-    if (fieldName[0] == 'p' && strcmp(fieldName, "priorityValue") == 0) return base+12;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numRcvdPkt") == 0) return base+13;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numRcvTrimmedHeader") == 0) return base+14;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numberReceivedPackets") == 0) return base+15;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numberSentPackets") == 0) return base+16;
-    if (fieldName[0] == 'r' && strcmp(fieldName, "request_rexmit_count") == 0) return base+17;
-    if (fieldName[0] == 'r' && strcmp(fieldName, "request_rexmit_timeout") == 0) return base+18;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numPullsTimeOuts") == 0) return base+19;
-    if (fieldName[0] == 'c' && strcmp(fieldName, "connNotAddedYet") == 0) return base+20;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "isfinalReceivedPrintedOut") == 0) return base+21;
-    if (fieldName[0] == 's' && strcmp(fieldName, "snd_mss") == 0) return base+22;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "iss") == 0) return base+23;
-    if (fieldName[0] == 'i' && strcmp(fieldName, "irs") == 0) return base+24;
-    if (fieldName[0] == 's' && strcmp(fieldName, "syn_rexmit_count") == 0) return base+25;
-    if (fieldName[0] == 's' && strcmp(fieldName, "syn_rexmit_timeout") == 0) return base+26;
+    if (fieldName[0] == 'r' && strcmp(fieldName, "request_id") == 0) return base+1;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "internal_request_id") == 0) return base+2;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isLongFlow") == 0) return base+3;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isHeader") == 0) return base+4;
+    if (fieldName[0] == 'I' && strcmp(fieldName, "IW") == 0) return base+5;
+    if (fieldName[0] == 'c' && strcmp(fieldName, "connFinished") == 0) return base+6;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToGet") == 0) return base+7;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToSend") == 0) return base+8;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isSender") == 0) return base+9;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isReceiver") == 0) return base+10;
+    if (fieldName[0] == 'p' && strcmp(fieldName, "priorityValue") == 0) return base+11;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numRcvdPkt") == 0) return base+12;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numRcvTrimmedHeader") == 0) return base+13;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numberReceivedPackets") == 0) return base+14;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numberSentPackets") == 0) return base+15;
+    if (fieldName[0] == 'r' && strcmp(fieldName, "request_rexmit_count") == 0) return base+16;
+    if (fieldName[0] == 'r' && strcmp(fieldName, "request_rexmit_timeout") == 0) return base+17;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numPullsTimeOuts") == 0) return base+18;
+    if (fieldName[0] == 'c' && strcmp(fieldName, "connNotAddedYet") == 0) return base+19;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "isfinalReceivedPrintedOut") == 0) return base+20;
+    if (fieldName[0] == 's' && strcmp(fieldName, "snd_mss") == 0) return base+21;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "iss") == 0) return base+22;
+    if (fieldName[0] == 'i' && strcmp(fieldName, "irs") == 0) return base+23;
+    if (fieldName[0] == 's' && strcmp(fieldName, "syn_rexmit_count") == 0) return base+24;
+    if (fieldName[0] == 's' && strcmp(fieldName, "syn_rexmit_timeout") == 0) return base+25;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -648,7 +644,6 @@ const char *NdpStateVariablesDescriptor::getFieldTypeString(int field) const
     }
     static const char *fieldTypeStrings[] = {
         "bool",    // FIELD_active
-        "bool",    // FIELD_fork
         "unsigned int",    // FIELD_request_id
         "unsigned int",    // FIELD_internal_request_id
         "bool",    // FIELD_isLongFlow
@@ -675,7 +670,7 @@ const char *NdpStateVariablesDescriptor::getFieldTypeString(int field) const
         "int",    // FIELD_syn_rexmit_count
         "omnetpp::simtime_t",    // FIELD_syn_rexmit_timeout
     };
-    return (field >= 0 && field < 27) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 26) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **NdpStateVariablesDescriptor::getFieldPropertyNames(int field) const
@@ -743,7 +738,6 @@ std::string NdpStateVariablesDescriptor::getFieldValueAsString(void *object, int
     NdpStateVariables *pp = (NdpStateVariables *)object; (void)pp;
     switch (field) {
         case FIELD_active: return bool2string(pp->active);
-        case FIELD_fork: return bool2string(pp->fork);
         case FIELD_request_id: return ulong2string(pp->request_id);
         case FIELD_internal_request_id: return ulong2string(pp->internal_request_id);
         case FIELD_isLongFlow: return bool2string(pp->isLongFlow);

@@ -1,0 +1,935 @@
+version 2
+run General-25-20210920-16:30:52-165173
+attr configname General
+attr datetime 20210920-16:30:52
+attr experiment General
+attr inifile exp1-1-seed1.ini
+attr iterationvars "$FatTreeSize=4, $0=\"permTM\", $numShortFlows=25, $1=30"
+attr iterationvarsf FatTreeSize=4,permTM,numShortFlows=25,30-
+attr measurement "$FatTreeSize=4, $0=\"permTM\", $numShortFlows=25, $1=30"
+attr network FatTreeNdp
+attr processid 165173
+attr repetition 0
+attr replication #0
+attr resultdir exp1-1-seed1
+attr runnumber 25
+attr seedset 25
+itervar FatTreeSize 4
+itervar numShortFlows 25
+param **.k 4
+param **.kValue 4
+param **.trafficMatrixType "\"permTM\""
+param **.arrivalRate 2500
+param **.shuffle true
+param **.flowSize 100
+param **.numShortFlows 25
+param **.longFlowSize 1
+param **.percentLongFlowNodes 0
+param **.initialWindow 8
+param **.IW 8
+param **.ndpSwitchQueueLength 30
+param **.isWebSearchWorkLoad false
+param **.perPacketEcmp true
+param **.perFlowEcmp false
+param **.seedValue 1111
+param **.oneToOne true
+param **.oneToMany false
+param **.manyToOne false
+param **.daisyChainGFS false
+param **.numReplica 5
+param **.numRunningMulticastGroups 1
+param **.numRunningMultiSourcingGroups 300
+param **.servers*.ppp[*].ppp.queue.typename "\"DropTailQueue\""
+param **.ppp[*].ppp.queue.typename "\"NDPQueue\""
+param **.ppp[*].ppp.queue.packetCapacity 30
+param **.ndp.typename "\"Ndp\""
+param **.ndp.ndpAlgorithmClass "\"DumbNDP\""
+param **.ndp.mss 1460
+param **.server*.numApps 1
+param **.server*.app[0].typename "\"NdpBasicClientApp\""
+param **.server*.app[0].connectAddress "\"FatTreeNdp.Pod[*].racks[*].servers[*]\""
+param **.server*.app[0].connectPort 80
+param **.server*.app[0].startTime 0s
+param **.server*.app[0].numPacketsToSend 1
+
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[0].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].racks[1].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[0].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[0].aggRouters[1].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[0].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].racks[1].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[0].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[1].aggRouters[1].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[0].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].racks[1].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[0].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[2].aggRouters[1].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[0].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].racks[1].edgeSwitch.ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[0].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.Pod[3].aggRouters[1].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[0].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[0].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[0].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[0].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[0].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[1].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[1].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[1].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[1].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[1].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[2].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[2].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[2].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[2].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[2].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[0].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[3].ppp[0].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[0].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[1].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[3].ppp[1].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[1].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[2].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[3].ppp[2].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[2].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[3].ppp.queue numTrimmedPkt:last nan
+attr interpolationmode none
+attr source numTrimmedPkt
+attr title "num Trimmed Pkt  , last"
+scalar FatTreeNdp.CoreRouter[3].ppp[3].ppp.queue dropPk:count 0
+attr interpolationmode none
+attr source dropPkByQueue
+attr title "dropped packets, count"
+scalar FatTreeNdp.CoreRouter[3].ppp[3].ppp.queue rcvdPk:count 0
+attr interpolationmode none
+attr title "received packets, count"
+

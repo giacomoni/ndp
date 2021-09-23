@@ -232,42 +232,45 @@ GenericAppMsgNdp& GenericAppMsgNdp::operator=(const GenericAppMsgNdp& other)
 
 void GenericAppMsgNdp::copy(const GenericAppMsgNdp& other)
 {
-    this->numPaketToSend = other.numPaketToSend;
+    this->numPacketsToSend = other.numPacketsToSend;
     this->isSender_ = other.isSender_;
     this->isReceiver_ = other.isReceiver_;
     this->isLongFlow_ = other.isLongFlow_;
     this->serverClose = other.serverClose;
+    this->sequenceNumber = other.sequenceNumber;
 }
 
 void GenericAppMsgNdp::parsimPack(omnetpp::cCommBuffer *b) const
 {
     ::inet::FieldsChunk::parsimPack(b);
-    doParsimPacking(b,this->numPaketToSend);
+    doParsimPacking(b,this->numPacketsToSend);
     doParsimPacking(b,this->isSender_);
     doParsimPacking(b,this->isReceiver_);
     doParsimPacking(b,this->isLongFlow_);
     doParsimPacking(b,this->serverClose);
+    doParsimPacking(b,this->sequenceNumber);
 }
 
 void GenericAppMsgNdp::parsimUnpack(omnetpp::cCommBuffer *b)
 {
     ::inet::FieldsChunk::parsimUnpack(b);
-    doParsimUnpacking(b,this->numPaketToSend);
+    doParsimUnpacking(b,this->numPacketsToSend);
     doParsimUnpacking(b,this->isSender_);
     doParsimUnpacking(b,this->isReceiver_);
     doParsimUnpacking(b,this->isLongFlow_);
     doParsimUnpacking(b,this->serverClose);
+    doParsimUnpacking(b,this->sequenceNumber);
 }
 
-int GenericAppMsgNdp::getNumPaketToSend() const
+int GenericAppMsgNdp::getNumPacketsToSend() const
 {
-    return this->numPaketToSend;
+    return this->numPacketsToSend;
 }
 
-void GenericAppMsgNdp::setNumPaketToSend(int numPaketToSend)
+void GenericAppMsgNdp::setNumPacketsToSend(int numPacketsToSend)
 {
     handleChange();
-    this->numPaketToSend = numPaketToSend;
+    this->numPacketsToSend = numPacketsToSend;
 }
 
 bool GenericAppMsgNdp::isSender() const
@@ -314,16 +317,28 @@ void GenericAppMsgNdp::setServerClose(bool serverClose)
     this->serverClose = serverClose;
 }
 
+uint32_t GenericAppMsgNdp::getSequenceNumber() const
+{
+    return this->sequenceNumber;
+}
+
+void GenericAppMsgNdp::setSequenceNumber(uint32_t sequenceNumber)
+{
+    handleChange();
+    this->sequenceNumber = sequenceNumber;
+}
+
 class GenericAppMsgNdpDescriptor : public omnetpp::cClassDescriptor
 {
   private:
     mutable const char **propertynames;
     enum FieldConstants {
-        FIELD_numPaketToSend,
+        FIELD_numPacketsToSend,
         FIELD_isSender,
         FIELD_isReceiver,
         FIELD_isLongFlow,
         FIELD_serverClose,
+        FIELD_sequenceNumber,
     };
   public:
     GenericAppMsgNdpDescriptor();
@@ -386,7 +401,7 @@ const char *GenericAppMsgNdpDescriptor::getProperty(const char *propertyname) co
 int GenericAppMsgNdpDescriptor::getFieldCount() const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
-    return basedesc ? 5+basedesc->getFieldCount() : 5;
+    return basedesc ? 6+basedesc->getFieldCount() : 6;
 }
 
 unsigned int GenericAppMsgNdpDescriptor::getFieldTypeFlags(int field) const
@@ -398,13 +413,14 @@ unsigned int GenericAppMsgNdpDescriptor::getFieldTypeFlags(int field) const
         field -= basedesc->getFieldCount();
     }
     static unsigned int fieldTypeFlags[] = {
-        FD_ISEDITABLE,    // FIELD_numPaketToSend
+        FD_ISEDITABLE,    // FIELD_numPacketsToSend
         FD_ISEDITABLE,    // FIELD_isSender
         FD_ISEDITABLE,    // FIELD_isReceiver
         FD_ISEDITABLE,    // FIELD_isLongFlow
         FD_ISEDITABLE,    // FIELD_serverClose
+        FD_ISEDITABLE,    // FIELD_sequenceNumber
     };
-    return (field >= 0 && field < 5) ? fieldTypeFlags[field] : 0;
+    return (field >= 0 && field < 6) ? fieldTypeFlags[field] : 0;
 }
 
 const char *GenericAppMsgNdpDescriptor::getFieldName(int field) const
@@ -416,24 +432,26 @@ const char *GenericAppMsgNdpDescriptor::getFieldName(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldNames[] = {
-        "numPaketToSend",
+        "numPacketsToSend",
         "isSender",
         "isReceiver",
         "isLongFlow",
         "serverClose",
+        "sequenceNumber",
     };
-    return (field >= 0 && field < 5) ? fieldNames[field] : nullptr;
+    return (field >= 0 && field < 6) ? fieldNames[field] : nullptr;
 }
 
 int GenericAppMsgNdpDescriptor::findField(const char *fieldName) const
 {
     omnetpp::cClassDescriptor *basedesc = getBaseClassDescriptor();
     int base = basedesc ? basedesc->getFieldCount() : 0;
-    if (fieldName[0] == 'n' && strcmp(fieldName, "numPaketToSend") == 0) return base+0;
+    if (fieldName[0] == 'n' && strcmp(fieldName, "numPacketsToSend") == 0) return base+0;
     if (fieldName[0] == 'i' && strcmp(fieldName, "isSender") == 0) return base+1;
     if (fieldName[0] == 'i' && strcmp(fieldName, "isReceiver") == 0) return base+2;
     if (fieldName[0] == 'i' && strcmp(fieldName, "isLongFlow") == 0) return base+3;
     if (fieldName[0] == 's' && strcmp(fieldName, "serverClose") == 0) return base+4;
+    if (fieldName[0] == 's' && strcmp(fieldName, "sequenceNumber") == 0) return base+5;
     return basedesc ? basedesc->findField(fieldName) : -1;
 }
 
@@ -446,13 +464,14 @@ const char *GenericAppMsgNdpDescriptor::getFieldTypeString(int field) const
         field -= basedesc->getFieldCount();
     }
     static const char *fieldTypeStrings[] = {
-        "int",    // FIELD_numPaketToSend
+        "int",    // FIELD_numPacketsToSend
         "bool",    // FIELD_isSender
         "bool",    // FIELD_isReceiver
         "bool",    // FIELD_isLongFlow
         "bool",    // FIELD_serverClose
+        "uint32_t",    // FIELD_sequenceNumber
     };
-    return (field >= 0 && field < 5) ? fieldTypeStrings[field] : nullptr;
+    return (field >= 0 && field < 6) ? fieldTypeStrings[field] : nullptr;
 }
 
 const char **GenericAppMsgNdpDescriptor::getFieldPropertyNames(int field) const
@@ -519,11 +538,12 @@ std::string GenericAppMsgNdpDescriptor::getFieldValueAsString(void *object, int 
     }
     GenericAppMsgNdp *pp = (GenericAppMsgNdp *)object; (void)pp;
     switch (field) {
-        case FIELD_numPaketToSend: return long2string(pp->getNumPaketToSend());
+        case FIELD_numPacketsToSend: return long2string(pp->getNumPacketsToSend());
         case FIELD_isSender: return bool2string(pp->isSender());
         case FIELD_isReceiver: return bool2string(pp->isReceiver());
         case FIELD_isLongFlow: return bool2string(pp->isLongFlow());
         case FIELD_serverClose: return bool2string(pp->getServerClose());
+        case FIELD_sequenceNumber: return ulong2string(pp->getSequenceNumber());
         default: return "";
     }
 }
@@ -538,11 +558,12 @@ bool GenericAppMsgNdpDescriptor::setFieldValueAsString(void *object, int field, 
     }
     GenericAppMsgNdp *pp = (GenericAppMsgNdp *)object; (void)pp;
     switch (field) {
-        case FIELD_numPaketToSend: pp->setNumPaketToSend(string2long(value)); return true;
+        case FIELD_numPacketsToSend: pp->setNumPacketsToSend(string2long(value)); return true;
         case FIELD_isSender: pp->setIsSender(string2bool(value)); return true;
         case FIELD_isReceiver: pp->setIsReceiver(string2bool(value)); return true;
         case FIELD_isLongFlow: pp->setIsLongFlow(string2bool(value)); return true;
         case FIELD_serverClose: pp->setServerClose(string2bool(value)); return true;
+        case FIELD_sequenceNumber: pp->setSequenceNumber(string2ulong(value)); return true;
         default: return false;
     }
 }

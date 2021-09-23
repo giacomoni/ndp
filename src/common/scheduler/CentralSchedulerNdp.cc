@@ -351,10 +351,10 @@ void CentralSchedulerNdp::scheduleLongFlows()
 
         // Receiver sink app
         cModule* ndpDestModule = destModule->getSubmodule("ndp");
-//        int newNdpGateOutSizeDest = ndpDestModule->gateSize("appOut") + 1;
-//        int newNdpGateInSizeDest = ndpDestModule->gateSize("appIn") + 1;
-//        ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
-//        ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
+        int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
+        ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
         int newNumNdpSinkAppsDest = findNumSumbodules(destModule, "ndp.application.ndpapp.NdpSinkApp") + 1;
         cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp");
         std::string nameNdpAppDest = "app[" + std::to_string(newNumNdpSinkAppsDest - 1) + "]";
@@ -364,8 +364,8 @@ void CentralSchedulerNdp::scheduleLongFlows()
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------
-        cGate *gateNdpInDest = ndpDestModule->gate("appIn");//, newNdpGateOutSizeDest - 1);
-        cGate *gateNdpOutDest = ndpDestModule->gate("appOut");//, newNdpGateOutSizeDest - 1);
+        cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateOutSizeDest - 1);
+        cGate *gateNdpOutDest = ndpDestModule->gate("out", newNdpGateOutSizeDest - 1);
         cGate *gateInDest = newDestAppModule->gate("socketIn");
         cGate *gateOutDest = newDestAppModule->gate("socketOut");
         gateNdpOutDest->connectTo(gateInDest);
@@ -381,6 +381,10 @@ void CentralSchedulerNdp::scheduleLongFlows()
 
         // Sender  app
         cModule* ndpSrcModule = srcModule->getSubmodule("ndp");
+        int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("appOut") + 1;
+        int newNDPGateInSizeSrc = ndpSrcModule->gateSize("appIn") + 1;
+        ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
+        ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
         int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule, "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         cModuleType *moduleTypeSrc = cModuleType::get("ndp.application.ndpapp.NdpBasicClientApp");
         std::string nameNdpAppSrc = "app[" + std::to_string(newNumNdpSessionAppsSrc - 1) + "]";
@@ -396,8 +400,8 @@ void CentralSchedulerNdp::scheduleLongFlows()
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------
-        cGate *gateNdpIn = ndpSrcModule->gate("appIn");//, newNDPGateInSizeSrc - 1);
-        cGate *gateNdpOut = ndpSrcModule->gate("appOut");//, newNDPGateOutSizeSrc - 1);
+        cGate *gateNdpIn = ndpSrcModule->gate("in", newNDPGateInSizeSrc - 1);
+        cGate *gateNdpOut = ndpSrcModule->gate("out", newNDPGateOutSizeSrc - 1);
         cGate *gateIn = newSrcAppModule->gate("socketIn");
         cGate *gateOut = newSrcAppModule->gate("socketOut");
         gateNdpOut->connectTo(gateIn);
@@ -427,6 +431,10 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders)
     // get the src ndp module
     cModule* destModule = getModuleByPath(newDest.c_str());
     cModule* ndpDestModule = destModule->getSubmodule("ndp");
+    unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+    unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+    ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
+    ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
     unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule, "ndp.application.ndpapp.NdpSinkApp") + 1;
     cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp");
     std::string nameNdpAppDest = "app[" + std::to_string(newNumNdpSinkAppsDest - 1) + "]";
@@ -434,8 +442,8 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders)
     newDestAppModule->par("localPort").setIntValue(80 +newNumNdpSinkAppsDest);
 
     newDestAppModule->par("isLongFlow").setBoolValue(false);
-    cGate *gateNdpInDest = ndpDestModule->gate("appIn");//, newNdpGateOutSizeDest - 1);
-    cGate *gateNdpOutDest = ndpDestModule->gate("appOut");//, newNdpGateOutSizeDest - 1);
+    cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateOutSizeDest - 1);
+    cGate *gateNdpOutDest = ndpDestModule->gate("out", newNdpGateOutSizeDest - 1);
     cGate *gateInDest = newDestAppModule->gate("socketIn");
     cGate *gateOutDest = newDestAppModule->gate("socketOut");
     gateNdpOutDest->connectTo(gateInDest);
@@ -457,10 +465,10 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders)
 
     cModule* srcModule = getModuleByPath(itsSrc.c_str());  // const char* c_str Return pointer to the string.
     cModule* ndpSrcModule = srcModule->getSubmodule("ndp");
-    //unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("appOut") + 1;
-    //unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("appIn") + 1;
-    //ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
-    //ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
+    unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("appOut") + 1;
+    unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("appIn") + 1;
+    ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
+    ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
     unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule, "ndp.application.ndpapp.NdpBasicClientApp") + 1;
     cModuleType *moduleTypeSrc = cModuleType::get("ndp.application.ndpapp.NdpBasicClientApp");
     std::string nameNdpAppSrc = "app[" + std::to_string(newNumNdpSessionAppsSrc - 1) + "]";
@@ -471,8 +479,8 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders)
     newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
 
 
-    cGate *gateNdpIn = ndpSrcModule->gate("appIn");//, newNDPGateInSizeSrc - 1);
-    cGate *gateNdpOut = ndpSrcModule->gate("appOut");//, newNDPGateOutSizeSrc - 1);
+    cGate *gateNdpIn = ndpSrcModule->gate("in", newNDPGateInSizeSrc - 1);
+    cGate *gateNdpOut = ndpSrcModule->gate("out", newNDPGateOutSizeSrc - 1);
     cGate *gateIn = newSrcAppModule->gate("socketIn");
     cGate *gateOut = newSrcAppModule->gate("socketOut");
     gateNdpOut->connectTo(gateIn);
@@ -527,7 +535,7 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc, std::string n
     //std::cout << "\n NDP DEST" << ndpDestModule->getFullName();
     //std::cout << "\n NDP DEST APP" << newDestAppModule->getFullName();
     //std::cout << "\n" << ndpDestModule->getGateNames();
-    cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateOutSizeDest - 1);
+    cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateInSizeDest - 1);
     cGate *gateNdpOutDest = ndpDestModule->gate("out", newNdpGateOutSizeDest - 1);
     cGate *gateInDest = newDestAppModule->gate("socketIn");
     cGate *gateOutDest = newDestAppModule->gate("socketOut");
@@ -537,7 +545,7 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc, std::string n
     newDestAppModule->buildInside();
     newDestAppModule->scheduleStart(simTime());
     std::cout << "\nnewDestAppModule callInitialize()" << std::endl;
-    //newDestAppModule->callInitialize();
+    newDestAppModule->callInitialize();
     std::cout << "\n Finshed newDestAppModule callInitialize()" << std::endl;
 
     // src app
@@ -582,7 +590,7 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc, std::string n
     newSrcAppModule->buildInside();
     newSrcAppModule->scheduleStart(simTime());
     std::cout << "\nnewSrcAppModule callInitialize()" << std::endl;
-    //newSrcAppModule->callInitialize();
+    newSrcAppModule->callInitialize();
     std::cout << "\n Finshed newSrcAppModule callInitialize()" << std::endl;
     newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl()+ sumArrivalTimes);
 }
@@ -984,6 +992,10 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
         std::cout << " newDest " << thisDest << "\n";
         cModule* destModule = getModuleByPath(thisDest.c_str());
         cModule* ndpDestModule = destModule->getSubmodule("ndp");
+        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
+        ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
         unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule, "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumTCPSinkApp   =  " << newNumNdpSinkAppsDest << "\n";
         cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp"); // find factory object
@@ -1001,8 +1013,8 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
         newDestAppModule->par("isLongFlow").setBoolValue(false);
         newDestAppModule->par("multiCastGroupId").setDoubleValue(multicastGrpId);
 
-        cGate *gateNdpInDest = ndpDestModule->gate("appIn");
-        cGate *gateNdpOutDest = ndpDestModule->gate("appOut");
+        cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateOutSizeDest - 1);
+        cGate *gateNdpOutDest = ndpDestModule->gate("out", newNdpGateOutSizeDest - 1);
         cGate *gateInDest = newDestAppModule->gate("socketIn");
         cGate *gateOutDest = newDestAppModule->gate("socketOut");
         gateNdpOutDest->connectTo(gateInDest);
@@ -1015,6 +1027,10 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
         // get the src ndp module
         cModule* srcModule = getModuleByPath(itsSrc.c_str()); // const char* c_str Return pointer to the string.
         cModule* ndpSrcModule = srcModule->getSubmodule("ndp");
+        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
+        ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
         unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule, "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         std::cout << "Src  numTCPSessionApp =  " << newNumNdpSessionAppsSrc << "\n";
         cModuleType *moduleTypeSrc = cModuleType::get("ndp.application.ndpapp.NdpBasicClientApp"); // find factory object
@@ -1046,8 +1062,8 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
         }
         /// >>>>>>>>>>>
 
-        cGate *gateNdpIn = ndpSrcModule->gate("appIn");
-        cGate *gateNdpOut = ndpSrcModule->gate("appOut");
+        cGate *gateNdpIn = ndpSrcModule->gate("in", newNDPGateInSizeSrc - 1);
+        cGate *gateNdpOut = ndpSrcModule->gate("out", newNDPGateOutSizeSrc - 1);
         cGate *gateIn = newSrcAppModule->gate("socketIn");
         cGate *gateOut = newSrcAppModule->gate("socketOut");
         gateNdpOut->connectTo(gateIn);
@@ -1096,10 +1112,10 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc, std::v
         std::cout << " newDest " << thisDest << "\n";
         cModule* destModule = getModuleByPath(thisDest.c_str());
         cModule* ndpDestModule = destModule->getSubmodule("ndp");
-        //unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("appOut") + 1;
-        //unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("appIn") + 1;
-        //ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
-        //ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
+        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
+        ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
         unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule, "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumTCPSinkApp   =  " << newNumNdpSinkAppsDest << "\n";
         cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp"); // find factory object
@@ -1239,10 +1255,10 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
         std::cout << " dest: " << dest << "\n";
         cModule* destModule = getModuleByPath(dest.c_str());
         cModule* ndpDestModule = destModule->getSubmodule("ndp");
-        //unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("appOut") + 1;
-        //unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("appIn") + 1;
-        //ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
-        //ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
+        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        ndpDestModule->setGateSize("appOut", newNdpGateOutSizeDest);
+        ndpDestModule->setGateSize("appIn", newNdpGateInSizeDest);
         unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule, "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumNDPSinkApp   =  " << newNumNdpSinkAppsDest << "\n";
         cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp"); // find factory object
@@ -1253,8 +1269,8 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
         newDestAppModule->par("isLongFlow").setBoolValue(false);
         newDestAppModule->par("multiSrcGroupId").setDoubleValue(multiSrcGroupId); // added new
 
-        cGate *gateNdpInDest = ndpDestModule->gate("appIn");
-        cGate *gateNdpOutDest = ndpDestModule->gate("appOut");
+        cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateInSizeDest - 1);
+        cGate *gateNdpOutDest = ndpDestModule->gate("out", newNdpGateOutSizeDest - 1);
         cGate *gateInDest = newDestAppModule->gate("socketIn");
         cGate *gateOutDest = newDestAppModule->gate("socketOut");
 
@@ -1270,10 +1286,10 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
         std::string itsSender = *iter;
         cModule* srcModule = getModuleByPath(itsSender.c_str()); // const char* c_str Return pointer to the string.
         cModule* ndpSrcModule = srcModule->getSubmodule("ndp");
-        //unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("appOut") + 1;
-        //unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("appIn") + 1;
-        //ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
-        //ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
+        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        ndpSrcModule->setGateSize("appOut", newNDPGateOutSizeSrc);
+        ndpSrcModule->setGateSize("appIn", newNDPGateInSizeSrc);
         unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule, "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         std::cout << "Src  numTCPSessionApp =  " << newNumNdpSessionAppsSrc << "\n";
         cModuleType *moduleTypeSrc = cModuleType::get("ndp.application.ndpapp.NdpBasicClientApp"); // find factory object
@@ -1306,8 +1322,8 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
 //        newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
 
 
-        cGate *gateNdpIn = ndpSrcModule->gate("appIn");
-        cGate *gateNdpOut = ndpSrcModule->gate("appOut");
+        cGate *gateNdpIn = ndpSrcModule->gate("in", newNDPGateInSizeSrc - 1);
+        cGate *gateNdpOut = ndpSrcModule->gate("out", newNDPGateOutSizeSrc - 1);
         cGate *gateIn = newSrcAppModule->gate("socketIn");
         cGate *gateOut = newSrcAppModule->gate("socketOut");
         gateNdpOut->connectTo(gateIn);

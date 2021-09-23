@@ -1,6 +1,6 @@
 echo " Running FatTree Traffic .... "
 find . -name "*.vec" -type f -delete|find . -name  "*.sca"  -type f -delete| find . -name "*.vci" -type f -delete | find . -name "*.csv" -type f -delete
-opp_run_release  -u Cmdenv -m -n ../../../..:../../../../../examples:../../../../../tutorials -l ../../../../INET ../exp1-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
+opp_run_release  -u Cmdenv -m -n ..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials -l ../../../../inet4/src/INET ../exp1-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
 
 echo "Throughput"
 scavetool export -T s -f "module(**.ndpApp[*]) AND ("mohThroughputNDP:mean")"   -F CSV-S -o instThroughput.csv *.sca

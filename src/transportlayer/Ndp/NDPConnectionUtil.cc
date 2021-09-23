@@ -394,7 +394,7 @@ void NDPConnection::sendRstAck(uint32 seq, uint32 ack, L3Address src, L3Address 
     ndpseg->setDataSequenceNumber(seq);
     ndpseg->setAckNo(ack);
 
-    Packet *fp = new Packet("RST+ACK");
+    Packet *fp = new Packet("RST+ACK TODO CHANGE");
     // send it
     sendToIP(fp, ndpseg, src, dest);
 

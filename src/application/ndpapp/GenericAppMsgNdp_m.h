@@ -36,22 +36,24 @@ namespace inet {
  * <pre>
  * class GenericAppMsgNdp extends FieldsChunk
  * {
- *     int numPaketToSend;  //  if this is a reader(receiver)
+ *     int numPacketsToSend;  //  if this is a reader(receiver)
  *     bool isSender;  // receiver 
  *     bool isReceiver;  // receiver 
  *     bool isLongFlow;
  *     bool serverClose;        // if true, server should close the
+ *     uint32_t sequenceNumber; //new TODO
  * }
  * </pre>
  */
 class GenericAppMsgNdp : public ::inet::FieldsChunk
 {
   protected:
-    int numPaketToSend = 0;
+    int numPacketsToSend = 0;
     bool isSender_ = false;
     bool isReceiver_ = false;
     bool isLongFlow_ = false;
     bool serverClose = false;
+    uint32_t sequenceNumber = 0;
 
   private:
     void copy(const GenericAppMsgNdp& other);
@@ -70,8 +72,8 @@ class GenericAppMsgNdp : public ::inet::FieldsChunk
     virtual void parsimUnpack(omnetpp::cCommBuffer *b) override;
 
     // field getter/setter methods
-    virtual int getNumPaketToSend() const;
-    virtual void setNumPaketToSend(int numPaketToSend);
+    virtual int getNumPacketsToSend() const;
+    virtual void setNumPacketsToSend(int numPacketsToSend);
     virtual bool isSender() const;
     virtual void setIsSender(bool isSender);
     virtual bool isReceiver() const;
@@ -80,6 +82,8 @@ class GenericAppMsgNdp : public ::inet::FieldsChunk
     virtual void setIsLongFlow(bool isLongFlow);
     virtual bool getServerClose() const;
     virtual void setServerClose(bool serverClose);
+    virtual uint32_t getSequenceNumber() const;
+    virtual void setSequenceNumber(uint32_t sequenceNumber);
 };
 
 inline void doParsimPacking(omnetpp::cCommBuffer *b, const GenericAppMsgNdp& obj) {obj.parsimPack(b);}

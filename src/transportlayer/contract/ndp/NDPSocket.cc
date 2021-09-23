@@ -46,6 +46,7 @@ NDPSocket::NDPSocket(NDPAvailableInfo *availableInfo)
     remoteAddr = availableInfo->getRemoteAddr();
     localPrt = availableInfo->getLocalPort();
     remotePrt = availableInfo->getRemotePort();
+    EV_INFO << "\n\n\n\nMARKER LOCAL ADDRESS: " << localAddr.str();
 }
 
 NDPSocket::~NDPSocket() {
@@ -121,15 +122,16 @@ void NDPSocket::bind(L3Address lAddr, int lPort) {
     auto request = new Request("PassiveOPEN", NDP_C_OPEN_PASSIVE);
 
     NDPOpenCommand *openCmd = new NDPOpenCommand();
+
     openCmd->setLocalAddr(localAddr);
     openCmd->setLocalPort(localPrt);
-
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
     openCmd->setIsSender(false);
     openCmd->setIsReceiver(true);
     request->setControlInfo(openCmd);
     sendToNDP(request);
     sockstate = LISTENING;
+    //throw cRuntimeError( "Local address %d Local Port %d", localAddr, localPrt);
 }
  void NDPSocket::accept(int socketId)
  {

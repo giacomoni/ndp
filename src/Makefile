@@ -42,6 +42,10 @@ OBJS = \
     $O/common/TopologyEcmp.o \
     $O/common/queue/NDPQueue.o \
     $O/common/scheduler/CentralSchedulerNdp.o \
+    $O/networklayer/common/L3AddressResolverEcmp.o \
+    $O/networklayer/configurator/base/NetworkConfiguratorBaseEcmp.o \
+    $O/networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.o \
+    $O/networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.o \
     $O/networklayer/ipv4/IcmpNdp.o \
     $O/networklayer/ipv4/Igmpv2Ndp.o \
     $O/networklayer/ipv4/Ipv4FragBufNdp.o \
@@ -50,6 +54,7 @@ OBJS = \
     $O/networklayer/ipv4/Ipv4Ndp.o \
     $O/networklayer/ipv4/Ipv4NetworkLayerNdp.o \
     $O/networklayer/ipv4/Ipv4RoutingTableEcmp.o \
+    $O/networklayer/ipv4/RoutingTableParserEcmp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NDPConnectionBase.o \
     $O/transportlayer/Ndp/NDPConnectionEventProc.o \

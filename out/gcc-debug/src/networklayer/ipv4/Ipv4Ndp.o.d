@@ -80,15 +80,15 @@
  ../../inet4/src/inet/networklayer/contract/IRoutingTable.h \
  ../../inet4/src/inet/networklayer/contract/IRoute.h \
  ../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h \
+ networklayer/ipv4/Ipv4RoutingTableEcmp.h \
  ../../inet4/src/inet/networklayer/ipv4/IcmpHeader_m.h \
  ../../inet4/src/inet/transportlayer/common/CrcMode_m.h \
  networklayer/ipv4/Ipv4Ndp.h \
  ../../inet4/src/inet/networklayer/contract/INetfilter.h \
  ../../inet4/src/inet/common/stlutils.h \
  ../../inet4/src/inet/networklayer/contract/INetworkProtocol.h \
- ../../inet4/src/inet/networklayer/ipv4/Icmp.h \
- ../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h \
  networklayer/ipv4/IcmpNdp.h \
+ ../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h \
  ../../inet4/src/inet/networklayer/ipv4/Ipv4FragBuf.h \
  ../../inet4/src/inet/common/packet/ReassemblyBuffer.h \
  ../../inet4/src/inet/common/packet/ChunkBuffer.h \
@@ -263,6 +263,8 @@
 
 ../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h:
 
+networklayer/ipv4/Ipv4RoutingTableEcmp.h:
+
 ../../inet4/src/inet/networklayer/ipv4/IcmpHeader_m.h:
 
 ../../inet4/src/inet/transportlayer/common/CrcMode_m.h:
@@ -275,11 +277,9 @@ networklayer/ipv4/Ipv4Ndp.h:
 
 ../../inet4/src/inet/networklayer/contract/INetworkProtocol.h:
 
-../../inet4/src/inet/networklayer/ipv4/Icmp.h:
+networklayer/ipv4/IcmpNdp.h:
 
 ../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h:
-
-networklayer/ipv4/IcmpNdp.h:
 
 ../../inet4/src/inet/networklayer/ipv4/Ipv4FragBuf.h:
 

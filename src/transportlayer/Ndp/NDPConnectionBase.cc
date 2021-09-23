@@ -63,6 +63,7 @@ NdpStateVariables::NdpStateVariables() {
     connNotAddedYet = true;
 
     active = false;
+    //fork = false;
     snd_mss = 0;
     iss = 0;
 
@@ -148,7 +149,8 @@ void NDPConnection::handleMessage(cMessage *msg)
 {
     if (msg->isSelfMessage()) {
         if (!processTimer(msg))
-            ndpMain->removeConnection(this);
+            EV_INFO << "\nConnection Attempted Removal!\n";
+            //ndpMain->removeConnection(this);
     }
     else
         throw cRuntimeError("model error: NDPConnection allows only self messages");

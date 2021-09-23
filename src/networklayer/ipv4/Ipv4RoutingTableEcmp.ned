@@ -47,6 +47,7 @@ import inet.networklayer.contract.IRoutingTable;
 simple Ipv4RoutingTableEcmp like IRoutingTable
 {
     parameters:
+        @class("inet::Ipv4RoutingTableEcmp");
         string interfaceTableModule;   // The path to the InterfaceTable module
         string routerId = default("auto"); // for routers, the router id using IPv4 address dotted
                           // notation; specify "auto" to select the highest

@@ -46,7 +46,7 @@
 #include "NDPReceiveQueue.h"
 #include "NDPSendQueue.h"
 #include "ndp_common/NdpHeader.h"
-
+#include "../../networklayer/ipv4/Ipv4HeaderNdp_m.h"
 namespace inet {
 namespace ndp {
 
@@ -136,13 +136,19 @@ NDPConnection *Ndp::findConnForApp(int socketId)
 
 void Ndp::handleLowerPacket(Packet *packet)
 {
+    EV_INFO << "\n\n\n\nLOWER PACKET DETAILS: " << packet->str() << std::endl;
     // must be a NdpHeader
     auto ndpHeader = packet->peekAtFront<NdpHeader>();
+    //TODO Packet does not appear to have NdpHeader at front?
+    //auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
+    //auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
     //inet::Ptr<NdpHeader> header = makeShared<NdpHeader>();
     //header->copy(ndpHeader);
     //header->setPriorityValue(10);   //FIX THIS
     //ndpHeader->setPriorityValue(10);
     // get src/dest addresses
+    //packet->insertAtFront(ndpHeader);
+    //packet->insertAtFront(ipv4Header);
     L3Address srcAddr, destAddr;
     srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();
     destAddr = packet->getTag<L3AddressInd>()->getDestAddress();
@@ -152,9 +158,9 @@ void Ndp::handleLowerPacket(Packet *packet)
     ASSERT(ecn != -1);
 
     // process segment
-    NDPConnection *conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
+    NDPConnection *conn = nullptr;
+    conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
     if (conn) {
-
         bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr, destAddr);
         if (!ret)
             removeConnection(conn);
@@ -206,6 +212,11 @@ NDPConnection *Ndp::findConnForSegment(const Ptr<const NdpHeader>& ndpseg, L3Add
     key.localPort = ndpseg->getDestPort();
     key.remotePort = ndpseg->getSrcPort();
     SockPair save = key;
+
+    EV_INFO << "\n   eeee localPort   " <<  key.localPort  << " \n";
+    EV_INFO << "\n eee localAddr  " <<  destAddr  << " \n";
+    EV_INFO << "\n eee destAddr " <<  srcAddr << " \n";
+    EV_INFO << "\n eee remotePort  " <<  key.remotePort  << " \n";
 
     // try with fully qualified SockPair
     auto i = ndpConnMap.find(key);
@@ -289,6 +300,11 @@ void Ndp::addSockPair(NDPConnection *conn, L3Address localAddr, L3Address remote
     key.localPort = conn->localPort = localPort;
     key.remotePort = conn->remotePort = remotePort;
 
+    EV_INFO << "\naaaa  localAddr " <<  localAddr << " \n";
+    EV_INFO << "\naaa remoteAddr   " <<  remoteAddr  << " \n";
+    EV_INFO << "\naaa localPort  " <<  localPort  << " \n";
+    EV_INFO << "\naaa remotePort  " <<  remotePort  << " \n";
+
     // make sure connection is unique
     auto it = ndpConnMap.find(key);
     if (it != ndpConnMap.end()) {
@@ -301,7 +317,7 @@ void Ndp::addSockPair(NDPConnection *conn, L3Address localAddr, L3Address remote
                     localAddr.str().c_str(), localPort, remoteAddr.str().c_str(), remotePort);
     }
 
-    // then insert it into tcpConnMap
+    // then insert it into ncpConnMap
     ndpConnMap[key] = conn;
 
     // mark port as used
@@ -331,6 +347,10 @@ void Ndp::updateSockPair(NDPConnection *conn, L3Address localAddr, L3Address rem
     key.remotePort = conn->remotePort = remotePort;
     ndpConnMap[key] = conn;
 
+    EV_INFO << "\nbbbb updateSockPair localAddr " <<  localAddr << " \n";
+    EV_INFO << "\nbbbb updateSockPair remoteAddr   " <<  remoteAddr  << " \n";
+    EV_INFO << "\nbbbb updateSockPair localPort  " <<  localPort  << " \n";
+    EV_INFO << "\nbbbb updateSockPair remotePort  " <<  remotePort  << " \n";
     // localPort doesn't change (see ASSERT above), so there's no need to update usedEphemeralPorts[].
 }
 

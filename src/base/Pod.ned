@@ -7,6 +7,7 @@ import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 import inet.node.inet.StandardHost;
 import inet.node.inet.Router;
+import ndp.base.RouterNdp;
 import inet.node.ethernet.EtherLink;
 import ned.DatarateChannel;
 import ned.IBidirectionalChannel;
@@ -48,7 +49,7 @@ module Pod
         }
 
 		// Also k/2 aggregation routers in one pod.
-        aggRouters[khalf]: Router {
+        aggRouters[khalf]: RouterNdp {
             @display("p=80,100,m,$k,120,150");
         }
     //          configurator: IPv4NetworkConfigurator;

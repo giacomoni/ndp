@@ -17,10 +17,12 @@ void NdpServerHostApp::handleStartOperation(LifecycleOperation *operation)
 {
     const char *localAddress = par("localAddress");
     int localPort = par("localPort");
-
+    EV_INFO << "\n\nMARKER LOCAL ADDRESS CHAR: " << localAddress;
     serverSocket.setOutputGate(gate("socketOut"));
     serverSocket.setCallback(this);
+    //serverSocket.bind(localAddress[0] ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
     serverSocket.bind(localAddress[0] ? L3Address(localAddress) : L3Address(), localPort);
+    EV_INFO << "\n\n\n\n\nMARKER LOCAL ADDRESS: " << serverSocket.getLocalAddress().str();
     serverSocket.listen();
 }
 
