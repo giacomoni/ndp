@@ -172,9 +172,10 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
     else if (isOverloaded()) {
         std::string header="Header-";
         if (ndpHeader != nullptr) {
-            std::string name=ndpHeader->getName();
+            std::string name=packet->getName();
             std::string rename=header+name;
             //ndpHeader->setName(rename.c_str());
+            packet->setName(rename.c_str());
             ndpHeader->setIsHeader(true);
             ndpHeader->setIsDataPacket(false);
 
@@ -190,7 +191,7 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         packet->insertAtFront(ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength=headersQueue.getLength();
-        emit(packetPushedHeadersQueueSignal, packet);
+        //emit(packetPushedHeadersQueueSignal, packet);
         ++numTrimmedPkt;
         numTrimmedPacketsVec.record(numTrimmedPkt);
         //emit(numTrimmedPktSig, numTrimmedPkt);       TODO EMIT

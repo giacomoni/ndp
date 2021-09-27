@@ -9,6 +9,7 @@
 #include "../contract/ndp/NDPCommand_m.h"
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 #include "inet/applications/common/SocketTag_m.h"
+#include "ndp_common/NdpHeader.h"
 //Preprocessor directives
 //  #define  ShowOut
  #ifdef ShowOut
@@ -46,7 +47,7 @@ void NDPConnection::sendInitialWindow() {
 
         if (state->IW > state->numPacketsToSend)
             state->IW = state->numPacketsToSend;
-
+        //state->IW = 8;
         for (int i = 1; i <= state->IW; i++) {
 //            MY_COUT << "  sendInitialWindow "   << std::endl;
 //            itt = sentPakcetsList.begin();
@@ -105,7 +106,7 @@ NDPEventCode NDPConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const 
 
 
 
-void NDPConnection::ackArrivedFreeBuffer(unsigned int ackNum) {
+void NDPConnection::ackArrivedFreeBuffer(Packet* packet) {
 
 }
 
@@ -149,7 +150,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     if (fsm.getState() == NDP_S_ESTABLISHED && state->isSender == true && ndpseg->getNackBit() == true) {
 //        MY_COUT  << "  \n\n\n  ££££££££££££££££  Sender   ££££££££££££££ new  ACK arrived: ackNum = " << ndpseg->getNackNo() << std::endl;
 //        ackArrivedFreeBuffer(ndpseg->getNackNo());
-        sendQueue->nackArrivedMoveFront(ndpseg->getNackNo());
+        sendQueue->nackArrivedMoveFront(packet, ndpseg->getNackNo());
         // TODO
     }
 
@@ -159,7 +160,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     if (fsm.getState() == NDP_S_ESTABLISHED &&  state->isSender == true && ndpseg->getAckBit() == true) {
 //        MY_COUT  << "  \n\n\n  £££££££££ Sender ££££££££ new  ACK arrived: ackNum = "  << ndpseg->getAckNo() << std::endl;
-        sendQueue->ackArrivedFreeBuffer(ndpseg->getAckNo());
+        sendQueue->ackArrivedFreeBuffer(packet);
     }
 
     // (S.3)  at the sender: PULL pkt arrived, this pkt triggers either retransmission of trimmed pkt or sending a new data pkt.
@@ -388,15 +389,16 @@ void NDPConnection::addRequestToPullsQueue(){
 //    ndpseg->setIsLastPktToSend(false);
 
 
-     ndpseg->setPullSequenceNumber(state->request_id);
+    ndpseg->setPullSequenceNumber(state->request_id);
+    ndppack->insertAtFront(ndpseg);
      //    ndpseg->addPayloadMessage(msg->dup(),10);
     //sendToIP(ndpseg);
     //pullQueue.insert(ndppack);
     //pullQueue.insert(ndpseg);
     //pullQueue.insert(std::make_tuple(ndppack, ndpseg));
-    pullQueue.push(std::make_tuple(ndpseg, ndppack));
+    pullQueue.insert(ndppack);
     //EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength()<< "\n\n\n\n";
-    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.size()<< "\n\n\n\n";
+    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getBitLength()<< "\n\n\n\n";
 //    MY_COUT << "pullsQueue length now = " << pullQueue.getLength()<< ".\n";
 //    MY_COUT  << " mmmm  addRequestToPullsQueue  this->getFullPath() " << ndpMain->getFullPath() << " , len= " << pullQueue.getLength()   << "\n";
     bool napState = getNDPMain()->getNapState();
@@ -410,18 +412,22 @@ void NDPConnection::addRequestToPullsQueue(){
 void NDPConnection::sendRequestFromPullsQueue(){
 //    MY_COUT  << " ssssssssssssss sendRequestFromPullsQueuemmmm  this->getFullPath() " << ndpMain->getFullPath()     << "\n";
 
-    if (pullQueue.size() > 0  ){
-        const auto& ndpseg = (std::get<0>(pullQueue.front()));
-        Packet* fp = std::get<1>(pullQueue.front());
+    if (b(pullQueue.getBitLength()) > B(0) ){
+        //Packet* fp = (Packet *) pullQueue.pop();
+        Packet* fp = check_and_cast<Packet *>(pullQueue.front());
         pullQueue.pop();
-        EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.size()<< " \n\n";
+        //const auto& ndpseg = fp->popAtFront<ndp::NdpHeader>();
+        auto ndpseg = fp->removeAtFront<ndp::NdpHeader>();
+        //ndpseg = dynamic_cast<IntrusivePtr<NdpHeader>>(ndpseg);
+        //pullQueue.pop();
+        EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.getBitLength()<< " \n\n";
         sendToIP(fp, ndpseg);
     }
 }
 
-int NDPConnection::getPullsQueueLength()  {
+b NDPConnection::getPullsQueueLength()  {
 //    MY_COUT << "pullsQueue length now = " <<" " << pullQueue.getLength()<< ".\n";
-    int len = pullQueue.size();
+    b len = b(pullQueue.getBitLength());
     //int len = pullQueue.getLength();
     return len;
 }

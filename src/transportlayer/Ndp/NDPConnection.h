@@ -6,7 +6,7 @@
 #include "inet/common/INETDefs.h"
 #include <queue>
 #include "inet/networklayer/common/L3Address.h"
-
+#include "inet/common/packet/ChunkQueue.h"
 namespace inet {
 
 class NDPCommand;
@@ -222,8 +222,7 @@ public:
 
 protected:
     //cQueue pullQueue;
-    std::queue<std::tuple<const Ptr<NdpHeader>&, Packet*>> pullQueue;
-    cQueue pullTets;
+    cPacketQueue pullQueue;
     // NDP behavior in data transfer state
     NDPAlgorithm *ndpAlgorithm = nullptr;
     NDPAlgorithm *getNdpAlgorithm() const { return ndpAlgorithm; }
@@ -323,7 +322,7 @@ public:
     virtual void sendNackNdp(unsigned int nackNum); // MOH: HAS BEEN ADDED
 
 
-    virtual void ackArrivedFreeBuffer(unsigned int ackNum); // MOH: HAS BEEN ADDED
+    virtual void ackArrivedFreeBuffer(Packet* packet); // MOH: HAS BEEN ADDED
     virtual void getBufferedPkt(unsigned int seqNum , std::list<PacketsToSend>::iterator& iter );
     virtual void getFirstBufferedPkt(std::list<PacketsToSend>::iterator& iter );
 
@@ -359,8 +358,7 @@ public:
     virtual void  addRequestToPullsQueue();
     virtual void  sendRequestFromPullsQueue();
 
-    virtual int  getPullsQueueLength();
-
+    virtual b getPullsQueueLength();
     /** Utility: signal to user that connection timed out */
     virtual void signalConnectionTimeout();
 

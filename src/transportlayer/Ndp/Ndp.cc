@@ -90,12 +90,18 @@ void Ndp::initialize(int stage)
 
 void Ndp::finish()
 {
+    if (requestTimerMsg->isScheduled())
+            cancelEvent(requestTimerMsg);
+            delete requestTimerMsg;
     EV_INFO << getFullPath() << ": finishing with " << ndpConnMap.size() << " connections open.\n";
 }
 
 void Ndp::handleSelfMessage(cMessage *msg)
 {
-    throw cRuntimeError("model error: should schedule timers on connection");
+    //throw cRuntimeError("model error: should schedule timers on connection");
+    if (msg == requestTimerMsg) {
+        process_REQUEST_TIMER();
+    }
 }
 
 void Ndp::handleUpperCommand(cMessage *msg)
@@ -528,14 +534,14 @@ void Ndp::sendFirstRequest() {
 
 bool Ndp::allPullQueuesEmpty() {
 //     std::cout << "  Ndp::allPullQueuesEmpty()    "  << this->getFullPath()   << "\n";
-    int pullsQueueLength =0;
+    b pullsQueueLength = B(0);
     auto iter = requestCONNMap.begin();
     while (iter !=  requestCONNMap.end()){
 //        std::cout << "   aaaaallPullQueuesEmpty   "     << "\n";
          pullsQueueLength = iter->second->getPullsQueueLength();
 //         std::cout <<    this->getFullPath()   << " pullsQueueLength=   "  <<   pullsQueueLength<< "\n";
 
-        if (pullsQueueLength >0) return false;
+        if (pullsQueueLength > B(0)) return false;
         ++iter;
     }
       return true;
@@ -578,6 +584,7 @@ void Ndp::updateConnMap() {
 }
 
 void Ndp::requestTimer() {
+    Enter_Method_Silent();
 //    std::cout << "  requestTimer  \n";
 //  //  state->request_rexmit_count = 0;
 //  //  state->request_rexmit_timeout = NDP_TIMEOUT_PULL_REXMIT;  // 3 sec
@@ -629,8 +636,8 @@ void Ndp::process_REQUEST_TIMER() {
                 counter = 0;
             auto iter = requestCONNMap.begin();
             std::advance(iter, counter);
-            int pullsQueueLength = iter->second->getPullsQueueLength();
-            if (pullsQueueLength > 0) {
+            b pullsQueueLength = iter->second->getPullsQueueLength();
+            if (pullsQueueLength > B(0)) {
                 iter->second->sendRequestFromPullsQueue();
                 requestTimer();
                 sendNewRequest = true;

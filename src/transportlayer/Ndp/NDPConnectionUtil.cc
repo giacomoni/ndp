@@ -72,6 +72,8 @@ const char *NDPConnection::indicationName(int code) {
 }
 
 void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg) {
+    EV_INFO << "\n\n\n\n\nLOCAL PORT" << localPort;
+    EV_INFO << "\nIS PULL PACKET?: " << ndpseg->isPullPacket();
     ndpseg->setSrcPort(localPort);
     ndpseg->setDestPort(remotePort);
     ASSERT(ndpseg->getHeaderLength() >= NDP_MIN_HEADER_LENGTH);
@@ -227,7 +229,7 @@ void NDPConnection::sendNackNdp(unsigned int nackNum) {
 
     // write header options
     writeHeaderOptions(ndpseg);
-    Packet *fp = new Packet("NdpNAck");
+    Packet *fp = new Packet("NdpNack");
     // send it
     sendToIP(fp, ndpseg);
 }

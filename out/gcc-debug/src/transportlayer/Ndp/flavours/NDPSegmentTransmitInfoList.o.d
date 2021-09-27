@@ -54,7 +54,9 @@
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
+ ../../inet4/src/inet/common/packet/ChunkQueue.h \
+ ../../inet4/src/inet/common/packet/chunk/EmptyChunk.h
 
 transportlayer/Ndp/flavours/NDPSegmentTransmitInfoList.h:
 
@@ -167,3 +169,7 @@ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
+
+../../inet4/src/inet/common/packet/ChunkQueue.h:
+
+../../inet4/src/inet/common/packet/chunk/EmptyChunk.h:

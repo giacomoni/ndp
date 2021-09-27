@@ -62,9 +62,9 @@ network FatTreeNdp
         configurator: Ipv4NetworkConfigurator {
             @display("p=1314.495,672.2275");
         }
-        centralSchedulerNdp: CentralSchedulerNdp {
-            @display("p=704.06,601.0725;i=abstract/person,#17FF39;b=,,rect;is=vl;t=Central flow scheduler");
-        }
+        //centralSchedulerNdp: CentralSchedulerNdp {
+        //    @display("p=704.06,601.0725;i=abstract/person,#17FF39;b=,,rect;is=vl;t=Central flow scheduler");
+        //}
 //        multicastOrganiser: multicastOrganiser {
 //            @display("p=385.735,601.0725");
 //        }

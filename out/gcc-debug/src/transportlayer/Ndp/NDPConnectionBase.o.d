@@ -54,9 +54,9 @@
  transportlayer/Ndp/../../transportlayer/Ndp/NDPConnection.h \
  transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h \
  transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
- transportlayer/Ndp/NDPReceiveQueue.h \
  ../../inet4/src/inet/common/packet/ChunkQueue.h \
  ../../inet4/src/inet/common/packet/chunk/EmptyChunk.h \
+ transportlayer/Ndp/NDPReceiveQueue.h \
  ../../inet4/src/inet/common/packet/ReorderBuffer.h \
  ../../inet4/src/inet/common/packet/ChunkBuffer.h \
  transportlayer/Ndp/NDPConnection.h transportlayer/Ndp/NDPSendQueue.h \
@@ -172,11 +172,11 @@ transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h:
 
 transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
-transportlayer/Ndp/NDPReceiveQueue.h:
-
 ../../inet4/src/inet/common/packet/ChunkQueue.h:
 
 ../../inet4/src/inet/common/packet/chunk/EmptyChunk.h:
+
+transportlayer/Ndp/NDPReceiveQueue.h:
 
 ../../inet4/src/inet/common/packet/ReorderBuffer.h:
 

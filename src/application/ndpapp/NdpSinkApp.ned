@@ -2,16 +2,16 @@
 package ndp.application.ndpapp;
 import ndp.application.contract.INdpApp;
 import ndp.application.ndpapp.NdpServerHostApp;
-
-simple NdpSinkApp extends NdpServerHostApp
+import inet.applications.contract.IApp;
+simple NdpSinkApp like IApp
 {
     parameters:
-        serverThreadModuleType = default("ndp.application.ndpapp.NdpSinkAppThread");
+        volatile string localAddress = default(""); // may be left empty ("")
+        volatile int localPort; // port number to listen on
         @class("inet::NdpSinkApp");
          @display("i=block/sink");
-        int multiCastGroupId = default(-1);
-        int multiSrcGroupId = default(-1);
- 		serverThreadModuleType = default("ndp.application.ndpapp.NdpSinkAppThread"); // module type of "thread" module to launch on incoming connections
+        double multiCastGroupId = default(-1);
+        double multiSrcGroupId = default(-1);
         // moh
         bool isLongFlow = default(false);
         
@@ -35,10 +35,8 @@ simple NdpSinkApp extends NdpServerHostApp
 //       @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(rcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
 
         @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(rcvdPk)"; unit=bps; record=mean);
+    gates:
+        input socketIn @labels(NDPCommand/up);
+        output socketOut @labels(NDPCommand/down);
 }
-
-simple NdpSinkAppThread
-{
-     @display("i=block/sink");
-}    
 

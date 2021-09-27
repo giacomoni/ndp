@@ -12,8 +12,6 @@
 //#include "/Volumes/LocalDataHD/m/ma/ma777/Desktop/omnetpp-5.2.1-hpc/omnetpp-5.2.1/samples/inet-myprojects/inet/src/inet/common/ResultFilters.h"
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 
-//Preprocessor directives
-//#define  ShowOut
 #ifdef ShowOut
 #define MY_COUT std::cout
 #else
@@ -29,9 +27,8 @@ namespace inet {
 //
 //}
 Define_Module(NdpSinkApp);
-Define_Module(NdpSinkAppThread);
 
-simsignal_t NdpSinkAppThread::rcvdPkSignalNDP = registerSignal("rcvdPk");
+simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("rcvdPk");
 
 simsignal_t fctRecordv3 = NodeStatus::registerSignal("fctRecordv3");
 simsignal_t multicastGroupIdSignal =  NodeStatus::registerSignal("multicastGroupIdSignal");
@@ -41,91 +38,46 @@ simsignal_t numRcvTrimmedHeaderSigNdp = NodeStatus::registerSignal("numRcvTrimme
 // MOH ADDED
 //simsignal_t throughputRecordv1eee = NodeStatus::registerSignal("throughputRecordv1eee");
 
-NdpSinkApp::NdpSinkApp()
-{
-}
-
-NdpSinkApp::~NdpSinkApp()
-{
-}
-
 void NdpSinkApp::initialize(int stage)
 {
-     NdpServerHostApp::initialize(stage);
-    if (stage == INITSTAGE_LOCAL) {
-        bytesRcvd = 0;
-        WATCH(bytesRcvd);
-    }
-//    else if (stage == INITSTAGE_APPLICATION_LAYER) {
-//        timeoutMsg = new cMessage("timer");
-//
-//        bool isOperational;
-//        NodeStatus *nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
-//        isOperational = (!nodeStatus) || nodeStatus->getState() == NodeStatus::UP;
-//        if (!isOperational)
-//            throw cRuntimeError("This module doesn't support starting in node DOWN state");
-//
-//        const char *localAddress = par("localAddress");
-//        int localPort = par("localPort");
-////        MY_COUT << "NdpSinkApp initialize -- localPort =   " << localPort << "\n";
-////        MY_COUT << "NdpSinkApp initialize -- isLongFlow =   " << isLongFlow << "\n";
-//        gateToNdp = gate("ndpOut"); // MOH for multi sourcing
-//        socket.setOutputGate(gate("ndpOut"));
-//
-//        socket.bind(localAddress[0] ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
-//        socket.listen();
-//
-//         timeoutMsg->setKind(SEND_INIT_REQUEST_TO_READ);
-//        scheduleAt(simTime(), timeoutMsg);
-//    }
+     cSimpleModule::initialize(stage);
 
-}
-
-void NdpSinkApp::finish()
-{
-    NdpServerHostApp::finish();
-}
-
-void NdpSinkApp::refreshDisplay() const
-{
-    ApplicationBase::refreshDisplay();
-    char buf[160];
-    sprintf(buf, "threads: %d\nrcvd: %ld bytes", socketMap.size(), bytesRcvd);
-    getDisplayString().setTagArg("t", 0, buf);
-} // namespace inet
-
-void NdpSinkAppThread::sendRequest() {
-    char msgname[16];
-    //sprintf(msgname, "REQUEST-%d",++requestIndex);
-    sprintf(msgname, "REQUEST-INIT_READ");
-
-    auto packet = new Packet("REQUEST-INIT_READ");
-    const auto& payload = makeShared<GenericAppMsgNdp>();
-    payload->setChunkLength(B(10));
-    payload->setServerClose(false);
-    packet->insertAtFront(payload);
-    sock->send(packet);
-
-}
-
-void NdpSinkAppThread::initialize(int stage)
-{
-    NdpServerThreadBase::initialize(stage);
     isLongFlow = par("isLongFlow");  // moh
-//    multiCastGroupId = par("multiCastGroupId");
-//    multiSrcGroupId = par("multiSrcGroupId");
+
+    multiCastGroupId = par("multiCastGroupId");
+    multiSrcGroupId = par("multiSrcGroupId");
+
+
     if (stage == INITSTAGE_LOCAL) {
         bytesRcvd = 0;
         WATCH(bytesRcvd);
     }
+    else if (stage == INITSTAGE_APPLICATION_LAYER) {
+        timeoutMsg = new cMessage("timer");
+
+        bool isOperational;
+        NodeStatus *nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
+        isOperational = (!nodeStatus) || nodeStatus->getState() == NodeStatus::UP;
+        if (!isOperational)
+            throw cRuntimeError("This module doesn't support starting in node DOWN state");
+
+        const char *localAddress = par("localAddress");
+        int localPort = par("localPort");
+//        MY_COUT << "NdpSinkApp initialize -- localPort =   " << localPort << "\n";
+//        MY_COUT << "NdpSinkApp initialize -- isLongFlow =   " << isLongFlow << "\n";
+        gateToNdp = gate("socketOut"); // MOH for multi sourcing
+        socket.setOutputGate(gate("socketOut"));
+
+        socket.bind(localAddress[0] ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
+        socket.listen();
+
+         timeoutMsg->setKind(SEND_INIT_REQUEST_TO_READ);
+        scheduleAt(simTime(), timeoutMsg);
+    }
+
 }
 
-void NdpSinkAppThread::established()
-{
-    bytesRcvd = 0;
-}
-
-void NdpSinkAppThread::dataArrived(Packet *msg, bool urgent)
+void NdpSinkApp::handleMessage(cMessage *msg)
 {
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
         tEndAdded = simTime();
@@ -142,8 +94,8 @@ void NdpSinkAppThread::dataArrived(Packet *msg, bool urgent)
      if (centralMod && isLongFlow == false) {
             int   numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows +1 ;
-            centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
-             MY_COUT << "NdpSinkAppThread::dataArrived  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
+            centralMod->par("numCompletedShortFlows").setDoubleValue(newNumFinishedFlows);
+             MY_COUT << "NdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
         }
         delete msg;
 
@@ -176,16 +128,59 @@ void NdpSinkAppThread::dataArrived(Packet *msg, bool urgent)
     }
 }
 
-void NdpSinkAppThread::refreshDisplay() const
-{
-    std::ostringstream os;
-    //os << (sock ? NDPSocket::stateName(sock->getState()) : "NULL_SOCKET") << "\nrcvd: " << bytesRcvd << " bytes";
-    getDisplayString().setTagArg("t", 0, os.str().c_str());
+void NdpSinkApp::sendRequest() {
+    char msgname[16];
+    //sprintf(msgname, "REQUEST-%d",++requestIndex);
+    sprintf(msgname, "REQUEST-INIT_READ");
+
+    auto packet = new Packet("REQUEST-INIT_READ");
+    const auto& payload = makeShared<GenericAppMsgNdp>();
+    payload->setChunkLength(B(10));
+    payload->setServerClose(false);
+    packet->insertAtFront(payload);
+    socket.send(packet);
+
 }
 
-void NdpSinkAppThread::finish()
+// not used
+void NdpSinkApp::allReceivedCloseAllMultiSourcingConns() {
+
+    MY_COUT << "allReceivedCloseAllMultiSourcingConns \n\n\n\n" ;
+    char msgname[16];
+    sprintf(msgname, "CloseMultiSourcingConns");
+
+//    GenericAppMsgNdp *msg = new GenericAppMsgNdp(msgname);
+//    msg->setByteLength(10);
+//    msg->setServerClose(false);
+//    msg->setIsClient(true);  // client 1, server 0 ///////dasdasdsadasdasdasdasdad
+//    msg->setOpcode(opcode);
+//        msg->setFileId(fileId);
+//    msg->setNumSymbolsToGet(30);
+//    msg->setNamePooling(true);
+
+//        EV_INFO << "sending request with " << requestLength
+//                       << " bytes, expected reply length " << replyLength
+//                       << " bytes," << "numRequestsToSend " << numRequestsToSend
+//                       << " request\n";
+
+//    NDPCommand *cmd = new NDPCommand();
+//    cmd->setForcMultiSrcConnClose(true);
+//    cmd->setMultiSourcingGrpId(multiSrcGoupId);
+
+//    msg->setControlInfo(cmd);
+//     send(msg,  gateToNdp);
+
+
+//        socket.send(msg);
+
+}
+
+
+
+void NdpSinkApp::finish()
 {
-    NdpServerThreadBase::finish();
+//     MY_COUT << " NdpSinkApp::finish() fffffffffffffffffffffffffffffffffffffffffffffffffffff \n\n\n";
+
     // MOH Added
     double throughput = 8 * (double) bytesRcvd / (SIMTIME_DBL(tEndAdded - tStartAdded));
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
@@ -195,8 +190,8 @@ void NdpSinkAppThread::finish()
     // don't emit the FCT of the longFlows(no need), we just observe the shortFlows
     if (isLongFlow == false) {
           emit(fctRecordv3, FCT);
-//         emit(multicastGroupIdSignal, multiCastGroupId);
-//         emit(multisourceGroupIdSignal, multiSrcGroupId);
+         emit(multicastGroupIdSignal, multiCastGroupId);
+         emit(multisourceGroupIdSignal, multiSrcGroupId);
          std::cout << " numRcvTrimmedHeader   sink  "   << numRcvTrimmedHeader <<  "\n";
          emit(numRcvTrimmedHeaderSigNdp,numRcvTrimmedHeader );
 
@@ -204,4 +199,12 @@ void NdpSinkAppThread::finish()
           std::cout << "bytesRcvd: " << bytesRcvd << "  "   << this->getFullPath() <<   "\n\n\n";
     }
 }
+
+void NdpSinkApp::refreshDisplay() const
+{
+    std::ostringstream os;
+//    os << NDPSocket::stateName(socket.getState()) << "\nrcvd: " << bytesRcvd << " bytes";
+    getDisplayString().setTagArg("t", 0, os.str().c_str());
+}
+
 } // namespace inet

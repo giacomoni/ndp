@@ -171,7 +171,7 @@ void NDPSocket::connect(L3Address  localAddress ,  L3Address remoteAddress, int 
 
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
 
-
+    EV_INFO << "\n\n\n\nNUMBER OF PACKETS TO SEND: " << numPacketsToSend << "\n\n\n\n";
     openCmd->setNumPacketsToSend(numPacketsToSend);
     openCmd->setPriorityValue(priorityValue);
     openCmd->setIsSender(isSender);

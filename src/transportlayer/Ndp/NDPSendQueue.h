@@ -38,7 +38,7 @@ class INET_API NDPSendQueue : public cObject
     uint32 end = 0;    // last sequence number stored +1
 
     ChunkQueue dataToSendQueue;      // dataBuffer
-    ChunkQueue sentDataQueue;
+    cPacketQueue sentDataQueue;
 
   public:
     /**
@@ -52,7 +52,7 @@ class INET_API NDPSendQueue : public cObject
     virtual ~NDPSendQueue();
 
     virtual ChunkQueue& getDataToSendQueue() { return dataToSendQueue; }
-    virtual ChunkQueue& getSentDataQueue() { return sentDataQueue; }
+    virtual cPacketQueue& getSentDataQueue() { return sentDataQueue; }
     /**
      * Set the connection that owns this queue.
      */
@@ -96,8 +96,8 @@ class INET_API NDPSendQueue : public cObject
 
     virtual const std::tuple<Ptr<NdpHeader>, Packet*> getNdpHeader();
 
-    virtual void ackArrivedFreeBuffer(unsigned int ackNum);
-    virtual void nackArrivedMoveFront(unsigned int nackNum);
+    virtual void ackArrivedFreeBuffer(Packet* packet);
+    virtual void nackArrivedMoveFront(Packet* packet, unsigned int nackNum);
 
 
     /**

@@ -54,6 +54,8 @@
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  transportlayer/Ndp/flavours/../../../transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
  transportlayer/Ndp/flavours/../../../transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
+ ../../inet4/src/inet/common/packet/ChunkQueue.h \
+ ../../inet4/src/inet/common/packet/chunk/EmptyChunk.h \
  transportlayer/Ndp/flavours/../../../transportlayer/Ndp/Ndp.h \
  transportlayer/Ndp/flavours/../../../application/ndpapp/GenericAppMsgNdp_m.h
 
@@ -166,6 +168,10 @@ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/flavours/../../../transp
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
+
+../../inet4/src/inet/common/packet/ChunkQueue.h:
+
+../../inet4/src/inet/common/packet/chunk/EmptyChunk.h:
 
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/Ndp.h:
 
