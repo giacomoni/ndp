@@ -115,7 +115,7 @@ void Ipv4NetworkConfiguratorEcmp::computeConfiguration()
     printElapsedTime("computeConfiguration", initializeStartTime);
 }
 
-void Ipv4NetworkConfiguratorEcmp::ensureConfigurationComputed(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::ensureConfigurationComputed(TopologyEcmp& topology)
 {
     if (topology.getNumNodes() == 0)
         computeConfiguration();
@@ -136,7 +136,7 @@ void Ipv4NetworkConfiguratorEcmp::dumpConfiguration()
     if (par("dumpRoutes"))
         TIME(dumpRoutes(topology));
     // print current configuration to an XML file
-    if (!isEmpty(par("dumpConfig")))
+    if (!isEmptyEcmp(par("dumpConfig")))
         TIME(dumpConfig(topology));
 }
 
@@ -440,7 +440,7 @@ void Ipv4NetworkConfiguratorEcmp::collectCompatibleInterfaces(const std::vector<
     EV_TRACE << "Found " << compatibleInterfaces.size() << " compatible interfaces" << endl;
 }
 
-void Ipv4NetworkConfiguratorEcmp::assignAddresses(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::assignAddresses(TopologyEcmp& topology)
 {
     if (configureIsolatedNetworksSeparatly) {
         std::map<int, std::vector<LinkInfo *>> isolatedNetworks;
@@ -609,7 +609,7 @@ void Ipv4NetworkConfiguratorEcmp::assignAddresses(std::vector<LinkInfo *> links)
     }
 }
 
-Ipv4NetworkConfiguratorEcmp::InterfaceInfo *Ipv4NetworkConfiguratorEcmp::createInterfaceInfo(NetworkConfiguratorBaseEcmp::Topology& topology, NetworkConfiguratorBaseEcmp::Node *node, LinkInfo *linkInfo, InterfaceEntry *ie)
+Ipv4NetworkConfiguratorEcmp::InterfaceInfo *Ipv4NetworkConfiguratorEcmp::createInterfaceInfo(NetworkConfiguratorBaseEcmp::TopologyEcmp& topology, NetworkConfiguratorBaseEcmp::Node *node, LinkInfo *linkInfo, InterfaceEntry *ie)
 {
     InterfaceInfo *interfaceInfo = new InterfaceInfo(static_cast<Ipv4NetworkConfiguratorEcmp::Node *>(node), linkInfo, ie);
     Ipv4InterfaceData *ipv4Data = ie->findProtocolData<Ipv4InterfaceData>();
@@ -628,7 +628,7 @@ Ipv4NetworkConfiguratorEcmp::InterfaceInfo *Ipv4NetworkConfiguratorEcmp::createI
     return interfaceInfo;
 }
 
-void Ipv4NetworkConfiguratorEcmp::readInterfaceConfiguration(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::readInterfaceConfiguration(TopologyEcmp& topology)
 {
     using namespace xmlutils;
 
@@ -664,8 +664,8 @@ void Ipv4NetworkConfiguratorEcmp::readInterfaceConfiguration(Topology& topology)
             Matcher towardsMatcher(towardsAttr);
 
             // parse address/netmask constraints
-            bool haveAddressConstraint = isNotEmpty(addressAttr);
-            bool haveNetmaskConstraint = isNotEmpty(netmaskAttr);
+            bool haveAddressConstraint = isNotEmptyEcmp(addressAttr);
+            bool haveNetmaskConstraint = isNotEmptyEcmp(netmaskAttr);
 
             uint32_t address, addressSpecifiedBits, netmask, netmaskSpecifiedBits;
             if (haveAddressConstraint)
@@ -712,15 +712,15 @@ void Ipv4NetworkConfiguratorEcmp::readInterfaceConfiguration(Topology& topology)
                             interfaceInfo->addSubnetRoute = addSubnetRouteAttr;
 
                             // mtu
-                            if (isNotEmpty(mtuAttr))
+                            if (isNotEmptyEcmp(mtuAttr))
                                 interfaceInfo->mtu = atoi(mtuAttr);
 
                             // metric
-                            if (isNotEmpty(metricAttr))
+                            if (isNotEmptyEcmp(metricAttr))
                                 interfaceInfo->metric = atoi(metricAttr);
 
                             // groups
-                            if (isNotEmpty(groupsAttr)) {
+                            if (isNotEmptyEcmp(groupsAttr)) {
                                 cStringTokenizer tokenizer(groupsAttr);
                                 while (tokenizer.hasMoreTokens())
                                     interfaceInfo->multicastGroups.push_back(Ipv4Address(tokenizer.nextToken()));
@@ -774,7 +774,7 @@ bool Ipv4NetworkConfiguratorEcmp::linkContainsMatchingHostExcept(LinkInfo *linkI
     return false;
 }
 
-void Ipv4NetworkConfiguratorEcmp::dumpLinks(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::dumpLinks(TopologyEcmp& topology)
 {
     for (size_t i = 0; i < topology.linkInfos.size(); i++) {
         EV_INFO << "Link " << i << endl;
@@ -786,7 +786,7 @@ void Ipv4NetworkConfiguratorEcmp::dumpLinks(Topology& topology)
     }
 }
 
-void Ipv4NetworkConfiguratorEcmp::dumpAddresses(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::dumpAddresses(TopologyEcmp& topology)
 {
     for (size_t i = 0; i < topology.linkInfos.size(); i++) {
         EV_INFO << "Link " << i << endl;
@@ -799,7 +799,7 @@ void Ipv4NetworkConfiguratorEcmp::dumpAddresses(Topology& topology)
     }
 }
 
-void Ipv4NetworkConfiguratorEcmp::dumpRoutes(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::dumpRoutes(TopologyEcmp& topology)
 {
     for (int i = 0; i < topology.getNumNodes(); i++) {
         Node *node = (Node *)topology.getNode(i);
@@ -812,7 +812,7 @@ void Ipv4NetworkConfiguratorEcmp::dumpRoutes(Topology& topology)
     }
 }
 
-void Ipv4NetworkConfiguratorEcmp::dumpConfig(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::dumpConfig(TopologyEcmp& topology)
 {
     FILE *f;
     const char *filename = par("dumpConfig");
@@ -960,7 +960,7 @@ void Ipv4NetworkConfiguratorEcmp::dumpConfig(Topology& topology)
     fclose(f);
 }
 
-void Ipv4NetworkConfiguratorEcmp::readMulticastGroupConfiguration(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::readMulticastGroupConfiguration(TopologyEcmp& topology)
 {
     cXMLElementList multicastGroupElements = configuration->getChildrenByTagName("multicast-group");
     for (auto & multicastGroupElement : multicastGroupElements) {
@@ -1014,7 +1014,7 @@ void Ipv4NetworkConfiguratorEcmp::readMulticastGroupConfiguration(Topology& topo
     }
 }
 
-void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(TopologyEcmp& topology)
 {
     cXMLElementList routeElements = configuration->getChildrenByTagName("route");
     for (auto & routeElement : routeElements) {
@@ -1028,10 +1028,10 @@ void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(Topology& topolog
         try {
             // parse and check the attributes
             Ipv4Address destination;
-            if (!isEmpty(destinationAttr) && strcmp(destinationAttr, "*"))
+            if (!isEmptyEcmp(destinationAttr) && strcmp(destinationAttr, "*"))
                 destination = resolve(destinationAttr, L3AddressResolver::ADDR_IPv4).toIpv4();
             Ipv4Address netmask;
-            if (!isEmpty(netmaskAttr) && strcmp(netmaskAttr, "*")) {
+            if (!isEmptyEcmp(netmaskAttr) && strcmp(netmaskAttr, "*")) {
                 if (netmaskAttr[0] == '/')
                     netmask = Ipv4Address::makeNetmask(atoi(netmaskAttr + 1));
                 else
@@ -1039,7 +1039,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(Topology& topolog
             }
             if (!netmask.isValidNetmask())
                 throw cRuntimeError("Wrong netmask %s", netmask.str().c_str());
-            if (isEmpty(interfaceAttr) && isEmpty(gatewayAttr))
+            if (isEmptyEcmp(interfaceAttr) && isEmptyEcmp(gatewayAttr))
                 throw cRuntimeError("Incomplete route: either gateway or interface (or both) must be specified");
 
             // find matching host(s), and add the route
@@ -1062,7 +1062,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(Topology& topolog
                         route->setNetmask(netmask);
                         route->setGateway(gateway);    // may be unspecified
                         route->setInterface(ie);
-                        if (isNotEmpty(metricAttr))
+                        if (isNotEmptyEcmp(metricAttr))
                             route->setMetric(atoi(metricAttr));
                         node->staticRoutes.push_back(route);
                     }
@@ -1075,7 +1075,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualRouteConfiguration(Topology& topolog
     }
 }
 
-void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology& topology)
+void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(TopologyEcmp& topology)
 {
     cXMLElementList routeElements = configuration->getChildrenByTagName("multicast-route");
     for (auto & routeElement : routeElements) {
@@ -1090,10 +1090,10 @@ void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology
         try {
             // parse and check the attributes
             Ipv4Address source;
-            if (!isEmpty(sourceAttr) && strcmp(sourceAttr, "*"))
+            if (!isEmptyEcmp(sourceAttr) && strcmp(sourceAttr, "*"))
                 source = resolve(sourceAttr, L3AddressResolver::ADDR_IPv4).toIpv4();
             Ipv4Address netmask;
-            if (!isEmpty(netmaskAttr) && strcmp(netmaskAttr, "*")) {
+            if (!isEmptyEcmp(netmaskAttr) && strcmp(netmaskAttr, "*")) {
                 if (netmaskAttr[0] == '/')
                     netmask = Ipv4Address::makeNetmask(atoi(netmaskAttr + 1));
                 else
@@ -1104,7 +1104,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology
                 throw cRuntimeError("Wrong netmask %s", netmask.str().c_str());
 
             std::vector<Ipv4Address> groups;
-            if (isEmpty(groupsAttr))
+            if (isEmptyEcmp(groupsAttr))
                 groups.push_back(Ipv4Address::UNSPECIFIED_ADDRESS);
             else {
                 cStringTokenizer tokenizer(groupsAttr);
@@ -1126,7 +1126,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology
                     std::string hostShortenedFullPath = hostFullPath.substr(hostFullPath.find('.') + 1);
                     if (atMatcher.matches(hostShortenedFullPath.c_str()) || atMatcher.matches(hostFullPath.c_str())) {
                         InterfaceEntry *parent = nullptr;
-                        if (!isEmpty(parentAttr)) {
+                        if (!isEmptyEcmp(parentAttr)) {
                             parent = node->interfaceTable->findInterfaceByName(parentAttr);
                             if (!parent)
                                 throw cRuntimeError("Parent interface '%s' not found.", parentAttr);
@@ -1150,7 +1150,7 @@ void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology
                             route->setOriginNetmask(netmask);
                             route->setMulticastGroup(group);
                             route->setInInterface(parent ? new Ipv4MulticastRoute::InInterface(parent) : nullptr);
-                            if (isNotEmpty(metricAttr))
+                            if (isNotEmptyEcmp(metricAttr))
                                 route->setMetric(atoi(metricAttr));
                             for (auto & child : children)
                                 route->addOutInterface(new Ipv4MulticastRoute::OutInterface(child, false    /*TODO:isLeaf*/));
@@ -1167,10 +1167,10 @@ void Ipv4NetworkConfiguratorEcmp::readManualMulticastRouteConfiguration(Topology
 }
 
 void Ipv4NetworkConfiguratorEcmp::resolveInterfaceAndGateway(Node *node, const char *interfaceAttr, const char *gatewayAttr,
-        InterfaceEntry *& outIE, Ipv4Address& outGateway, Topology& topology)
+        InterfaceEntry *& outIE, Ipv4Address& outGateway, TopologyEcmp& topology)
 {
     // resolve interface name
-    if (isEmpty(interfaceAttr)) {
+    if (isEmptyEcmp(interfaceAttr)) {
         outIE = nullptr;
     }
     else {
@@ -1181,12 +1181,12 @@ void Ipv4NetworkConfiguratorEcmp::resolveInterfaceAndGateway(Node *node, const c
     }
 
     // if gateway is not specified, we are done
-    if (isEmpty(gatewayAttr) || !strcmp(gatewayAttr, "*")) {
+    if (isEmptyEcmp(gatewayAttr) || !strcmp(gatewayAttr, "*")) {
         outGateway = Ipv4Address();
         return;    // outInterface also already done -- we're done
     }
 
-    ASSERT(isNotEmpty(gatewayAttr));    // see "if" above
+    ASSERT(isNotEmptyEcmp(gatewayAttr));    // see "if" above
 
     // check syntax of gatewayAttr, and obtain an initial value
     outGateway = resolve(gatewayAttr, L3AddressResolver::ADDR_IPv4).toIpv4();
@@ -1271,7 +1271,7 @@ Ipv4NetworkConfiguratorEcmp::InterfaceInfo *Ipv4NetworkConfiguratorEcmp::findInt
     return nullptr;
 }
 
-Ipv4NetworkConfiguratorEcmp::LinkInfo *Ipv4NetworkConfiguratorEcmp::findLinkOfInterface(Topology& topology, InterfaceEntry *ie)
+Ipv4NetworkConfiguratorEcmp::LinkInfo *Ipv4NetworkConfiguratorEcmp::findLinkOfInterface(TopologyEcmp& topology, InterfaceEntry *ie)
 {
     for (auto & linkInfo : topology.linkInfos) {
         for (size_t j = 0; j < linkInfo->interfaceInfos.size(); j++)
@@ -1283,8 +1283,8 @@ Ipv4NetworkConfiguratorEcmp::LinkInfo *Ipv4NetworkConfiguratorEcmp::findLinkOfIn
 
 IRoutingTable *Ipv4NetworkConfiguratorEcmp::findRoutingTable(NetworkConfiguratorBaseEcmp::Node *node)
 {
-    //return L3AddressResolver().findIpv4RoutingTableOf(node->module);
-    return nullptr; //TODO
+    return L3AddressResolver().findIpv4RoutingTableOf(node->module);
+    //return nullptr; //TODO
 }
 
 bool Ipv4NetworkConfiguratorEcmp::containsRoute(const std::vector<Ipv4Route *>& routes, Ipv4Route *route)
@@ -1295,7 +1295,7 @@ bool Ipv4NetworkConfiguratorEcmp::containsRoute(const std::vector<Ipv4Route *>& 
     return false;
 }
 
-void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(Topology& topology, cXMLElement *autorouteElement)
+void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(TopologyEcmp& topology, cXMLElement *autorouteElement)
 {
     // set node weights
     const char *metric = autorouteElement->getAttribute("metric");
@@ -1379,19 +1379,17 @@ void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(Topology& topology, cXMLElemen
             InterfaceInfo *gatewayInterfaceInfo = static_cast<InterfaceInfo *>(sourceInterfaceInfo->linkInfo->gatewayInterfaceInfo);
             //InterfaceEntry *gatewayInterfaceEntry = gatewayInterfaceInfo->interfaceEntry;
 
-            if (addDirectRoutesParameter) {
-                // add a network route for the local network using ARP
-                Ipv4Route *route = new Ipv4Route();
-                route->setDestination(sourceInterfaceInfo->getAddress().doAnd(sourceInterfaceInfo->getNetmask()));
-                route->setGateway(Ipv4Address::UNSPECIFIED_ADDRESS);
-                route->setNetmask(sourceInterfaceInfo->getNetmask());
-                route->setInterface(sourceInterfaceEntry);
-                route->setSourceType(Ipv4Route::MANUAL);
-                sourceNode->staticRoutes.push_back(route);
-            }
+            // add a network route for the local network using ARP
+            Ipv4Route *route = new Ipv4Route();
+            route->setDestination(sourceInterfaceInfo->getAddress().doAnd(sourceInterfaceInfo->getNetmask()));
+            route->setGateway(Ipv4Address::UNSPECIFIED_ADDRESS);
+            route->setNetmask(sourceInterfaceInfo->getNetmask());
+            route->setInterface(sourceInterfaceEntry);
+            route->setSourceType(Ipv4Route::MANUAL);
+            sourceNode->staticRoutes.push_back(route);
 
             // add a default route towards the only one gateway
-            Ipv4Route *route = new Ipv4Route();
+            route = new Ipv4Route();
             Ipv4Address gateway = gatewayInterfaceInfo->getAddress();
             route->setDestination(Ipv4Address::UNSPECIFIED_ADDRESS);
             route->setNetmask(Ipv4Address::UNSPECIFIED_ADDRESS);
@@ -1418,20 +1416,69 @@ void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(Topology& topology, cXMLElemen
                 // determine next hop interface
                 // find next hop interface (the last IP interface on the path that is not in the source node)
                 Node *node = destinationNode;
-                Link *link = nullptr;
-                InterfaceInfo *nextHopInterfaceInfo = nullptr;
-                while (node != sourceNode) {
-                    link = (Link *)node->getPath(0);
-                    if (node != sourceNode && !isBridgeNode(node) && link->sourceInterfaceInfo)
-                        nextHopInterfaceInfo = static_cast<InterfaceInfo *>(link->sourceInterfaceInfo);
-                    node = (Node *)node->getPath(0)->getRemoteNode();
-                }
+                Node *nodeTemp = destinationNode;                                       // MOH: Added
+                Node *nodeCore = destinationNode;                                       // MOH: Added
+                bool midWay = false;                                                    // MOH: Added
+                int multiplePathsPoint = 0;                                             // MOH: Added
+                int numShortestPaths = node->outPathEcmp.size();                        // MOH: Added
+                int index = 0;                                                          // MOH: Added
+
+//                if (strcmp(sourceNode->getModule()->getFullName(), "Edge1") == 0  && strcmp(destinationNode->getModule()->getFullName(), "server") == 0) {
+//                std::cout  << " \n\\n sourceNode: " << sourceNode->getModule()->getFullName() << "\n";
+//                std::cout  << " destinationNode: " << destinationNode->getModule()->getFullName() << "\n";
+//                std::cout << "dest numShortestPaths =  " << numShortestPaths << std::endl;
+
+
+                                                       // MOH: Added
+//                std::cout << "nn numShortestPaths =  " << numShortestPaths << std::endl;
+
+               bool startBranch=true;
+                label:
+                nodeTemp=node;
+//                std::cout  << " nodeTemp: " << nodeTemp->getModule()->getFullName() << "\n";
+
+                numShortestPaths = nodeTemp->outPathEcmp.size();                         // MOH: Added
+//                std::cout << "bbbb numShortestPaths =  " << numShortestPaths << std::endl;
+
+                for (int moh = 0; moh < numShortestPaths; moh++) {                        // MOH: Added
+//                    std::cout  << " moh: " << moh << "\n";
+
+//                    std::cout  << " nodeTemp: " << nodeTemp->getModule()->getFullName() << "\n";
+//                    std::cout  << " node ccc " << node->getModule()->getFullName() << "\n";
+
+                    Link *link = nullptr;
+                    InterfaceInfo *nextHopInterfaceInfo = nullptr;
+
+//                    link = (Link *) node->getPathECMP(moh);                         // MOH: Added
+//                    if (node != sourceNode && !isBridgeNode(node) && link->sourceInterfaceInfo)
+//                                 nextHopInterfaceInfo = static_cast<InterfaceInfo *>(link->sourceInterfaceInfo);
+                    if (numShortestPaths>1)
+                     node = (Node *) nodeTemp->getPathECMP(moh)->getRemoteNode();        // MOH: Added
+
+                    while (node != sourceNode) {
+                       // link = (Link *)node->getPath(0);                              // MOH: commented
+                        link = (Link *) node->getPathECMP(0);                         // MOH: Added
+                        if (node != sourceNode && !isBridgeNode(node) && link->sourceInterfaceInfo)
+                            nextHopInterfaceInfo = static_cast<InterfaceInfo *>(link->sourceInterfaceInfo);
+                       // node = (Node *)node->getPath(0)->getRemoteNode();              // MOH: commented
+
+                        node = (Node *) node->getPathECMP(0)->getRemoteNode();        // MOH: Added
+
+                        if (node->outPathEcmp.size() > 1 && startBranch==true) {                               // MOH: Added
+                            startBranch=false;
+//                            std::cout  << "node: " << node->getModule()->getFullName() << "\n";
+//                            std::cout << "  goto labe  "  << std::endl;
+//                            std::cout << "  multiplePathsPoint  "  << multiplePathsPoint << std::endl;
+                            goto label;
+                        }                                                                 // MOH: Added
+                    }
+
 
                 // determine source interface
                 if (nextHopInterfaceInfo && link->destinationInterfaceInfo && link->destinationInterfaceInfo->addStaticRoute) {
                     InterfaceEntry *sourceInterfaceEntry = link->destinationInterfaceInfo->interfaceEntry;
                     // add the same routes for all destination interfaces (IP packets are accepted from any interface at the destination)
-                    for (size_t j = 0; j < destinationNode->interfaceInfos.size(); j++) {
+                    for (int j = 0; j < (int)destinationNode->interfaceInfos.size(); j++) {
                         InterfaceInfo *destinationInterfaceInfo = static_cast<InterfaceInfo *>(destinationNode->interfaceInfos[j]);
                         std::string destinationFullPath = destinationInterfaceInfo->interfaceEntry->getInterfaceFullPath();
                         std::string destinationShortenedFullPath = destinationFullPath.substr(destinationFullPath.find('.') + 1);
@@ -1448,7 +1495,6 @@ void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(Topology& topology, cXMLElemen
                             if (addSubnetRoutesParameter && destinationNode->interfaceInfos.size() == 1 && destinationNode->interfaceInfos[0]->linkInfo->gatewayInterfaceInfo
                                 && destinationNode->interfaceInfos[0]->addSubnetRoute)
                             {
-                                ASSERT(!destinationAddress.doAnd(destinationNetmask).isUnspecified());
                                 route->setDestination(destinationAddress.doAnd(destinationNetmask));
                                 route->setNetmask(destinationNetmask);
                             }
@@ -1460,22 +1506,28 @@ void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(Topology& topology, cXMLElemen
                             if (gatewayAddress != destinationAddress)
                                 route->setGateway(gatewayAddress);
                             route->setSourceType(Ipv4Route::MANUAL);
+
+                            // MOH:  this line does not affect any multiple path (to be checked again) TODO
                             if (containsRoute(sourceNode->staticRoutes, route))
-                                delete route;
-                            else if (!addDirectRoutesParameter && route->getGateway().isUnspecified())
                                 delete route;
                             else {
                                 sourceNode->staticRoutes.push_back(route);
+//                                std::cout << "Adding route " << sourceInterfaceEntry->getFullPath() << " -> " << destinationInterfaceEntry->getFullPath() << " as " << route->info() << endl;
+
                                 EV_DEBUG << "Adding route " << sourceInterfaceEntry->getInterfaceFullPath() << " -> " << destinationInterfaceEntry->getInterfaceFullPath() << " as " << route->str() << endl;
                             }
                         }
                     }
                 }
-            }
+            } // MOH: Added
+//                if (multiplePathsPoint ==2)  goto Core;  // MOH: Added
+//             }// to be removed mmmmmohhhh
 
             // optimize routing table to save memory and increase lookup performance
-            if (optimizeRoutesParameter)
-                optimizeRoutes(sourceNode->staticRoutes);
+           // if (optimizeRoutesParameter)                                               // MOH: commented
+           //     optimizeRoutes(sourceNode->staticRoutes);                              // MOH: commented
+
+            }
         }
     }
 }

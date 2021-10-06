@@ -12,7 +12,7 @@ namespace inet {
 #define MSGKIND_SEND       1
 
 Define_Module(NdpBasicClientApp);
-simsignal_t NdpBasicClientApp::rcvdPacketSignal =  registerSignal("rcvdPacketSignal");
+//simsignal_t NdpBasicClientApp::packetReceivedSignal =  registerSignal("packetReceived");
 
 NdpBasicClientApp::~NdpBasicClientApp() {
     cancelAndDelete(timeoutMsg);

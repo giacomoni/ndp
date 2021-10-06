@@ -18,7 +18,7 @@ class INET_API NdpBasicClientApp : public NdpAppBase
     cMessage *timeoutMsg = nullptr;
     NodeStatus *nodeStatus = nullptr;
 
-    static simsignal_t rcvdPacketSignal; // moh
+    static simsignal_t packetReceivedSignal; // moh
 
 
     simtime_t startTime;

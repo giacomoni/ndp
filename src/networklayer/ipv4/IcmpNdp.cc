@@ -267,7 +267,6 @@ void IcmpNdp::processEchoRequest(Packet *request)
     auto addressReq = reply->addTag<L3AddressReq>();
     addressReq->setSrcAddress(addressInd->getDestAddress().toIpv4());
     addressReq->setDestAddress(addressInd->getSrcAddress().toIpv4());
-
     sendToIP(reply);
     delete request;
 }

@@ -37,7 +37,11 @@
  ../../inet4/src/inet/networklayer/contract/IRoute.h \
  ../../inet4/src/inet/networklayer/ipv4/IIpv4RoutingTable.h \
  ../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h \
- ../../inet4/src/inet/networklayer/ipv4/Ipv4InterfaceData.h
+ ../../inet4/src/inet/networklayer/ipv4/Ipv4InterfaceData.h \
+ networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.h \
+ networklayer/configurator/ipv4/../../../common/TopologyEcmp.h \
+ networklayer/configurator/ipv4/../base/NetworkConfiguratorBaseEcmp.h \
+ networklayer/configurator/ipv4/../base/../../../common/TopologyEcmp.h
 
 ../../inet4/src/inet/common/ModuleAccess.h:
 
@@ -116,3 +120,11 @@ networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.h:
 ../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h:
 
 ../../inet4/src/inet/networklayer/ipv4/Ipv4InterfaceData.h:
+
+networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.h:
+
+networklayer/configurator/ipv4/../../../common/TopologyEcmp.h:
+
+networklayer/configurator/ipv4/../base/NetworkConfiguratorBaseEcmp.h:
+
+networklayer/configurator/ipv4/../base/../../../common/TopologyEcmp.h:

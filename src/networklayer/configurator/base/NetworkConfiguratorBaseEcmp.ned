@@ -20,6 +20,7 @@ import inet.networklayer.configurator.contract.INetworkConfigurator;
 simple NetworkConfiguratorBaseEcmp like INetworkConfigurator
 {
     parameters:
+        @class("inet::physicallayer::NetworkConfiguratorBaseEcmp");
         double minLinkWeight = default(1E-3);
         bool configureIsolatedNetworksSeparatly = default(false);
 }

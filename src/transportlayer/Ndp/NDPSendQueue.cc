@@ -21,6 +21,7 @@ NDPSendQueue::~NDPSendQueue()
 
 void NDPSendQueue::init(unsigned int numPacketsToSend , B mss)
 {
+    //dataToSendQueue.empty();
     dataToSendQueue.clear();          // clear dataBuffer
     sentDataQueue.clear();
     // filling the dataToSendQueue queue with (random data) packets based on the numPacketsToSend value that the application passes
@@ -49,7 +50,8 @@ void NDPSendQueue::init(unsigned int numPacketsToSend , B mss)
         //auto header = makeShared<NdpHeader>();
         //header->setDataSequenceNumber(i);
         //packet->insertAtFront(header); // insert header into segment
-        dataToSendQueue.push((packet->peekDataAt(B(0), packet->getDataLength())));
+        //dataToSendQueue.push((packet->peekDataAt(B(0), packet->getDataLength())));
+        dataToSendQueue.insert(packet);
         EV_INFO << "\n\n SQN: " << i << " msgName " << packet->str() << "\n";
     }
 }
@@ -64,7 +66,8 @@ std::string NDPSendQueue::str() const
 void NDPSendQueue::enqueueAppData(Packet *msg)
 {
     //tcpEV << "sendQ: " << str() << " enqueueAppData(bytes=" << msg->getByteLength() << ")\n";
-    dataToSendQueue.push(msg->peekDataAt(B(0), msg->getDataLength()));
+    //dataToSendQueue.push(msg->peekDataAt(B(0), msg->getDataLength()));
+    dataToSendQueue.insert(msg);
     end += msg->getByteLength();
     if (seqLess(end, begin))
         throw cRuntimeError("Send queue is full");
@@ -86,7 +89,7 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
 
 //    ASSERT(seqLE(begin, fromSeq) && seqLE(fromSeq + numBytes, end));
     EV_INFO << "\n\n\nDATA QUEUE LENGTH :"<< dataToSendQueue.getLength() << std::endl;
-    if (dataToSendQueue.getLength() > B(0)) {
+    if (dataToSendQueue.getLength() > 0) {
 
         //NdpHeader *ndpseg = new NdpHeader(nullptr);
         const auto& ndpseg = makeShared<NdpHeader>();
@@ -105,7 +108,9 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
         //ndpseg->addPayloadMessage(iter->msg->dup(), 1);
 
         //ndpseg->setDataSequenceNumber(iter->sequenceNo); PLEASE FIX
-        auto& appmsg = dataToSendQueue.pop<GenericAppMsgNdp>(b(-1), Chunk::PF_ALLOW_NULLPTR);
+        //auto& appmsg = dataToSendQueue.pop<GenericAppMsgNdp>(b(-1), Chunk::PF_ALLOW_NULLPTR);
+        Packet* queuePacket = check_and_cast<Packet *>(dataToSendQueue.pop());
+        auto& appmsg = queuePacket->peekData<GenericAppMsgNdp>();
         EV_INFO << "\n\n\nDATA SEQUENCE NUMBER :"<< appmsg->getSequenceNumber() << std::endl;
         //const auto& appmsg = prevPacket->peekData<GenericAppMsgNdp>;
         //Packet *packet = createSegmentWithBytes(0, 1500);
@@ -124,6 +129,7 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
         Packet * dupPacket = packet->dup();
         //sentDataQueue.push(dupPacket->peekDataAt(B(0), dupPacket->getDataLength()));
         sentDataQueue.insert(dupPacket);
+        delete queuePacket;
         return std::make_tuple(ndpseg,packet);
     } else {
         EV_INFO << " Nothing to send !! \n";
@@ -159,8 +165,8 @@ void NDPSendQueue::moveFrontDataQueue(Chunk::Iterator iter) {
 //
 //    delete iter->msg;
 //    sentDataQueue.erase(iter);
-    Packet *packet = createSegmentWithBytes(begin, 1500);
-    packet->setByteLength(1500);
+//    Packet *packet = createSegmentWithBytes(begin, 1500);
+//    packet->setByteLength(1500);
 
 }
 
@@ -190,7 +196,13 @@ void NDPSendQueue::nackArrivedMoveFront(Packet* packet, unsigned int nackNum){
     payload->setSequenceNumber(nackNum);
     payload->setChunkLength(B(1500));
     newPacket->insertAtBack(payload);
-    dataToSendQueue.push((newPacket->peekDataAt(B(0), newPacket->getDataLength())));
+    if(dataToSendQueue.getLength() > 0){
+        dataToSendQueue.insertBefore(dataToSendQueue.front(), newPacket);
+    }
+    else{
+        dataToSendQueue.insert(newPacket);
+    }
+    //dataToSendQueue.insert(newPacket);
     //const auto& payload = makeShared<GenericAppMsgNdp>(); // state->iss
     //std::string packetName = "DATAPKT-"+std::to_string(nackNum);
     //Packet *packet = new Packet(packetName.c_str());
@@ -213,29 +225,29 @@ void NDPSendQueue::nackArrivedMoveFront(Packet* packet, unsigned int nackNum){
 //    printAllInfoInQueue();
 }
 
-Packet *NDPSendQueue::createSegmentWithBytes(uint32 fromSeq, ulong numBytes)
-{
-    //tcpEV << "sendQ: " << str() << " createSeg(seq=" << fromSeq << " len=" << numBytes << ")\n";
-
-    char msgname[32];
-    sprintf(msgname, "ndpseg(l=%lu)", numBytes);
-
-    Packet *packet = new Packet(msgname);
-    const auto& payload = dataToSendQueue.peekAt(B(fromSeq - begin), B(numBytes));   //get data from buffer
-    //std::cout << "#: " << getSimulation()->getEventNumber() << ", T: " << simTime() << ", SENDER: " << conn->getTcpMain()->getParentModule()->getFullName() << ", DATA: " << payload << std::endl;
-    packet->insertAtBack(payload);
-    return packet;
-}
-
-void NDPSendQueue::discardUpTo(uint32 seqNum)
-{
-    //tcpEV << "sendQ: " << str() << " discardUpTo(seq=" << seqNum << ")\n";
-
-    if (seqNum != begin) {
-        dataToSendQueue.pop(B(seqNum - begin));
-        begin = seqNum;
-    }
-}
+//Packet *NDPSendQueue::createSegmentWithBytes(uint32 fromSeq, ulong numBytes)
+//{
+//    //tcpEV << "sendQ: " << str() << " createSeg(seq=" << fromSeq << " len=" << numBytes << ")\n";
+//
+//    char msgname[32];
+//    sprintf(msgname, "ndpseg(l=%lu)", numBytes);
+//
+//    Packet *packet = new Packet(msgname);
+//    const auto& payload = dataToSendQueue.peekAt(B(fromSeq - begin), B(numBytes));   //get data from buffer
+//    //std::cout << "#: " << getSimulation()->getEventNumber() << ", T: " << simTime() << ", SENDER: " << conn->getTcpMain()->getParentModule()->getFullName() << ", DATA: " << payload << std::endl;
+//    packet->insertAtBack(payload);
+//    return packet;
+//}
+//
+//void NDPSendQueue::discardUpTo(uint32 seqNum)
+//{
+//    //tcpEV << "sendQ: " << str() << " discardUpTo(seq=" << seqNum << ")\n";
+//
+//    if (seqNum != begin) {
+//        dataToSendQueue.pop(B(seqNum - begin));
+//        begin = seqNum;
+//    }
+//}
 
 } // namespace tcp
 

@@ -12,6 +12,7 @@
 //#include "/Volumes/LocalDataHD/m/ma/ma777/Desktop/omnetpp-5.2.1-hpc/omnetpp-5.2.1/samples/inet-myprojects/inet/src/inet/common/ResultFilters.h"
 #include "../../transportlayer/contract/ndp/NDPCommand_m.h"
 
+#include "inet/common/ResultFilters.h"
 #ifdef ShowOut
 #define MY_COUT std::cout
 #else
@@ -28,7 +29,7 @@ namespace inet {
 //}
 Define_Module(NdpSinkApp);
 
-simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("rcvdPk");
+simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("packetReceived");
 
 simsignal_t fctRecordv3 = NodeStatus::registerSignal("fctRecordv3");
 simsignal_t multicastGroupIdSignal =  NodeStatus::registerSignal("multicastGroupIdSignal");
@@ -94,7 +95,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
      if (centralMod && isLongFlow == false) {
             int   numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows +1 ;
-            centralMod->par("numCompletedShortFlows").setDoubleValue(newNumFinishedFlows);
+            centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
              MY_COUT << "NdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
         }
         delete msg;
@@ -105,11 +106,12 @@ void NdpSinkApp::handleMessage(cMessage *msg)
       //  send(msg, "ndpOut");  // TODO    we need to use this one
     }
     else if (msg->getKind() == NDP_I_DATA || msg->getKind() == NDP_I_URGENT_DATA) {
-        cPacket *pk = PK(msg);
-        long packetLength = pk->getByteLength();
+        //cPacket *pk = PK(msg);
+       // long packetLength = pk->getByteLength();
 //        bytesRcvd += packetLength;
+        Packet *packet = check_and_cast<Packet *>(msg);
         ++bytesRcvd;
-        emit(rcvdPkSignalNDP, pk);
+        emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
              tStartAdded = simTime();

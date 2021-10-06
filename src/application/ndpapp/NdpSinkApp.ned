@@ -26,15 +26,17 @@ simple NdpSinkApp like IApp
 
 
         @signal[fctRecordv3](type=double);
-        @statistic[fctRecordv3](title="NDP Sesssion's flow completion time"; source=fctRecordv3; unit=s; record=last);
+        @statistic[fctRecordv3](title="NDP Session's flow completion time"; source=fctRecordv3; unit=s; record=last);
 
-        @signal[rcvdPk](type=cPacket);
-        @statistic[rcvdPk](title="packets (symbols) received"; source=rcvdPk; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        @signal[packetReceived](type=inet::Packet);
+        @statistic[packetReceived](title="packets (symbols) received"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
 
          // MOH: FCT using ResultFilter.cc (messageAge)
 //       @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(rcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
 
-        @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(rcvdPk)"; unit=bps; record=mean);
+        //@statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(packetReceived)"; unit=bps; record=mean); //ResultsFilter.cc
+        @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughputA(packetReceived)"; unit=bps; record=mean,vector); //ResultsFilter.cc
+        //TODO
     gates:
         input socketIn @labels(NDPCommand/up);
         output socketOut @labels(NDPCommand/down);

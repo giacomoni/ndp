@@ -33,10 +33,12 @@ simple NdpBasicClientApp like IApp
 		double stopOperationExtraTime @unit(s) = default(-1s);    // extra time after lifecycle stop operation finished
         double stopOperationTimeout @unit(s) = default(2s);    // timeout value for lifecycle stop operation
         
-        @signal[rcvdPacketSignal](type=cPacket);
-        @statistic[rcvdPacketSignal](title="packets received"; source=rcvdPacketSignal; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        //@signal[rcvdPacketSignal](type=cPacket);
+        //@statistic[rcvdPacketSignal](title="packets received"; source=rcvdPacketSignal; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        //@signal[packetReceived](type=inet::Packet);
+        //@statistic[packetReceived](title="packets received test"; source=packetReceived; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
         //MOH: method2 instantaneous throughputs, see ResultFilter.cc
-        @statistic[ndpThroughput](title="ndpThroughput"; source="throughput(rcvdPacketSignal)"; unit=bps; record=mean);
+        //@statistic[ndpThroughput](title="ndpThroughput"; source="throughput(packetReceived)"; unit=bps; record=mean);
 
         @display("i=msg/mail;i2=status/down");
     gates:

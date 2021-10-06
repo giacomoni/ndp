@@ -17,7 +17,7 @@
 #define NETWORKLAYER_CONFIGURATOR_IPV4_IPV4NETWORKCONFIGURATORECMP_H_
 
 #include <algorithm>
-#include "inet/common/Topology.h"
+#include "../../../common/TopologyEcmp.h"
 #include "../base/NetworkConfiguratorBaseEcmp.h"
 #include "inet/networklayer/contract/ipv4/Ipv4Address.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
@@ -52,7 +52,7 @@ class INET_API Ipv4NetworkConfiguratorEcmp : public NetworkConfiguratorBaseEcmp
         }
     };
 
-    class Topology : public NetworkConfiguratorBaseEcmp::Topology
+    class TopologyEcmp : public NetworkConfiguratorBaseEcmp::TopologyEcmp
     {
       protected:
         virtual Node *createNode(cModule *module) override { return new Ipv4NetworkConfiguratorEcmp::Node(module); }
@@ -132,7 +132,7 @@ class INET_API Ipv4NetworkConfiguratorEcmp : public NetworkConfiguratorBaseEcmp
     bool optimizeRoutesParameter = false;
 
     // internal state
-    Topology topology;
+    TopologyEcmp topology;
 
   public:
     /**
@@ -174,35 +174,35 @@ class INET_API Ipv4NetworkConfiguratorEcmp : public NetworkConfiguratorBaseEcmp
     /**
      * Reads interface elements from the configuration file and stores result.
      */
-    virtual void readInterfaceConfiguration(Topology& topology);
+    virtual void readInterfaceConfiguration(TopologyEcmp& topology);
 
     /**
      * Reads multicast-group elements from the configuration file and stores the result
      */
-    virtual void readMulticastGroupConfiguration(Topology& topology);
+    virtual void readMulticastGroupConfiguration(TopologyEcmp& topology);
 
     /**
      * Reads route elements from configuration file and stores the result
      */
-    virtual void readManualRouteConfiguration(Topology& topology);
+    virtual void readManualRouteConfiguration(TopologyEcmp& topology);
 
     /**
      * Reads multicast-route elements from configuration file and stores the result.
      */
-    virtual void readManualMulticastRouteConfiguration(Topology& topology);
+    virtual void readManualMulticastRouteConfiguration(TopologyEcmp& topology);
 
     /**
      * Assigns the addresses for all interfaces based on the parameters given
      * in the configuration file. See the NED file for details.
      */
-    virtual void assignAddresses(Topology& topology);
+    virtual void assignAddresses(TopologyEcmp& topology);
 
     /**
      * Adds static routes to all routing tables in the network.
      * The algorithm uses Dijkstra's weighted shortest path algorithm.
      * May add default routes and subnet routes if possible and requested.
      */
-    virtual void addStaticRoutes(Topology& topology, cXMLElement *element);
+    virtual void addStaticRoutes(TopologyEcmp& topology, cXMLElement *element);
 
     /**
      * Destructively optimizes the given Ipv4 routes by merging some of them.
@@ -213,7 +213,7 @@ class INET_API Ipv4NetworkConfiguratorEcmp : public NetworkConfiguratorBaseEcmp
      */
     virtual void optimizeRoutes(std::vector<Ipv4Route *>& routes);
 
-    void ensureConfigurationComputed(Topology& topology);
+    void ensureConfigurationComputed(TopologyEcmp& topology);
     void configureInterface(InterfaceInfo *interfaceInfo);
     void configureRoutingTable(Node *node);
     void configureRoutingTable(Node *node, InterfaceEntry *interfaceEntry);
@@ -222,19 +222,19 @@ class INET_API Ipv4NetworkConfiguratorEcmp : public NetworkConfiguratorBaseEcmp
      * Prints the current network configuration to the module output.
      */
     virtual void dumpConfiguration();
-    virtual void dumpLinks(Topology& topology);
-    virtual void dumpAddresses(Topology& topology);
-    virtual void dumpRoutes(Topology& topology);
-    virtual void dumpConfig(Topology& topology);
+    virtual void dumpLinks(TopologyEcmp& topology);
+    virtual void dumpAddresses(TopologyEcmp& topology);
+    virtual void dumpRoutes(TopologyEcmp& topology);
+    virtual void dumpConfig(TopologyEcmp& topology);
 
     // helper functions
-    virtual InterfaceInfo *createInterfaceInfo(NetworkConfiguratorBaseEcmp::Topology& topology, NetworkConfiguratorBaseEcmp::Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry) override;
+    virtual InterfaceInfo *createInterfaceInfo(NetworkConfiguratorBaseEcmp::TopologyEcmp& topology, NetworkConfiguratorBaseEcmp::Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry) override;
     virtual void parseAddressAndSpecifiedBits(const char *addressAttr, uint32_t& outAddress, uint32_t& outAddressSpecifiedBits);
     virtual bool linkContainsMatchingHostExcept(LinkInfo *linkInfo, Matcher *hostMatcher, cModule *exceptModule);
-    virtual void resolveInterfaceAndGateway(Node *node, const char *interfaceAttr, const char *gatewayAttr, InterfaceEntry *& outIE, Ipv4Address& outGateway, Topology& topology);
+    virtual void resolveInterfaceAndGateway(Node *node, const char *interfaceAttr, const char *gatewayAttr, InterfaceEntry *& outIE, Ipv4Address& outGateway, TopologyEcmp& topology);
     virtual InterfaceInfo *findInterfaceOnLinkByNode(LinkInfo *linkInfo, cModule *node);
     virtual InterfaceInfo *findInterfaceOnLinkByNodeAddress(LinkInfo *linkInfo, Ipv4Address address);
-    virtual LinkInfo *findLinkOfInterface(Topology& topology, InterfaceEntry *interfaceEntry);
+    virtual LinkInfo *findLinkOfInterface(TopologyEcmp& topology, InterfaceEntry *interfaceEntry);
     virtual IRoutingTable *findRoutingTable(NetworkConfiguratorBaseEcmp::Node *node) override;
     virtual void assignAddresses(std::vector<LinkInfo *> links);
 

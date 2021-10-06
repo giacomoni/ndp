@@ -95,6 +95,14 @@ class NDPAcceptCommand extends NDPCommand
 {
 }
 
+class NDPSetOptionCommand extends NDPCommand
+{
+}
+
+class NDPSetTimeToLiveCommand extends NDPSetOptionCommand
+{
+    int ttl;
+}
 
 class NDPSendCommand extends NDPCommand
 {

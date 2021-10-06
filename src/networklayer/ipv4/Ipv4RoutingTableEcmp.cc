@@ -474,7 +474,8 @@ Ipv4Route *Ipv4RoutingTableEcmp::findBestMatchingRouteEcmp(Packet *packet, const
     }
     if (numPossibleEcmpRoutesCaches > 1) {
         //unsigned  int hashValueIII = static_cast<int>(hashValue) ;
-        int selected = ((rand() % numPossibleEcmpRoutesCaches) ); // per-packet ECMP spraying pkts
+        int selected = ((rand() % numPossibleEcmpRoutesCaches) ); // per-packet ECMP spraying pkts  //TODO
+        //int selected= hashValueIII%numPossibleEcmpRoutesCaches ; // per-flow ECMP
         int i=0;
         for (auto it = range.first; it != range.second; ++it) {
             if ( i == selected) {

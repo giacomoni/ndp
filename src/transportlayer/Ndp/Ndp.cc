@@ -66,7 +66,7 @@ Ndp::~Ndp()
 void Ndp::initialize(int stage)
 {
     OperationalBase::initialize(stage);
-
+    //delete getModuleByPath("myexample.client.ndp.conn-10");
     if (stage == INITSTAGE_LOCAL) {
 
         lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
@@ -144,36 +144,45 @@ void Ndp::handleLowerPacket(Packet *packet)
 {
     EV_INFO << "\n\n\n\nLOWER PACKET DETAILS: " << packet->str() << std::endl;
     // must be a NdpHeader
-    auto ndpHeader = packet->peekAtFront<NdpHeader>();
-    //TODO Packet does not appear to have NdpHeader at front?
-    //auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
-    //auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
-    //inet::Ptr<NdpHeader> header = makeShared<NdpHeader>();
-    //header->copy(ndpHeader);
-    //header->setPriorityValue(10);   //FIX THIS
-    //ndpHeader->setPriorityValue(10);
-    // get src/dest addresses
-    //packet->insertAtFront(ndpHeader);
-    //packet->insertAtFront(ipv4Header);
-    L3Address srcAddr, destAddr;
-    srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();
-    destAddr = packet->getTag<L3AddressInd>()->getDestAddress();
-    int ecn = 0;
-    if (auto ecnTag = packet->findTag<EcnInd>())
-        ecn = ecnTag->getExplicitCongestionNotification();
-    ASSERT(ecn != -1);
+    auto protocol = packet->getTag<PacketProtocolTag>()->getProtocol();
+    if (protocol == &ProtocolNdp::ndp) {
+        auto ndpHeader = packet->peekAtFront<NdpHeader>();
+        //TODO Packet does not appear to have NdpHeader at front?
+        //auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
+        //auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
+        //inet::Ptr<NdpHeader> header = makeShared<NdpHeader>();
+        //header->copy(ndpHeader);
+        //header->setPriorityValue(10);   //FIX THIS
+        //ndpHeader->setPriorityValue(10);
+        // get src/dest addresses
+        //packet->insertAtFront(ndpHeader);
+        //packet->insertAtFront(ipv4Header);
+        L3Address srcAddr, destAddr;
+        srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();
+        destAddr = packet->getTag<L3AddressInd>()->getDestAddress();
+        int ecn = 0;
+        if (auto ecnTag = packet->findTag<EcnInd>())
+            ecn = ecnTag->getExplicitCongestionNotification();
+        ASSERT(ecn != -1);
 
-    // process segment
-    NDPConnection *conn = nullptr;
-    conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
-    if (conn) {
-        bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr, destAddr);
-        if (!ret)
-            removeConnection(conn);
+        // process segment
+        NDPConnection *conn = nullptr;
+        conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
+        if (conn) {
+            bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr, destAddr);
+            if (!ret)
+                removeConnection(conn);
+        }
+        else {
+            segmentArrivalWhileClosed(packet, ndpHeader, srcAddr, destAddr);
+        }
     }
-    else {
-        segmentArrivalWhileClosed(packet, ndpHeader, srcAddr, destAddr);
+    else if (protocol == &Protocol::icmpv4 || protocol == &Protocol::icmpv6)  {
+        EV_DETAIL << "ICMP error received -- discarding\n";    // FIXME can ICMP packets really make it up to Tcp???
+        delete packet;
     }
+    else
+        throw cRuntimeError("Unknown protocol: '%s'", (protocol != nullptr ? protocol->getName() : "<nullptr>"));
 }
 
 NDPConnection *Ndp::createConnection(int socketId)

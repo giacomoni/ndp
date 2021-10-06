@@ -16,6 +16,7 @@
 package ndp.networklayer.configurator.ipv4;
 
 import inet.networklayer.configurator.base.NetworkConfiguratorBase;
+import ndp.networklayer.configurator.base.NetworkConfiguratorBaseEcmp;
 
 //
 // This module assigns IPv4 addresses and sets up static routing for an IPv4 network.
@@ -403,10 +404,10 @@ import inet.networklayer.configurator.base.NetworkConfiguratorBase;
 //        Mandatory parameter attribute that specifies the cost. Valid values are
 //        "infinite" and numbers.
 //
-simple Ipv4NetworkConfiguratorEcmp extends NetworkConfiguratorBase
+simple Ipv4NetworkConfiguratorEcmp extends NetworkConfiguratorBaseEcmp
 {
     parameters:
-        @class(inet::Ipv4NetworkConfiguratorEcmp);
+        @class("inet::Ipv4NetworkConfiguratorEcmp");
         @display("i=block/cogwheel");
         xml config = default(xml("<config><interface hosts='**' address='10.x.x.x' netmask='255.x.x.x'/></config>")); // XML configuration parameters for IP address assignment and adding manual routes
         bool assignAddresses = default(true); // assign IP addresses to all interfaces in the network

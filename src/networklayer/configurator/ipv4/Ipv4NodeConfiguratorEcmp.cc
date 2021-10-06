@@ -52,7 +52,7 @@ void Ipv4NodeConfiguratorEcmp::initialize(int stage)
             cModule *module = getModuleByPath(networkConfiguratorPath);
             if (!module)
                 throw cRuntimeError("Configurator module '%s' not found (check the 'networkConfiguratorModule' parameter)", networkConfiguratorPath);
-            networkConfigurator = check_and_cast<Ipv4NetworkConfigurator *>(module);
+            networkConfigurator = check_and_cast<Ipv4NetworkConfiguratorEcmp *>(module);
         }
     }
     else if (stage == INITSTAGE_NETWORK_CONFIGURATION) {
@@ -154,8 +154,8 @@ void Ipv4NodeConfiguratorEcmp::configureAllInterfaces()
 void Ipv4NodeConfiguratorEcmp::configureRoutingTable()
 {
     ASSERT(networkConfigurator);
-    //if (par("configureRoutingTable"))
-        //networkConfigurator->configureRoutingTable(routingTable);
+    if (par("configureRoutingTable"))
+        networkConfigurator->configureRoutingTable(routingTable);
         //TODO
 }
 
@@ -182,8 +182,8 @@ void Ipv4NodeConfiguratorEcmp::receiveSignal(cComponent *source, simsignal_t sig
             auto *entry = ieChangeDetails->getInterfaceEntry();
             if (entry->isUp() && networkConfigurator) {
                 networkConfigurator->configureInterface(entry);
-                //if (par("configureRoutingTable"))
-                    //networkConfigurator->configureRoutingTable(routingTable, entry);
+                if (par("configureRoutingTable"))
+                    networkConfigurator->configureRoutingTable(routingTable, entry);
             }       //TODO
             // otherwise the RoutingTable deletes routing entries of interface entry
         }

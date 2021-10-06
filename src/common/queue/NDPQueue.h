@@ -25,12 +25,14 @@
 #include "inet/queueing/contract/IPassivePacketSource.h"
 #include "inet/queueing/contract/IActivePacketSink.h"
 #include "inet/queueing/contract/IActivePacketSource.h"
+#include "inet/common/INETDefs.h"
+
 namespace inet {
 namespace queueing {
 /**
  * Drop-front queue. See NED for more info.
  */
-class INET_API NDPQueue : public PacketQueueBase, public IPacketBuffer::ICallback
+class INET_API NDPQueue : public PacketQueueBase, public cListener
 {
   protected:
     // configuration
@@ -43,12 +45,12 @@ class INET_API NDPQueue : public PacketQueueBase, public IPacketBuffer::ICallbac
 
     cOutVector numTrimmedPacketsVec;
 
-   int dataQueueLength;
-   int headersQueueLength;
-   int synAckQueueLength;
+   long dataQueueLength;
+   long headersQueueLength;
+   long synAckQueueLength;
 
    unsigned int weight;
-   unsigned int numTrimmedPkt ;
+   int numTrimmedPkt ;
 
    cGate *inputGate = nullptr;
    IActivePacketSource *producer = nullptr;
@@ -58,16 +60,21 @@ class INET_API NDPQueue : public PacketQueueBase, public IPacketBuffer::ICallbac
 
    b dataCapacity = b(-1);
     // statistics
-//    static simsignal_t dataQueueLengthSignal;
-//    static simsignal_t headersQueueLengthSignal;
-//    static simsignal_t synAckQueueLengthSignal;
-//    static simsignal_t numTrimmedPktSig;
-   static simsignal_t packetPushedDataQueueSignal;
-   static simsignal_t packetPoppedDataQueueSignal;
-   static simsignal_t packetPushedHeadersQueueSignal;
-   static simsignal_t packetPoppedHeadersQueueSignal;
-   static simsignal_t packetPushedSynAckQueueSignal;
-   static simsignal_t packetPoppedSynAckQueueSignal;
+    static simsignal_t dataQueueLengthSignal;
+    static simsignal_t headersQueueLengthSignal;
+    //static simsignal_t synAckQueueLengthSignal;
+    static simsignal_t numTrimmedPktSig;
+
+    /** Signal with packet when received it */
+   //static simsignal_t rcvdPkSignal;
+   /** Signal with packet when enqueued it */
+   //static simsignal_t enqueuePkSignal;
+   /** Signal with packet when sent out it */
+   //static simsignal_t dequeuePkSignal;
+   /** Signal with packet when dropped it */
+   //static simsignal_t dropPkByQueueSignal;
+   /** Signal with value of delaying time when sent out a packet. */
+   static simsignal_t queueingTimeSignal;
 
   protected:
     virtual void initialize(int stage) override;
@@ -99,8 +106,7 @@ class INET_API NDPQueue : public PacketQueueBase, public IPacketBuffer::ICallbac
     virtual Packet *popPacket(cGate *gate) override;
     //popPacket replaces dequeue()
 
-    virtual void handlePacketRemoved(Packet *packet) override;
-
+    virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details) override;
     virtual void dropPacket(Packet *packet, PacketDropReason reason, int limit) override;
     virtual void finish() override;
 };

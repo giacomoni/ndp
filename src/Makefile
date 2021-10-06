@@ -1,19 +1,13 @@
 #
-# OMNeT++/OMNEST Makefile for ndp
+# OMNeT++/OMNEST Makefile for $(LIB_PREFIX)ndp
 #
 # This file was generated with the command:
-#  opp_makemake -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
+#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
 #
 
 # Name of target to be created (-o option)
-TARGET = ndp$(D)$(EXE_SUFFIX)
+TARGET = $(LIB_PREFIX)ndp$(D)$(SHARED_LIB_SUFFIX)
 TARGET_DIR = .
-
-# User interface (uncomment one) (-u option)
-USERIF_LIBS = $(ALL_ENV_LIBS) # that is, $(TKENV_LIBS) $(QTENV_LIBS) $(CMDENV_LIBS)
-#USERIF_LIBS = $(CMDENV_LIBS)
-#USERIF_LIBS = $(TKENV_LIBS)
-#USERIF_LIBS = $(QTENV_LIBS)
 
 # C++ include paths (with -I)
 INCLUDE_PATH = -I$(INET4_PROJ)/src
@@ -37,12 +31,13 @@ OBJS = \
     $O/application/ndpapp/NdpEchoApp.o \
     $O/application/ndpapp/NdpServerHostApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
+    $O/common/MessageDispatcherNdp.o \
     $O/common/ProtocolGroupNdp.o \
     $O/common/ProtocolNdp.o \
+    $O/common/ResultFiltersThroughput.o \
     $O/common/TopologyEcmp.o \
     $O/common/queue/NDPQueue.o \
     $O/common/scheduler/CentralSchedulerNdp.o \
-    $O/networklayer/common/L3AddressResolverEcmp.o \
     $O/networklayer/configurator/base/NetworkConfiguratorBaseEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.o \
@@ -115,7 +110,7 @@ endif
 include $(CONFIGFILE)
 
 # Simulation kernel and user interface libraries
-OMNETPP_LIBS = $(OPPMAIN_LIB) $(USERIF_LIBS) $(KERNEL_LIBS) $(SYS_LIBS)
+OMNETPP_LIBS = -loppenvir$D $(KERNEL_LIBS) $(SYS_LIBS)
 ifneq ($(TOOLCHAIN_NAME),clangc2)
 LIBS += -Wl,-rpath,$(abspath $(INET4_PROJ)/src)
 endif
@@ -153,8 +148,9 @@ endif
 
 $O/$(TARGET): $(OBJS)  $(wildcard $(EXTRA_OBJS)) Makefile $(CONFIGFILE)
 	@$(MKPATH) $O
-	@echo Creating executable: $@
-	$(Q)$(CXX) $(LDFLAGS) -o $O/$(TARGET) $(OBJS) $(EXTRA_OBJS) $(AS_NEEDED_OFF) $(WHOLE_ARCHIVE_ON) $(LIBS) $(WHOLE_ARCHIVE_OFF) $(OMNETPP_LIBS)
+	@echo Creating shared library: $@
+	$(Q)$(SHLIB_LD) -o $O/$(TARGET) $(OBJS) $(EXTRA_OBJS) $(AS_NEEDED_OFF) $(WHOLE_ARCHIVE_ON) $(LIBS) $(WHOLE_ARCHIVE_OFF) $(OMNETPP_LIBS) $(LDFLAGS)
+	$(Q)$(SHLIB_POSTPROCESS) $O/$(TARGET)
 
 .PHONY: all clean cleanall depend msgheaders smheaders
 

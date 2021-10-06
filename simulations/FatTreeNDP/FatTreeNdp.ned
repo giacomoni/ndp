@@ -10,6 +10,7 @@ import ndp.base.Rack;
 import inet.node.ethernet.Eth100M;
 import ndp.common.queue.NDPQueue;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+import ndp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
 import inet.visualizer.contract.IIntegratedVisualizer;
 
 import ned.DatarateChannel;
@@ -59,12 +60,12 @@ network FatTreeNdp
         visualizer: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
             @display("p=305.665,67.625`");
         }
-        configurator: Ipv4NetworkConfigurator {
+        configurator: Ipv4NetworkConfiguratorEcmp {
             @display("p=1314.495,672.2275");
         }
-        //centralSchedulerNdp: CentralSchedulerNdp {
-        //    @display("p=704.06,601.0725;i=abstract/person,#17FF39;b=,,rect;is=vl;t=Central flow scheduler");
-        //}
+        centralSchedulerNdp: CentralSchedulerNdp {
+            @display("p=704.06,601.0725;i=abstract/person,#17FF39;b=,,rect;is=vl;t=Central flow scheduler");
+        }
 //        multicastOrganiser: multicastOrganiser {
 //            @display("p=385.735,601.0725");
 //        }

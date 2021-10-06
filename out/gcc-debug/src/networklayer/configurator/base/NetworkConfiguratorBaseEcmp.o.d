@@ -50,7 +50,7 @@
  ../../inet4/src/inet/common/stlutils.h \
  networklayer/configurator/base/NetworkConfiguratorBaseEcmp.h \
  ../../inet4/src/inet/common/PatternMatcher.h \
- ../../inet4/src/inet/common/Topology.h \
+ networklayer/configurator/base/../../../common/TopologyEcmp.h \
  ../../inet4/src/inet/networklayer/common/L3AddressResolver.h \
  ../../inet4/src/inet/networklayer/contract/IRoutingTable.h \
  ../../inet4/src/inet/networklayer/contract/IRoute.h \
@@ -242,7 +242,7 @@ networklayer/configurator/base/NetworkConfiguratorBaseEcmp.h:
 
 ../../inet4/src/inet/common/PatternMatcher.h:
 
-../../inet4/src/inet/common/Topology.h:
+networklayer/configurator/base/../../../common/TopologyEcmp.h:
 
 ../../inet4/src/inet/networklayer/common/L3AddressResolver.h:
 

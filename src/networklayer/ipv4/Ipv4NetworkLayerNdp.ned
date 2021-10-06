@@ -17,6 +17,8 @@ package ndp.networklayer.ipv4;
 
 import inet.common.MessageDispatcher;
 import inet.networklayer.configurator.contract.IIpv4NodeConfigurator;
+import ndp.networklayer.configurator.ipv4.Ipv4NodeConfiguratorEcmp;
+import inet.networklayer.configurator.ipv4.Ipv4NodeConfigurator;
 import inet.networklayer.contract.IArp;
 import inet.networklayer.contract.INetworkLayer;
 import inet.networklayer.ipv4.Ipv4RoutingTable;
@@ -56,7 +58,7 @@ module Ipv4NetworkLayerNdp like INetworkLayer
         output transportOut @labels(Ipv4ControlInfo/up);
 
     submodules:
-        configurator: <default("Ipv4NodeConfigurator")> like IIpv4NodeConfigurator if typename != "" {
+        configurator: <default("Ipv4NodeConfiguratorEcmp")> like IIpv4NodeConfigurator if typename != "" {
             parameters:
                 @display("p=100,100;is=s");
         }

@@ -107,7 +107,23 @@ void NDPConnection::process_OPEN_PASSIVE(NDPEventCode& event, NDPCommand *ndpCom
     delete msg;
 }
 
+void NDPConnection::process_OPTIONS(NDPEventCode& event, NDPCommand *ndpCommand, cMessage *msg)
+{
+    ASSERT(event == NDP_E_SETOPTION);
 
+    if (auto cmd = dynamic_cast<NDPSetTimeToLiveCommand *>(ndpCommand))
+        ttl = cmd->getTtl();
+//    else if (auto cmd = dynamic_cast<NDPSetTosCommand *>(ndpCommand)) {
+//        tos = cmd->getTos();
+//    }
+//    else if (auto cmd = dynamic_cast<NDPSetDscpCommand *>(ndpCommand)) {
+//        dscp = cmd->getDscp();
+//    }
+    else
+        throw cRuntimeError("Unknown subclass of NDPSetOptionCommand received from app: %s", ndpCommand->getClassName());
+    delete ndpCommand;
+    delete msg;
+}
 
 
 } // namespace ndp

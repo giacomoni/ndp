@@ -80,6 +80,7 @@
  ../../inet4/src/inet/networklayer/contract/IRoutingTable.h \
  ../../inet4/src/inet/networklayer/contract/IRoute.h \
  ../../inet4/src/inet/networklayer/common/L3AddressTag_m.h \
+ ../../inet4/src/inet/networklayer/common/HopLimitTag_m.h \
  transportlayer/Ndp/../../common/ProtocolNdp.h
 
 transportlayer/Ndp/ndp_common/NdpHeader.h:
@@ -245,5 +246,7 @@ transportlayer/Ndp/../common/L4ToolsNdp.h:
 ../../inet4/src/inet/networklayer/contract/IRoute.h:
 
 ../../inet4/src/inet/networklayer/common/L3AddressTag_m.h:
+
+../../inet4/src/inet/networklayer/common/HopLimitTag_m.h:
 
 transportlayer/Ndp/../../common/ProtocolNdp.h:

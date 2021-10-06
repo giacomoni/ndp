@@ -21,7 +21,7 @@
 #include "inet/common/INETDefs.h"
 #include "inet/common/INETMath.h"
 #include "inet/common/PatternMatcher.h"
-#include "inet/common/Topology.h"
+#include "../../../common/TopologyEcmp.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/contract/IRoutingTable.h"
@@ -29,8 +29,8 @@
 namespace inet {
 
 // TODO: move to some utility file
-inline bool isEmpty(const char *s) { return !s || !s[0]; }
-inline bool isNotEmpty(const char *s) { return s && s[0]; }
+inline bool isEmptyEcmp(const char *s) { return !s || !s[0]; }
+inline bool isNotEmptyEcmp(const char *s) { return s && s[0]; }
 
 class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3AddressResolver
 {
@@ -41,7 +41,7 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
     /**
      * Represents a node in the network.
      */
-    class Node : public inet::Topology::Node
+    class Node : public inet::TopologyEcmp::Node
     {
       public:
         cModule *module = nullptr;
@@ -50,14 +50,14 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
         std::vector<InterfaceInfo *> interfaceInfos;
 
       public:
-        Node(cModule *module) : inet::Topology::Node(module->getId()), module(module) { }
+        Node(cModule *module) : inet::TopologyEcmp::Node(module->getId()), module(module) { }
         virtual ~Node() { for (auto & interfaceInfo : interfaceInfos) delete interfaceInfo; }
     };
 
     /**
      * Represents a connection (wired or wireless) in the network.
      */
-    class Link : public inet::Topology::Link
+    class Link : public inet::TopologyEcmp::Link
     {
       public:
         InterfaceInfo *sourceInterfaceInfo = nullptr;
@@ -107,14 +107,14 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
     /**
      * Represents the network topology.
      */
-    class Topology : public inet::Topology
+    class TopologyEcmp : public inet::TopologyEcmp
     {
       public:
         std::vector<LinkInfo *> linkInfos;    // all links in the network
         std::map<int, InterfaceInfo *> interfaceInfos;    // all interfaces in the network
 
       public:
-        virtual ~Topology() { for (auto & linkInfo : linkInfos) delete linkInfo; }
+        virtual ~TopologyEcmp() { for (auto & linkInfo : linkInfos) delete linkInfo; }
 
       protected:
         virtual Node *createNode(cModule *module) override { return new NetworkConfiguratorBaseEcmp::Node(module); }
@@ -166,12 +166,12 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      * Creates vertices from modules having @networkNode property.
      * Creates edges from connections (wired and wireless) between network interfaces.
      */
-    virtual void extractTopology(Topology& topology);
+    virtual void extractTopology(TopologyEcmp& topology);
 
     // helper functions
-    virtual void extractWiredNeighbors(Topology& topology, Topology::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
-    virtual void extractWirelessNeighbors(Topology& topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
-    virtual void extractDeviceNeighbors(Topology& topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited);
+    virtual void extractWiredNeighbors(TopologyEcmp& topology, TopologyEcmp::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
+    virtual void extractWirelessNeighbors(TopologyEcmp& topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
+    virtual void extractDeviceNeighbors(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited);
     virtual InterfaceInfo *determineGatewayForLink(LinkInfo *linkInfo);
     virtual double computeNodeWeight(Node *node, const char *metric, cXMLElement *parameters);
     virtual double computeLinkWeight(Link *link, const char *metric, cXMLElement *parameters);
@@ -180,14 +180,14 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
     virtual bool isBridgeNode(Node *node);
     virtual bool isWirelessInterface(InterfaceEntry *interfaceEntry);
     virtual std::string getWirelessId(InterfaceEntry *interfaceEntry);
-    virtual InterfaceInfo *createInterfaceInfo(Topology& topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry);
-    virtual Topology::LinkOut *findLinkOut(Node *node, int gateId);
+    virtual InterfaceInfo *createInterfaceInfo(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry);
+    virtual TopologyEcmp::LinkOut *findLinkOut(Node *node, int gateId);
     virtual InterfaceInfo *findInterfaceInfo(Node *node, InterfaceEntry *interfaceEntry);
     virtual IInterfaceTable *findInterfaceTable(Node *node);
     virtual IRoutingTable *findRoutingTable(Node *node);
 
     // generic helper functions
-    virtual void dumpTopology(Topology& topology);
+    virtual void dumpTopology(TopologyEcmp& topology);
 };
 
 inline std::ostream& operator<<(std::ostream& stream, const NetworkConfiguratorBaseEcmp::Link& link)

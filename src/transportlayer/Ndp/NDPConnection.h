@@ -174,13 +174,11 @@ public:
 
     struct PacketsToSend {
         unsigned int pktId;
-        //Ptr<Chunk> *msg;
+        Packet* msg;
     };
     typedef std::list<PacketsToSend> PacketsList;
 //    PacketsList sentPacketsList;
     PacketsList receivedPacketsList;
-    PacketsList retransmitQueue; // TODO for nack
-
 
     // connection identification by apps: socketId
     int socketId = -1;    // identifies connection within the app
@@ -197,6 +195,9 @@ public:
     const L3Address& getRemoteAddr() const { return remoteAddr; }
     int localPort = -1;
     int remotePort = -1;
+
+    //NDP options for this connection
+    int ttl = -1;
 //    int ClientOrServerSel=10;
 protected:
     Ndp *ndpMain = nullptr;    // NDP module
@@ -253,7 +254,7 @@ protected:
     virtual void process_OPEN_ACTIVE(NDPEventCode& event, NDPCommand *NDPCommand, cMessage *msg);
     virtual void process_OPEN_PASSIVE(NDPEventCode& event, NDPCommand *NDPCommand,  cMessage *msg);
 
-
+    virtual void process_OPTIONS(NDPEventCode& event, NDPCommand *ndpCommand, cMessage *msg);
     /**
      * Process incoming NDP segment. Returns a specific event code (e.g. NDP_E_RCV_SYN)
      * which will drive the state machine.

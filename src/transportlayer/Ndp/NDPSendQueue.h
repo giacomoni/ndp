@@ -37,7 +37,7 @@ class INET_API NDPSendQueue : public cObject
     uint32 begin = 0;    // 1st sequence number stored
     uint32 end = 0;    // last sequence number stored +1
 
-    ChunkQueue dataToSendQueue;      // dataBuffer
+    cPacketQueue dataToSendQueue;      // dataBuffer
     cPacketQueue sentDataQueue;
 
   public:
@@ -51,7 +51,7 @@ class INET_API NDPSendQueue : public cObject
      */
     virtual ~NDPSendQueue();
 
-    virtual ChunkQueue& getDataToSendQueue() { return dataToSendQueue; }
+    virtual cPacketQueue& getDataToSendQueue() { return dataToSendQueue; }
     virtual cPacketQueue& getSentDataQueue() { return sentDataQueue; }
     /**
      * Set the connection that owns this queue.
@@ -120,13 +120,13 @@ class INET_API NDPSendQueue : public cObject
      * maxNumBytes bytes if the subclass wants to reproduce the original
      * segment boundaries when retransmitting.
      */
-    virtual Packet *createSegmentWithBytes(uint32 fromSeq, ulong numBytes);
+    //virtual Packet *createSegmentWithBytes(uint32 fromSeq, ulong numBytes);
 
     /**
      * Tells the queue that bytes up to (but NOT including) seqNum have been
      * transmitted and ACKed, so they can be removed from the queue.
      */
-    virtual void discardUpTo(uint32 seqNum);
+    //virtual void discardUpTo(uint32 seqNum);
 
 //    virtual void removeFromDataQueueToSentQueue(std::list<Chunk>::iterator iter);
 };

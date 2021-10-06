@@ -1,50 +1,50 @@
 echo " Running FatTree Traffic .... "
 find . -name "*.vec" -type f -delete|find . -name  "*.sca"  -type f -delete| find . -name "*.vci" -type f -delete | find . -name "*.csv" -type f -delete
-opp_run_release  -u Cmdenv -m -n ..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials -l ../../../../inet4/src/INET ../exp1-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
+opp_run_release -u Cmdenv -m -n ../..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials:../../../../inet4/showcases -l ../../../src/ndp ../exp1-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
 
 echo "Throughput"
-scavetool export -T s -f "module(**.ndpApp[*]) AND ("mohThroughputNDP:mean")"   -F CSV-S -o instThroughput.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("mohThroughputNDP:mean")"   -F CSV-S -o instThroughput.csv *.sca
 echo "   "
-scavetool export -T s -f "module(**.ndpApp[*]) AND ("multicastGroupIdSignal:last")"   -F CSV-S -o multicastgroups.csv *.sca
-scavetool export -T s -f "module(**.ndpApp[*]) AND ("multisourceGroupIdSignal:last")"   -F CSV-S -o multisourcegroups.csv *.sca
-cat multicastgroups.csv | cut -d, -f11  | sed "1 d" > MatMulticastgroups.csv
-cat multisourcegroups.csv | cut -d, -f11  | sed "1 d" > MatMultisourcegroups.csv
+scavetool export -T s -f "module(**.app[*]) AND ("multicastGroupIdSignal:last")"   -F CSV-S -o multicastgroups.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("multisourceGroupIdSignal:last")"   -F CSV-S -o multisourcegroups.csv *.sca
+cat multicastgroups.csv | cut -d, -f7  | sed "1 d" > MatMulticastgroups.csv
+cat multisourcegroups.csv | cut -d, -f7  | sed "1 d" > MatMultisourcegroups.csv
 echo "FCT"
-scavetool export -T s -f "module(**.ndpApp[*]) AND ("fctRecordv3:last")"   -F CSV-S -o fct.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("fctRecordv3:last")"   -F CSV-S -o fct.csv *.sca
 echo "   "
 echo "header"
-scavetool export -T s -f "module(**.ndpApp[*]) AND ("numRcvTrimmedHeaderSigNdp:last")"   -F CSV-S -o numRcvHeader.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("numRcvTrimmedHeaderSigNdp:last")"   -F CSV-S -o numRcvHeader.csv *.sca
 echo "   "
  cat numRcvHeader.csv | cut -d, -f11  | sed "1 d" > MatNumRcvHeader.csv
 echo "num trimmed packets"
 scavetool export -T s -f 'module(*.CoreRouter[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktCore.csv *.sca
 scavetool export -T s -f 'module(*.aggRouters[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktAgg.csv *.sca
 scavetool export -T s -f 'module(*.edgeSwitch.*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktEdge.csv *.sca
-echo "CoreRouter-rcvdPk:count"
-scavetool export -T s -f 'module(*.CoreRouter[*].*) AND name("rcvdPk:count") '   -F CSV-S -o coreRouterRcvdPkt.csv *.sca
-echo "CoreRouter-dropPk:count"
-scavetool export -T s -f "module(*.CoreRouter[*].*) AND name(dropPk:count)"   -F CSV-S -o coreRouterDropPkt.csv *.sca
+echo "CoreRouter-packetPushed:count"
+scavetool export -T s -f 'module(*.CoreRouter[*].*) AND name("packetPushed:count") '   -F CSV-S -o coreRouterRcvdPkt.csv *.sca
+echo "CoreRouter-packetDropped:count"
+scavetool export -T s -f "module(*.CoreRouter[*].*) AND name(packetDropped:count)"   -F CSV-S -o coreRouterDropPkt.csv *.sca
 echo "   "
-echo "aggRouters-rcvdPk:count"
-scavetool export -T s -f 'module(*.aggRouters[*].*) AND  name("rcvdPk:count") '   -F CSV-S -o aggRouterRcvdPkt.csv *.sca
+echo "aggRouters-packetPushed:count"
+scavetool export -T s -f 'module(*.aggRouters[*].*) AND  name("packetPushed:count") '   -F CSV-S -o aggRouterRcvdPkt.csv *.sca
 echo "   "
-echo "aggRouters-dropPk:count"
-scavetool export -T s -f "module(*.aggRouters[*].*) AND name(dropPk:count)"   -F CSV-S -o aggRouterDropPkt.csv *.sca
+echo "aggRouters-packetDropped:count"
+scavetool export -T s -f "module(*.aggRouters[*].*) AND name(packetDropped:count)"   -F CSV-S -o aggRouterDropPkt.csv *.sca
 echo "   "
-echo "edgeSwitch-rcvdPk:count"
-scavetool export -T s -f 'module(*.edgeSwitch.*) AND  name("rcvdPk:count") '   -F CSV-S -o edgeRouterRcvdPkt.csv *.sca
+echo "edgeSwitch-packetPushed:count"
+scavetool export -T s -f 'module(*.edgeSwitch.*) AND  name("packetPushed:count") '   -F CSV-S -o edgeRouterRcvdPkt.csv *.sca
 echo "   "
-echo "edgeSwitch-dropPk:count"
-scavetool export -T s -f "module(*.edgeSwitch.*) AND name(dropPk:count)"   -F CSV-S -o edgeRouterDropPkt.csv *.sca
+echo "edgeSwitch-packetDropped:count"
+scavetool export -T s -f "module(*.edgeSwitch.*) AND name(packetDropped:count)"   -F CSV-S -o edgeRouterDropPkt.csv *.sca
 echo "   "
-echo "servers-rcvdPk:sum(packetBytes)"
-scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("rcvdPk:sum(packetBytes)") '   -F CSV-S -o serversRcvdPktBytes.csv *.sca
-echo "servers-dropPk:sum(packetBytes)"
-scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("dropPk:sum(packetBytes)") '   -F CSV-S -o serversDropPktBytes.csv *.sca
-echo "servers-rcvdPk:count"
-scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("rcvdPk:count") '   -F CSV-S -o serversRcvdPkt.csv *.sca
-echo "servers-dropPk:count"
-scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("dropPk:count") '   -F CSV-S -o serversDropPkt.csv *.sca
+echo "servers-packetPushed:sum(packetBytes)"
+scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("packetReceived:sum(packetBytes)") '   -F CSV-S -o serversRcvdPktBytes.csv *.sca
+echo "servers-packetDropped:sum(packetBytes)"
+scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("packetDropped:sum(packetBytes)") '   -F CSV-S -o serversDropPktBytes.csv *.sca
+echo "servers-packetReceived:count"
+scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("packetReceived:count") '   -F CSV-S -o serversRcvdPkt.csv *.sca
+echo "servers-packetDropped:count"
+scavetool export -T s -f 'module(FatTreeNdp.Pod[*].racks[*].servers[*].ppp[*].queue) AND  name("packetDropped:count") '   -F CSV-S -o serversDropPkt.csv *.sca
 
 echo "   "
 echo "config."
@@ -64,29 +64,29 @@ scavetool export -T v -f 'module(FatTreeNdp.centralSchedulerNdp) AND name(permMa
 
 
 
-cat fct.csv | cut -d, -f11  | sed "1 d" > MatFct.csv
-scavetool export -T s -f "  module(**.ndpApp[*]) AND ("fctRecordv3:last")     "  -F CSV-S -o a-fct.csv *.sca
-cat a-fct.csv | cut -d, -f11  | sed "1 d" > aaMatFct.csv
-scavetool export -T s -f 'module(*.ndpApp[*]) AND name("rcvdPk:sum(packetBytes)")    '   -F CSV-S -o a-flowsizes.csv *.sca
-cat a-flowsizes.csv | cut -d, -f11  | sed "1 d" > aaMatFlowSizes.csv
-cat instThroughput.csv | cut -d, -f11  | sed "1 d" > MatInstThroughput.csv
-cat coreRouterRcvdPkt.csv | cut -d, -f11  | sed "1 d" > MatCoreRouterRcvdPkt.csv
-cat coreRouterDropPkt.csv | cut -d, -f11  | sed "1 d" > MatCoreRouterDropPkt.csv
+cat fct.csv | cut -d, -f7  | sed "1 d" > MatFct.csv
+scavetool export -T s -f "  module(**.app[*]) AND ("fctRecordv3:last")     "  -F CSV-S -o a-fct.csv *.sca
+cat a-fct.csv | cut -d, -f7  | sed "1 d" > aaMatFct.csv
+scavetool export -T s -f 'module(*.app[*]) AND name("packetReceived:sum(packetBytes)")    '   -F CSV-S -o a-flowsizes.csv *.sca
+cat a-flowsizes.csv | cut -d, -f7  | sed "1 d" > aaMatFlowSizes.csv
+cat instThroughput.csv | cut -d, -f7  | sed "1 d" > MatInstThroughput.csv
+cat coreRouterRcvdPkt.csv | cut -d, -f7  | sed "1 d" > MatCoreRouterRcvdPkt.csv
+cat coreRouterDropPkt.csv | cut -d, -f7  | sed "1 d" > MatCoreRouterDropPkt.csv
 
-cat aggRouterRcvdPkt.csv | cut -d, -f11  | sed "1 d" > MatAggRouterRcvdPkt.csv
-cat aggRouterDropPkt.csv | cut -d, -f11  | sed "1 d" > MatAggRouterDropPkt.csv
+cat aggRouterRcvdPkt.csv | cut -d, -f7  | sed "1 d" > MatAggRouterRcvdPkt.csv
+cat aggRouterDropPkt.csv | cut -d, -f7  | sed "1 d" > MatAggRouterDropPkt.csv
 
-cat aggRouterDropPkt.csv | cut -d, -f11  | sed "1 d" > MatAggRouterDropPkt.csv
-cat edgeRouterRcvdPkt.csv | cut -d, -f11  | sed "1 d" > MatEdgeRouterRcvdPkt.csv
-cat edgeRouterDropPkt.csv | cut -d, -f11  | sed "1 d" > MatEdgeRouterDropPkt.csv
-cat serversRcvdPktBytes.csv | cut -d, -f11  | sed "1 d" > MatServersRcvdPktBytes.csv
+cat aggRouterDropPkt.csv | cut -d, -f7  | sed "1 d" > MatAggRouterDropPkt.csv
+cat edgeRouterRcvdPkt.csv | cut -d, -f7  | sed "1 d" > MatEdgeRouterRcvdPkt.csv
+cat edgeRouterDropPkt.csv | cut -d, -f7  | sed "1 d" > MatEdgeRouterDropPkt.csv
+cat serversRcvdPktBytes.csv | cut -d, -f7  | sed "1 d" > MatServersRcvdPktBytes.csv
 
-cat serversRcvdPkt.csv | cut -d, -f11  | sed "1 d" > MatServersRcvdPkt.csv
+cat serversRcvdPkt.csv | cut -d, -f7  | sed "1 d" > MatServersRcvdPkt.csv
 
-cat serversDropPkt.csv | cut -d, -f11  | sed "1 d" > MatServersDropPkt.csv
-cat serversDropPktBytes.csv | cut -d, -f11  | sed "1 d" > MatServersDropPktBytes.csv
+cat serversDropPkt.csv | cut -d, -f7  | sed "1 d" > MatServersDropPkt.csv
+cat serversDropPktBytes.csv | cut -d, -f7  | sed "1 d" > MatServersDropPktBytes.csv
 
-cat config.csv | cut -d, -f11  | sed "1 d" > MatConfig.csv
+cat config.csv | cut -d, -f7  | sed "1 d" > MatConfig.csv
 cat numTcpSessionApps.csv | cut -d, -f9  | sed "1 d" > MatNumTcpSessionApps.csv
 cat numTcpSinkApps.csv | cut -d, -f9  | sed "1 d" > MatNumTcpSinkApps.csv
 cat nodes.csv | cut -d, -f9  | sed "1 d" > MatNodes.csv
@@ -101,9 +101,9 @@ cat randShortFlowsNodes.csv | cut -d, -f9  | sed "1 d" > MatRandShortFlowsNodes.
 cat randShortFlowsNodes.csv | cut -d, -f9  | sed "1 d" > MatRandShortFlowsNodes.csv
 
 cat permMapShortFlowsVector.csv | cut -d, -f9  | sed "1 d" > MatPermMapShortFlowsVector.csv
-cat numTrimmedPktCore.csv | cut -d, -f11  | sed "1 d" > MatNumTrimmedPktCore.csv
-cat numTrimmedPktAgg.csv | cut -d, -f11  | sed "1 d" > MatNumTrimmedPktAgg.csv
-cat numTrimmedPktEdge.csv | cut -d, -f11  | sed "1 d" > MatNumTrimmedPktEdge.csv
+cat numTrimmedPktCore.csv | cut -d, -f7  | sed "1 d" > MatNumTrimmedPktCore.csv
+cat numTrimmedPktAgg.csv | cut -d, -f7  | sed "1 d" > MatNumTrimmedPktAgg.csv
+cat numTrimmedPktEdge.csv | cut -d, -f7  | sed "1 d" > MatNumTrimmedPktEdge.csv
 
 
 if [ "$3" = "-p" ]  #p: plotting

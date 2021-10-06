@@ -48,7 +48,6 @@
  ../../inet4/src/inet/networklayer/contract/clns/ClnsAddress.h \
  ../../inet4/src/inet/queueing/function/PacketComparatorFunction.h \
  ../../inet4/src/inet/queueing/function/PacketDropperFunction.h \
- ../../inet4/src/inet/queueing/queue/CompoundPacketQueue.h \
  common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
  common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h \
  ../../inet4/src/inet/common/packet/chunk/Chunk_m.h \
@@ -60,46 +59,19 @@
  ../../inet4/src/inet/common/packet/chunk/SliceChunk.h \
  ../../inet4/src/inet/common/packet/chunk/FieldsChunk.h \
  ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h \
- common/queue/../../networklayer/ipv4/Ipv4Ndp.h \
- ../../inet4/src/inet/common/IProtocolRegistrationListener.h \
- ../../inet4/src/inet/common/Protocol.h \
- ../../inet4/src/inet/common/ProtocolTag_m.h \
- ../../inet4/src/inet/common/Protocol_m.h \
- ../../inet4/src/inet/common/TagBase_m.h \
- ../../inet4/src/inet/common/lifecycle/ModuleOperations.h \
- ../../inet4/src/inet/common/lifecycle/LifecycleOperation.h \
- ../../inet4/src/inet/common/lifecycle/OperationalBase.h \
- ../../inet4/src/inet/common/lifecycle/ILifecycle.h \
- ../../inet4/src/inet/common/packet/Message.h \
- ../../inet4/src/inet/networklayer/contract/IArp.h \
- ../../inet4/src/inet/networklayer/contract/INetfilter.h \
- ../../inet4/src/inet/common/stlutils.h \
- ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
- ../../inet4/src/inet/networklayer/common/L3Address_m.h \
- ../../inet4/src/inet/networklayer/contract/INetworkProtocol.h \
- common/queue/../../networklayer/ipv4/IcmpNdp.h \
- ../../inet4/src/inet/networklayer/ipv4/IIpv4RoutingTable.h \
- ../../inet4/src/inet/networklayer/contract/IRoutingTable.h \
- ../../inet4/src/inet/networklayer/contract/IRoute.h \
- ../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h \
- ../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h \
- ../../inet4/src/inet/networklayer/ipv4/IcmpHeader_m.h \
- ../../inet4/src/inet/transportlayer/common/CrcMode_m.h \
- ../../inet4/src/inet/networklayer/ipv4/Ipv4FragBuf.h \
- ../../inet4/src/inet/common/packet/ReassemblyBuffer.h \
- ../../inet4/src/inet/common/packet/ChunkBuffer.h \
- common/queue/../../networklayer/ipv4/Ipv4FragBufNdp.h \
  common/queue/../../networklayer/ipv4/Ipv4HeaderNdp_m.h \
  ../../inet4/src/inet/common/TlvOptions_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
+ ../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h \
+ ../../inet4/src/inet/common/ProtocolTag_m.h \
+ ../../inet4/src/inet/common/Protocol_m.h \
+ ../../inet4/src/inet/common/Protocol.h \
+ ../../inet4/src/inet/common/TagBase_m.h \
+ ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h \
+ ../../inet4/src/inet/transportlayer/common/CrcMode_m.h \
  common/queue/../../networklayer/ipv4/../../common/ProtocolGroupNdp.h \
- common/queue/../../networklayer/ipv4/../../common/ProtocolNdp.h \
- common/queue/../../networklayer/ipv4/Ipv4HeaderNdp_m.h \
- common/queue/../../common/ProtocolNdp.h \
- ../../inet4/src/inet/networklayer/common/L3Tools.h \
- ../../inet4/src/inet/common/ProtocolTools.h \
- ../../inet4/src/inet/transportlayer/common/L4Tools.h
+ common/queue/../../networklayer/ipv4/../../common/ProtocolNdp.h
 
 ../../inet4/src/inet/common/INETDefs.h:
 
@@ -203,8 +175,6 @@ common/queue/NDPQueue.h:
 
 ../../inet4/src/inet/queueing/function/PacketDropperFunction.h:
 
-../../inet4/src/inet/queueing/queue/CompoundPacketQueue.h:
-
 common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
 common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
@@ -227,82 +197,28 @@ common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
 
 ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h:
 
-common/queue/../../networklayer/ipv4/Ipv4Ndp.h:
-
-../../inet4/src/inet/common/IProtocolRegistrationListener.h:
-
-../../inet4/src/inet/common/Protocol.h:
-
-../../inet4/src/inet/common/ProtocolTag_m.h:
-
-../../inet4/src/inet/common/Protocol_m.h:
-
-../../inet4/src/inet/common/TagBase_m.h:
-
-../../inet4/src/inet/common/lifecycle/ModuleOperations.h:
-
-../../inet4/src/inet/common/lifecycle/LifecycleOperation.h:
-
-../../inet4/src/inet/common/lifecycle/OperationalBase.h:
-
-../../inet4/src/inet/common/lifecycle/ILifecycle.h:
-
-../../inet4/src/inet/common/packet/Message.h:
-
-../../inet4/src/inet/networklayer/contract/IArp.h:
-
-../../inet4/src/inet/networklayer/contract/INetfilter.h:
-
-../../inet4/src/inet/common/stlutils.h:
-
-../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h:
-
-../../inet4/src/inet/networklayer/common/L3Address_m.h:
-
-../../inet4/src/inet/networklayer/contract/INetworkProtocol.h:
-
-common/queue/../../networklayer/ipv4/IcmpNdp.h:
-
-../../inet4/src/inet/networklayer/ipv4/IIpv4RoutingTable.h:
-
-../../inet4/src/inet/networklayer/contract/IRoutingTable.h:
-
-../../inet4/src/inet/networklayer/contract/IRoute.h:
-
-../../inet4/src/inet/networklayer/ipv4/Ipv4Route.h:
-
-../../inet4/src/inet/networklayer/ipv4/IcmpHeader.h:
-
-../../inet4/src/inet/networklayer/ipv4/IcmpHeader_m.h:
-
-../../inet4/src/inet/transportlayer/common/CrcMode_m.h:
-
-../../inet4/src/inet/networklayer/ipv4/Ipv4FragBuf.h:
-
-../../inet4/src/inet/common/packet/ReassemblyBuffer.h:
-
-../../inet4/src/inet/common/packet/ChunkBuffer.h:
-
-common/queue/../../networklayer/ipv4/Ipv4FragBufNdp.h:
-
 common/queue/../../networklayer/ipv4/Ipv4HeaderNdp_m.h:
 
 ../../inet4/src/inet/common/TlvOptions_m.h:
 
 ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h:
 
+../../inet4/src/inet/networklayer/contract/NetworkHeaderBase_m.h:
+
+../../inet4/src/inet/common/ProtocolTag_m.h:
+
+../../inet4/src/inet/common/Protocol_m.h:
+
+../../inet4/src/inet/common/Protocol.h:
+
+../../inet4/src/inet/common/TagBase_m.h:
+
+../../inet4/src/inet/networklayer/common/L3Address_m.h:
+
 ../../inet4/src/inet/networklayer/contract/ipv4/Ipv4Address_m.h:
+
+../../inet4/src/inet/transportlayer/common/CrcMode_m.h:
 
 common/queue/../../networklayer/ipv4/../../common/ProtocolGroupNdp.h:
 
 common/queue/../../networklayer/ipv4/../../common/ProtocolNdp.h:
-
-common/queue/../../networklayer/ipv4/Ipv4HeaderNdp_m.h:
-
-common/queue/../../common/ProtocolNdp.h:
-
-../../inet4/src/inet/networklayer/common/L3Tools.h:
-
-../../inet4/src/inet/common/ProtocolTools.h:
-
-../../inet4/src/inet/transportlayer/common/L4Tools.h:

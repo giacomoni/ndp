@@ -318,15 +318,16 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             std::list<PacketsToSend>::iterator itR;  // received iterator
             itR = receivedPacketsList.begin();
             std::advance(itR, seqNo); // increment the iterator by esi
-            PacketsToSend receivedPkts;
-            receivedPkts.pktId = seqNo;
-            receivedPacketsList.push_back(receivedPkts);
             // MOH: Send any received Packet to the app, just for now to test the Incast example, this shouldn't be the normal case
             //cMessage *msgRcvd = nullptr;
             //msgRcvd = check_and_cast<Packet *>(msgRx);
             Packet *newPacket = new Packet("ReceivePacket", msgRx);
+            PacketsToSend receivedPkts;
+            receivedPkts.pktId = seqNo;
+            receivedPkts.msg = newPacket;
+            receivedPacketsList.push_back(receivedPkts);
             newPacket->setKind(NDP_I_DATA); // TBD currently we never send TCP_I_URGENT_DATA
-            NDPCommand *cmd = new NDPCommand();
+            //NDPCommand *cmd = new NDPCommand();
             //cmd->setConnId(socketId);
             newPacket->addTag<SocketInd>()->setSocketId(socketId);
             //newPacket->setControlInfo(cmd);
@@ -414,8 +415,7 @@ void NDPConnection::sendRequestFromPullsQueue(){
 
     if (b(pullQueue.getBitLength()) > B(0) ){
         //Packet* fp = (Packet *) pullQueue.pop();
-        Packet* fp = check_and_cast<Packet *>(pullQueue.front());
-        pullQueue.pop();
+        Packet* fp = check_and_cast<Packet *>(pullQueue.pop());
         //const auto& ndpseg = fp->popAtFront<ndp::NdpHeader>();
         auto ndpseg = fp->removeAtFront<ndp::NdpHeader>();
         //ndpseg = dynamic_cast<IntrusivePtr<NdpHeader>>(ndpseg);

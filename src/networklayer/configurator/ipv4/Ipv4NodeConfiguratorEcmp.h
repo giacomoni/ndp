@@ -23,6 +23,7 @@
 #include "inet/common/lifecycle/ILifecycle.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/networklayer/configurator/ipv4/Ipv4NetworkConfigurator.h"
+#include "Ipv4NetworkConfiguratorEcmp.h"
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/IIpv4RoutingTable.h"
 
@@ -40,7 +41,7 @@ class INET_API Ipv4NodeConfiguratorEcmp : public cSimpleModule, public ILifecycl
     NodeStatus *nodeStatus;
     IInterfaceTable *interfaceTable;
     IIpv4RoutingTable *routingTable;
-    Ipv4NetworkConfigurator *networkConfigurator;
+    Ipv4NetworkConfiguratorEcmp *networkConfigurator;
 
   public:
     Ipv4NodeConfiguratorEcmp();

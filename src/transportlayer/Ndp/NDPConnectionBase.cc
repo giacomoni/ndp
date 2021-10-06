@@ -113,17 +113,8 @@ NDPConnection::~NDPConnection() {
 
     std::list<PacketsToSend>::iterator iter;  // received iterator
 
-    while (!retransmitQueue.empty()) {
-              //std::cout << " destructor NDPConnection " << iter->pktId << " msgName "  << iter->msg->getFullName() << "\n";
-        //delete retransmitQueue.front().msg;
-        iter++;
-        retransmitQueue.pop_front();
-    }
-
-
-
     while (!receivedPacketsList.empty()) {
-        //delete receivedPacketsList.front().msg;
+        delete receivedPacketsList.front().msg;
         receivedPacketsList.pop_front();
     }
 
@@ -220,7 +211,9 @@ bool NDPConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader>
     case NDP_E_OPEN_PASSIVE:
         process_OPEN_PASSIVE(event, ndpCommand, msg);
         break;
-
+    case NDP_E_SETOPTION:
+        process_OPTIONS(event, ndpCommand, msg);
+        break;
     case NDP_E_CLOSE:
 //        process_CLOSE(event, ndpCommand, msg);
         break;

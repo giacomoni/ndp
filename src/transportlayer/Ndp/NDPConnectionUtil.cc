@@ -20,6 +20,7 @@
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
+#include "inet/networklayer/common/HopLimitTag_m.h"
 #include "../../common/ProtocolNdp.h"
 namespace inet {
 
@@ -89,6 +90,9 @@ void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg) {
     IL3AddressType *addressType = remoteAddr.getAddressType();
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
 
+    if (ttl != -1 && packet->findTag<HopLimitReq>() == nullptr)
+            packet->addTag<HopLimitReq>()->setHopLimit(ttl);
+    EV_INFO << "\n\n\nDISPATCH PROTOCOL: " << addressType->getNetworkProtocol()->str() << "\n\n\n\n\n";
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(localAddr);
     addresses->setDestAddress(remoteAddr);
@@ -111,6 +115,9 @@ void NDPConnection::sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg, L3Add
     ASSERT(ndpseg->getChunkLength() == ndpseg->getHeaderLength());
     //setByteLength() Replacement^
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
+
+    if (ttl != -1 && packet->findTag<HopLimitReq>() == nullptr)
+            packet->addTag<HopLimitReq>()->setHopLimit(ttl);
 
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(src);

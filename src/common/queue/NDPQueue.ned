@@ -29,20 +29,25 @@ simple NDPQueue extends PacketQueueBase like IPacketQueue
         
         
         @display("i=block/queue");
-        @signal[rcvdPk](type=inet::Packet);
-        @signal[enqueuePk](type=inet::Packet);
-        @signal[dequeuePk](type=inet::Packet);
-        @signal[dropPkByQueue](type=inet::Packet);
-        @signal[queueingTime](type=simtime_t; unit=s);
+        @signal[packetPushed](type=inet::Packet);//<- @signal[rcvdPk](type=inet::Packet);
+        @signal[packetPopped](type=inet::Packet);
+        @signal[packetRemoved](type=inet::Packet);
+        @signal[packetDropped](type=inet::Packet);
+        
         @signal[dataQueueLength](type=long);
         @signal[headersQueueLength](type=long);
         @signal[numTrimmedPkt](type=long);
         
+        @statistic[packetPushed](title="packets pushed"; source=localSignal(packetPushed); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
+        @statistic[packetPopped](title="packets popped"; source=localSignal(packetPopped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
+        @statistic[packetRemoved](title="packets removed"; source=localSignal(packetRemoved); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
+        @statistic[packetDropped](title="packets dropped: queue overflow"; source=packetDropReasonIsQueueOverflow(packetDropped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
         
+        @statistic[queueingTime](title="queueing times"; source=queueingTime(packetPopped); record=histogram,vector; unit=s; interpolationmode=none);
         
-        @statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[dropPk](title="dropped packets"; source=dropPkByQueue; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
-        @statistic[queueingTime](title="queueing time"; record=histogram,vector; interpolationmode=none);
+        //@statistic[rcvdPk](title="received packets"; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        //@statistic[dropPk](title="dropped packets"; source=dropPkByQueue; record=count,"sum(packetBytes)","vector(packetBytes)"; interpolationmode=none);
+        //@statistic[queueingTime](title="queueing time"; record=histogram,vector; interpolationmode=none);
         @statistic[dataQueueLength](title="queue length"; record=max,timeavg,vector; interpolationmode=sample-hold);
         @statistic[headersQueueLength](title="queue length"; record=max,timeavg,vector; interpolationmode=sample-hold);
         @statistic[numTrimmedPkt](title="num Trimmed Pkt  "; source=numTrimmedPkt; record=last ; interpolationmode=none);
