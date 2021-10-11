@@ -102,6 +102,10 @@ void Ndp::handleSelfMessage(cMessage *msg)
     if (msg == requestTimerMsg) {
         process_REQUEST_TIMER();
     }
+    else{
+        NDPConnection *conn = (NDPConnection *) msg->getContextPointer();
+        bool ret = conn->processTimer(msg);
+    }
 }
 
 void Ndp::handleUpperCommand(cMessage *msg)
@@ -543,14 +547,14 @@ void Ndp::sendFirstRequest() {
 
 bool Ndp::allPullQueuesEmpty() {
 //     std::cout << "  Ndp::allPullQueuesEmpty()    "  << this->getFullPath()   << "\n";
-    b pullsQueueLength = B(0);
+    int pullsQueueLength = 0;
     auto iter = requestCONNMap.begin();
     while (iter !=  requestCONNMap.end()){
 //        std::cout << "   aaaaallPullQueuesEmpty   "     << "\n";
          pullsQueueLength = iter->second->getPullsQueueLength();
 //         std::cout <<    this->getFullPath()   << " pullsQueueLength=   "  <<   pullsQueueLength<< "\n";
 
-        if (pullsQueueLength > B(0)) return false;
+        if (pullsQueueLength > 0) return false;
         ++iter;
     }
       return true;
@@ -593,7 +597,7 @@ void Ndp::updateConnMap() {
 }
 
 void Ndp::requestTimer() {
-    Enter_Method_Silent();
+    Enter_Method_Silent("requestTimer");
 //    std::cout << "  requestTimer  \n";
 //  //  state->request_rexmit_count = 0;
 //  //  state->request_rexmit_timeout = NDP_TIMEOUT_PULL_REXMIT;  // 3 sec
@@ -645,8 +649,8 @@ void Ndp::process_REQUEST_TIMER() {
                 counter = 0;
             auto iter = requestCONNMap.begin();
             std::advance(iter, counter);
-            b pullsQueueLength = iter->second->getPullsQueueLength();
-            if (pullsQueueLength > B(0)) {
+            int pullsQueueLength = iter->second->getPullsQueueLength();
+            if (pullsQueueLength > 0) {
                 iter->second->sendRequestFromPullsQueue();
                 requestTimer();
                 sendNewRequest = true;

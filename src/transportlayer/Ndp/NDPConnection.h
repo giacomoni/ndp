@@ -323,7 +323,7 @@ public:
     virtual void sendNackNdp(unsigned int nackNum); // MOH: HAS BEEN ADDED
 
 
-    virtual void ackArrivedFreeBuffer(Packet* packet); // MOH: HAS BEEN ADDED
+    virtual void ackArrivedFreeBuffer(Packet* packet, unsigned int acknum); // MOH: HAS BEEN ADDED
     virtual void getBufferedPkt(unsigned int seqNum , std::list<PacketsToSend>::iterator& iter );
     virtual void getFirstBufferedPkt(std::list<PacketsToSend>::iterator& iter );
 
@@ -359,7 +359,7 @@ public:
     virtual void  addRequestToPullsQueue();
     virtual void  sendRequestFromPullsQueue();
 
-    virtual b getPullsQueueLength();
+    virtual int getPullsQueueLength();
     /** Utility: signal to user that connection timed out */
     virtual void signalConnectionTimeout();
 

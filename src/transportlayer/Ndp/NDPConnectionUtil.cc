@@ -67,6 +67,7 @@ const char *NDPConnection::indicationName(int code) {
     CASE(NDP_I_DATA)
 ;        CASE(NDP_I_URGENT_DATA);
         CASE(NDP_I_ESTABLISHED);
+        //CASE(NDP_I_PEER_CLOSED);
     }
     return s;
 #undef CASE

@@ -80,6 +80,7 @@ void NdpSinkApp::initialize(int stage)
 
 void NdpSinkApp::handleMessage(cMessage *msg)
 {
+    EV_INFO << "\n\nMESSAGE KIND: " << msg->getKind() << "\n\n";
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
         tEndAdded = simTime();
         NDPCommand *controlInfo = check_and_cast<NDPCommand *>( msg->getControlInfo());
@@ -96,7 +97,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
             int   numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows +1 ;
             centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
-             MY_COUT << "NdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
+            EV_INFO << "\n\n\n\nNdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows <<  "\n\n\n";
         }
         delete msg;
 
@@ -114,7 +115,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
         emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
-             tStartAdded = simTime();
+            tStartAdded = simTime();
             firstDataReceived = false;
         }
         EV_INFO << "bytesRcvd  " << bytesRcvd <<  " " <<  this->getFullPath() << std::endl;

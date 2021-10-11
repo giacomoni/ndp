@@ -66,7 +66,8 @@
  ../../inet4/src/inet/common/Protocol.h \
  ../../inet4/src/inet/common/TagBase_m.h \
  ../../inet4/src/inet/common/lifecycle/NodeStatus.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h
+ application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
+ ../../inet4/src/inet/common/ResultFilters.h
 
 application/ndpapp/NdpSinkApp.h:
 
@@ -205,3 +206,5 @@ application/ndpapp/GenericAppMsgNdp_m.h:
 ../../inet4/src/inet/common/lifecycle/NodeStatus.h:
 
 application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
+
+../../inet4/src/inet/common/ResultFilters.h:

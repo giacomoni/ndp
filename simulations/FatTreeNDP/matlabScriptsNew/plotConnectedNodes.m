@@ -30,7 +30,6 @@ while ischar(textLine)
     for i=1:length(numbers)
     longFlowNodes(end+1)= numbers(i) ;
     end
-	% Read the next line.
     textLine = fgets(fid);
 	lineCounter = lineCounter + 1;
 end
@@ -67,7 +66,7 @@ shortFlowNodes=shortFlowNodes(2:end);
 SrcShort=shortFlowNodes(1:2:end);
 DestShort=shortFlowNodes(2:2:end);
 
-srcDestRand=[SrcShort;DestShort]';
+srcDestRand=[SrcShort;DestShort];
 
 srcDestRandUnique = unique(srcDestRand,'rows', 'stable');
 t = mat2cell(srcDestRandUnique,ones(1,size(srcDestRandUnique,1)),2);
@@ -99,7 +98,7 @@ shortFlowNodes=shortFlowNodes(2:end);
 
 SrcShort=shortFlowNodes(1:2:end);
 DestShort=shortFlowNodes(2:2:end);
-srcDestRand=[SrcShort;DestShort]';
+srcDestRand=[SrcShort;DestShort];
 
 srcDestRandUnique = unique(srcDestRand,'rows', 'stable');
 t = mat2cell(srcDestRandUnique,ones(1,size(srcDestRandUnique,1)),2);

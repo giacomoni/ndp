@@ -106,7 +106,7 @@ NDPEventCode NDPConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const 
 
 
 
-void NDPConnection::ackArrivedFreeBuffer(Packet* packet) {
+void NDPConnection::ackArrivedFreeBuffer(Packet* packet, unsigned int acknum) {
 
 }
 
@@ -160,7 +160,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     if (fsm.getState() == NDP_S_ESTABLISHED &&  state->isSender == true && ndpseg->getAckBit() == true) {
 //        MY_COUT  << "  \n\n\n  £££££££££ Sender ££££££££ new  ACK arrived: ackNum = "  << ndpseg->getAckNo() << std::endl;
-        sendQueue->ackArrivedFreeBuffer(packet);
+        sendQueue->ackArrivedFreeBuffer(packet, ndpseg->getAckNo());
     }
 
     // (S.3)  at the sender: PULL pkt arrived, this pkt triggers either retransmission of trimmed pkt or sending a new data pkt.
@@ -174,6 +174,9 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 //        MY_COUT << " "<< cSimulation::getActiveSimulation()->getContextSimpleModule()->getFullPath() << std::endl;
 
         int requestsGap = ndpseg->getPullSequenceNumber() - state->internal_request_id;
+        EV_INFO << "\n\n\n\n\nPULL SEQ NUMB: "<< ndpseg->getPullSequenceNumber() << "\n";
+        EV_INFO << "\nINTERNAL REQ NUMB: "<< state->internal_request_id << "\n";
+        EV_INFO << "\nREQUESTGAP: "<< requestsGap << "\n\n\n\n\n";
 //            MY_COUT <<  "  requestsGap=  " << requestsGap << std::endl;
 
         if (requestsGap >= 1) {
@@ -222,9 +225,10 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         sendNackNdp(ndpseg->getDataSequenceNumber());
 
 
-        if (state->isLongFlow == false)
-        ++state->numRcvTrimmedHeader;
-        addRequestToPullsQueue();
+        if (state->isLongFlow == false) {
+            ++state->numRcvTrimmedHeader;
+            addRequestToPullsQueue();
+        }
 
         if (state->numberReceivedPackets == 0 && state->connNotAddedYet == true) {
             getNDPMain()->requestCONNMap[getNDPMain()->connIndex] = this; // moh added
@@ -288,6 +292,13 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         }
 
         // numberReceivedPackets < wantedPackets
+//        EV_INFO << "\n\n\n\n\n\n\nNUMB RECEIVED PACKETS " << numberReceivedPackets << "\n";
+//        EV_INFO << "\nNUMB WANTED PACKETS " << wantedPackets << "\n";
+//        EV_INFO << "\nINITIAL SENT PACKETS " << initialSentPackets << "\n";
+//        EV_INFO << "\nVALUE " << wantedPackets-initialSentPackets << "\n";
+//        EV_INFO << "\nCONN FINISHED? " << state->connFinished << "\n";
+//        EV_INFO << "\nIS LONG FLOW? " << isLongFlowPacket << "\n";
+        //if (numberReceivedPackets <= (wantedPackets-initialSentPackets)  && state->connFinished == false && isLongFlowPacket == false) {
         if (numberReceivedPackets <= (wantedPackets-initialSentPackets)  && state->connFinished == false && isLongFlowPacket == false) {
             addRequestToPullsQueue();
         }
@@ -321,7 +332,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             // MOH: Send any received Packet to the app, just for now to test the Incast example, this shouldn't be the normal case
             //cMessage *msgRcvd = nullptr;
             //msgRcvd = check_and_cast<Packet *>(msgRx);
-            Packet *newPacket = new Packet("ReceivePacket", msgRx);
+            Packet *newPacket = new Packet("ReceivedPacket", msgRx);
             PacketsToSend receivedPkts;
             receivedPkts.pktId = seqNo;
             receivedPkts.msg = newPacket;
@@ -338,6 +349,8 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         // All the Packets have been received
          if (state->isfinalReceivedPrintedOut == false && isLongFlowPacket == false) {
 //             MY_COUT << "  multiSourcingGroupIndex = " << state->multiSourcingGroupIndex << "\n";
+            EV_INFO << "\n\n\n\n\nRECEIVED PACKETS: "<< numberReceivedPackets << "\n\n\n\n\n";
+            EV_INFO << "\n\n\n\n\nWANTED PACKETS: "<< wantedPackets << "\n\n\n\n\n";
             if (numberReceivedPackets == wantedPackets || state->connFinished == true) {
 //            MY_COUT << " \n\n all Packets  received, no more request to be sent \n ";
                 // checking that all the Packets  have been stored in the receivedPacketsList
@@ -352,6 +365,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 
                 MY_COUT << " numRcvTrimmedHeader:    " <<   state->numRcvTrimmedHeader << "\n\n";
 //             MY_COUT << " aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa sendIndicationToAppsendIndicationToApp\n\n\n";
+                EV_INFO << "\n\n\n\nCONNECTION FINISHED!" <<  "\n\n\n";
                 sendIndicationToApp(NDP_I_PEER_CLOSED); // this is ok if the sinkApp is used by one conn
                 // getNDPMain()->allConnFinished();
                 state->isfinalReceivedPrintedOut = true;
@@ -399,12 +413,14 @@ void NDPConnection::addRequestToPullsQueue(){
     //pullQueue.insert(std::make_tuple(ndppack, ndpseg));
     pullQueue.insert(ndppack);
     //EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength()<< "\n\n\n\n";
-    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getBitLength()<< "\n\n\n\n";
+    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength()<< "\n\n\n\n";
 //    MY_COUT << "pullsQueue length now = " << pullQueue.getLength()<< ".\n";
 //    MY_COUT  << " mmmm  addRequestToPullsQueue  this->getFullPath() " << ndpMain->getFullPath() << " , len= " << pullQueue.getLength()   << "\n";
     bool napState = getNDPMain()->getNapState();
+    //std::cout << "\n" << napState;
     if (napState == true) {
         getNDPMain()->requestTimer();
+
     }
 
 
@@ -413,21 +429,22 @@ void NDPConnection::addRequestToPullsQueue(){
 void NDPConnection::sendRequestFromPullsQueue(){
 //    MY_COUT  << " ssssssssssssss sendRequestFromPullsQueuemmmm  this->getFullPath() " << ndpMain->getFullPath()     << "\n";
 
-    if (b(pullQueue.getBitLength()) > B(0) ){
+    if (pullQueue.getLength() > 0 ){
         //Packet* fp = (Packet *) pullQueue.pop();
         Packet* fp = check_and_cast<Packet *>(pullQueue.pop());
         //const auto& ndpseg = fp->popAtFront<ndp::NdpHeader>();
         auto ndpseg = fp->removeAtFront<ndp::NdpHeader>();
+        ndpseg->setChunkLength(B(1500));
         //ndpseg = dynamic_cast<IntrusivePtr<NdpHeader>>(ndpseg);
         //pullQueue.pop();
-        EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.getBitLength()<< " \n\n";
+        EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.getLength()<< " \n\n";
         sendToIP(fp, ndpseg);
     }
 }
 
-b NDPConnection::getPullsQueueLength()  {
+int NDPConnection::getPullsQueueLength()  {
 //    MY_COUT << "pullsQueue length now = " <<" " << pullQueue.getLength()<< ".\n";
-    b len = b(pullQueue.getBitLength());
+    int len = pullQueue.getLength();
     //int len = pullQueue.getLength();
     return len;
 }

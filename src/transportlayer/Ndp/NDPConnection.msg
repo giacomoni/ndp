@@ -66,8 +66,8 @@ class NDPSendQueue extends cObject
 {
     @existingClass;
     @descriptor(readonly);
-    ChunkQueue dataToSendQueue;      // dataBuffer
-    ChunkQueue sentDataQueue;
+    cPacketQueue dataToSendQueue;      // dataBuffer
+    cPacketQueue sentDataQueue;
 }
 
 class NDPReceiveQueue extends cObject

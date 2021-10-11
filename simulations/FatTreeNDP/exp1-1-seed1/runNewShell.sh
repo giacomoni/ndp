@@ -108,10 +108,10 @@ cat numTrimmedPktEdge.csv | cut -d, -f7  | sed "1 d" > MatNumTrimmedPktEdge.csv
 
 if [ "$3" = "-p" ]  #p: plotting
 then
-/Applications/MATLAB_R2017a.app/bin/matlab -nodesktop -nosplash    -r "cd('matlabScriptsNew/'); plotResults($1,$2)"
+$HOME/MATLAB/R2021b/bin/matlab -nodesktop -nosplash    -r "cd('matlabScriptsNew/'); plotResults"
 elif [ "$3" = "-ph" ] #p: plotting on HPC
 then
-/Applications/MATLAB_R2017a.app/bin/matlab -nodesktop -nosplash    -r "cd('matlabScriptsNew/'); plotResults($1,$2)"
+$HOME/MATLAB/R2021b/bin/matlab -nodesktop -nosplash    -r "cd('matlabScriptsNew/'); plotResults"
 else
 echo "no plotting"
 fi

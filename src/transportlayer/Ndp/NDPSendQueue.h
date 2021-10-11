@@ -96,7 +96,7 @@ class INET_API NDPSendQueue : public cObject
 
     virtual const std::tuple<Ptr<NdpHeader>, Packet*> getNdpHeader();
 
-    virtual void ackArrivedFreeBuffer(Packet* packet);
+    virtual void ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum);
     virtual void nackArrivedMoveFront(Packet* packet, unsigned int nackNum);
 
 
@@ -111,7 +111,7 @@ class INET_API NDPSendQueue : public cObject
     }
 
 //    void removeFromDataQueueToSentQueue(Chunk::Iterator iter);
-    void moveFrontDataQueue(Chunk::Iterator iter);
+    void moveFrontDataQueue(unsigned int sequenceNumber);
 
     /**
      * Called when the NDP wants to send or retransmit data, it constructs

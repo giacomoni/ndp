@@ -1,7 +1,7 @@
 
 function plotThroughput 
 
-% path(path,genpath('/Volumes/LocalDataHD/m/ma/ma777/Desktop/distinguishable_colors'));
+% path(path,genpath('$HOME/distinguishable_colors'));
 % lineStyles = {'-', '--', ':', '-.'};
 % myColors = distinguishable_colors(nLines);
 %%

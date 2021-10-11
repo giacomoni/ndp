@@ -155,8 +155,9 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
        synAckQueueLength=synAckQueue.getLength();
        //emit(packetPushedSynAckQueueSignal, packet);
        //emit(synAckQueueLengthSignal, cPar(synAckQueue.getLength()));
+       return;
     }
-    else if (ndpHeaderPeek->isHeader() == true ) {
+    if (ndpHeaderPeek->isHeader() == true ) {
         //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
         //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         //packet->insertAtFront(ndpHeader);
@@ -164,8 +165,9 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         //emit(packetPushedHeadersQueueSignal, packet);
+        return;
     }
-    else if (ndpHeaderPeek->isPullPacket() == true ) {
+    if (ndpHeaderPeek->isPullPacket() == true ) {
         //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
         //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         EV_INFO << "\n\n\n\nPACKET INFO ROUTER: " << packet->str() << "\n\n\n";
@@ -174,8 +176,9 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         //emit(packetPushedHeadersQueueSignal, packet);
+        return;
     }
-    else if (isOverloaded()) {
+    if (isOverloaded()) {
         std::string header="Header-";
         auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
         ASSERT(B(ipv4Header->getTotalLengthField()) >= ipv4Header->getChunkLength());
@@ -207,6 +210,7 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         ++numTrimmedPkt;
         numTrimmedPacketsVec.record(numTrimmedPkt);
         cSimpleModule::emit(numTrimmedPktSig, numTrimmedPkt);
+        return;
         }
     else {
         //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
@@ -217,6 +221,7 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         dataQueue.insert(packet);
         //emit(packetPushedDataQueueSignal, packet);
         dataQueueLength=dataQueue.getLength();
+        return;
     }
 }
 
@@ -225,7 +230,7 @@ Packet *NDPQueue::popPacket(cGate *gate) {
     Enter_Method("popPacket");
     if (dataQueue.isEmpty() && headersQueue.isEmpty() && synAckQueue.isEmpty())
         return nullptr;
-    else if (synAckQueue.getLength()!=0){
+    if (synAckQueue.getLength()!=0){
         auto packet = check_and_cast<Packet *>(synAckQueue.front());
         synAckQueue.pop();
         //cSimpleModule::emit(synAckQueueLengthSignal, synAckQueue.getLength());
@@ -234,7 +239,7 @@ Packet *NDPQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    else if (headersQueue.getLength() == 0 && dataQueue.getLength() != 0) {
+    if (headersQueue.getLength() == 0 && dataQueue.getLength() != 0) {
         auto packet = check_and_cast<Packet *>(dataQueue.front());
         dataQueue.pop();
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
@@ -243,7 +248,7 @@ Packet *NDPQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    else if (headersQueue.getLength() != 0 && dataQueue.getLength() == 0) {
+    if (headersQueue.getLength() != 0 && dataQueue.getLength() == 0) {
         auto packet = check_and_cast<Packet *>(headersQueue.front());
         headersQueue.pop();
         cSimpleModule::emit(headersQueueLengthSignal, headersQueue.getLength());
@@ -252,7 +257,7 @@ Packet *NDPQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    else if ( headersQueue.getLength() != 0 && dataQueue.getLength() != 0 && weight%10 == 0) {
+    if ( headersQueue.getLength() != 0 && dataQueue.getLength() != 0 && weight%10 == 0) {
         auto packet = check_and_cast<Packet *>(dataQueue.front());
         dataQueue.pop();
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
@@ -261,7 +266,7 @@ Packet *NDPQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    else if (headersQueue.getLength() != 0 && dataQueue.getLength() != 0 ) {
+    if (headersQueue.getLength() != 0 && dataQueue.getLength() != 0 ) {
         auto packet = check_and_cast<Packet *>(headersQueue.front());
         headersQueue.pop();
         emit(packetRemovedSignal, packet);

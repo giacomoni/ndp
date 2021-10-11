@@ -48,7 +48,7 @@ class INET_API ThroughputFilterA : public cObjectResultFilter
     int packets = 0;
 
   protected:
-    //void emitThroughput(simtime_t endInterval, cObject *details);
+    void emitThroughput(simtime_t endInterval, cObject *details);
   public:
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details) override;
     //virtual void finish(cComponent *component, simsignal_t signalID) override;

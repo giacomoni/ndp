@@ -882,8 +882,8 @@ void Ipv4Ndp::fragmentAndSend(Packet *packet)
 
     const auto& ipv4Header = packet->peekAtFront<Ipv4HeaderNdp>();
 
-    EV_INFO << "\n\n\n\n\nTIME TO LIVE2: "<< ipv4Header->getTimeToLive();
-    EV_INFO << "\n" << packet->str() << "\n\n\n\n";
+    //EV_INFO << "\n\n\n\n\nTIME TO LIVE2: "<< ipv4Header->getTimeToLive();
+    //EV_INFO << "\n" << packet->str() << "\n\n\n\n";
     // hop counter check
     if (ipv4Header->getTimeToLive() <= 0) {
         // drop datagram, destruction responsibility in ICMP
