@@ -393,12 +393,12 @@ void CentralSchedulerNdp::scheduleLongFlows()
         cModule *newSrcAppModule = moduleTypeSrc->create(nameNdpAppSrc.c_str(), srcModule);
         newSrcAppModule->par("localAddress").setStringValue(source.c_str());
         newSrcAppModule->par("connectAddress").setStringValue(dest.c_str());
-        newSrcAppModule->par("connectPort").setDoubleValue(80 + newNumNdpSinkAppsDest);
+        newSrcAppModule->par("connectPort").setIntValue(80 + newNumNdpSinkAppsDest);
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl());
         // >>>>>>
-        newSrcAppModule->par("numPacketsToSend").setDoubleValue(longFlowSize); // should be longFlowSize
+        newSrcAppModule->par("numPacketsToSend").setIntValue(longFlowSize); // should be longFlowSize
         unsigned int priority = 0; // TODO
-        newSrcAppModule->par("priorityValue").setDoubleValue(priority);
+        newSrcAppModule->par("priorityValue").setIntValue(priority);
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------
@@ -476,9 +476,9 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders)
     std::string nameNdpAppSrc = "app[" + std::to_string(newNumNdpSessionAppsSrc - 1) + "]";
     cModule *newSrcAppModule = moduleTypeSrc->create(nameNdpAppSrc.c_str(), srcModule);
     newSrcAppModule->par("connectAddress").setStringValue(newDest);
-    newSrcAppModule->par("connectPort").setDoubleValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
+    newSrcAppModule->par("connectPort").setIntValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
     newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl()+ sumArrivalTimes);
-    newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
+    newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
 
 
     cGate *gateNdpIn = ndpSrcModule->gate("in", newNDPGateInSizeSrc - 1);
@@ -1041,7 +1041,7 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
         cModule *newSrcAppModule = moduleTypeSrc->create(nameNdpAppSrc.c_str(), srcModule);
 
         newSrcAppModule->par("connectAddress").setStringValue(thisDest);
-        newSrcAppModule->par("connectPort").setDoubleValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
+        newSrcAppModule->par("connectPort").setIntValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
 
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl() + sumArrivalTimes);
 
@@ -1056,7 +1056,7 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc, std::
 
         if (isWebSearchWorkLoad == true){
             unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
-            newSrcAppModule->par("numPacketsToSend").setDoubleValue(newFlowSize); //
+            newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
             unsigned int priority = getPriorityValue(newFlowSize);
 
@@ -1161,7 +1161,7 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc, std::v
         cModule *newSrcAppModule = moduleTypeSrc->create(nameNdpAppSrc.c_str(), srcModule);
 
         newSrcAppModule->par("connectAddress").setStringValue(thisDest);
-        newSrcAppModule->par("connectPort").setDoubleValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
+        newSrcAppModule->par("connectPort").setIntValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
 
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl() + sumArrivalTimes);
 
@@ -1170,7 +1170,7 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc, std::v
 //        newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
         /// >>>>>>>>>>>>
         if (isWebSearchWorkLoad == false){
-             newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
+             newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
             // aha .....
             unsigned int priority = getPriorityValue(flowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
@@ -1178,7 +1178,7 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc, std::v
 
         if (isWebSearchWorkLoad == true){
             unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
-            newSrcAppModule->par("numPacketsToSend").setDoubleValue(newFlowSize); //
+            newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
             unsigned int priority = getPriorityValue(newFlowSize);
 
@@ -1300,7 +1300,7 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
         cModule *newSrcAppModule = moduleTypeSrc->create(nameNdpAppSrc.c_str(), srcModule);
 
         newSrcAppModule->par("connectAddress").setStringValue(dest);
-        newSrcAppModule->par("connectPort").setDoubleValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
+        newSrcAppModule->par("connectPort").setIntValue(80 + newNumNdpSinkAppsDest);  //??? to be checked
 
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl() + sumArrivalTimes);
 
@@ -1308,7 +1308,7 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
         /// >>>>>>>>>>>>
         if (isWebSearchWorkLoad == false){
 //               flowSize = flowSize/3; ??????????????????
-            newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
+            newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
             // aha .....
             unsigned int priority = getPriorityValue(flowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
@@ -1316,7 +1316,7 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest, std:
 
         if (isWebSearchWorkLoad == true){
             unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
-            newSrcAppModule->par("numPacketsToSend").setDoubleValue(newFlowSize); //
+            newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
             unsigned int priority = getPriorityValue(newFlowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
