@@ -55,7 +55,7 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t, cOb
         //    bytes += packet->getByteLength();
         //    emitThroughput(now, details);
         //}
-        if (packets >=16) { // MOH modified
+        if (packets >=19) { // MOH modified
             bytes += packet->getByteLength();
             double throughput = 8 * bytes / (now - lastSignal).dbl();
             fire(this, now, throughput, details);

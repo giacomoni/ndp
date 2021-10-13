@@ -237,7 +237,8 @@ void NDPConnection::sendNackNdp(unsigned int nackNum) {
 
     // write header options
     writeHeaderOptions(ndpseg);
-    Packet *fp = new Packet("NdpNack");
+    std::string packetName = "NdpNack-"+std::to_string(nackNum);
+    Packet *fp = new Packet(packetName.c_str());
     // send it
     sendToIP(fp, ndpseg);
 }
@@ -260,7 +261,8 @@ void NDPConnection::sendAckNdp(unsigned int AckNum) {
 
     // write header options
     writeHeaderOptions(ndpseg);
-    Packet *fp = new Packet("NdpAck");
+    std::string packetName = "NdpAck-"+std::to_string(AckNum);
+    Packet *fp = new Packet(packetName.c_str());
 
     // send it
     sendToIP(fp, ndpseg);  // MOH: HAS BEEN REMOVED

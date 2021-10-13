@@ -141,7 +141,11 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     }
 
 
-
+    bool isTargetReq = false;
+    if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
+        std::cout << "\nSENDER";
+        isTargetReq = true;
+    }
     // (S.1)   at the sender: NACK Arrived at the sender, then prepare the trimmed pkt for retranmission
     //        (not to transmit yet just make it to be the first one to transmit upon getting a pull pkt later)
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
@@ -152,6 +156,10 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 //        ackArrivedFreeBuffer(ndpseg->getNackNo());
         sendQueue->nackArrivedMoveFront(packet, ndpseg->getNackNo());
         // TODO
+        if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
+            std::cout << "\nNACK ARRIVED FOR SEQ NUM: " << ndpseg->getNackNo();
+            isTargetReq = true;
+        }
     }
 
     // (S.2)  at the sender:  ACK arrived, so free the acknowledged pkt from the buffer.
@@ -173,6 +181,11 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 //        MY_COUT << " sender " << getNDPMain()->getFullPath()  << "\n";
 //        MY_COUT << " "<< cSimulation::getActiveSimulation()->getContextSimpleModule()->getFullPath() << std::endl;
 
+
+        if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
+            std::cout << "\nPULL ARRIVED " << ndpseg->getPullSequenceNumber();
+            isTargetReq = true;
+        }
         int requestsGap = ndpseg->getPullSequenceNumber() - state->internal_request_id;
         EV_INFO << "\n\n\n\n\nPULL SEQ NUMB: "<< ndpseg->getPullSequenceNumber() << "\n";
         EV_INFO << "\nINTERNAL REQ NUMB: "<< state->internal_request_id << "\n";
@@ -204,8 +217,14 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 //                    ndpseg->setIsLastPacketsToSend(false);
 //                    ndpseg->setDataSequenceNumber(state->sequenceNumber);
                     //Packet *fp = new Packet("Ndp");
+                    if(isTargetReq){
+                        std::cout << "\nDATA SEQ NUM " << ndpseg->getDataSequenceNumber() << " BEING SENT TO RECEIVER\n\n";
+                    }
                     sendToIP(fp, ndpseg);
                 }
+                //else{
+                //    --state->internal_request_id;
+                //}
             }
         } else if (requestsGap < 1) {
             EV_INFO << "Delayed pull arrived --> ignore it \n";
@@ -218,12 +237,21 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 // header arrived at the receiver==> send new request with pacing (fixed pacing: MTU/1Gbps)
+   if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
+           //std::cout <<  "\nport: " << ndpseg->getDestPort();
+           std::cout << "\nRECEIVER";
+           isTargetReq = true;
+       }
+
     if (fsm.getState() == NDP_S_ESTABLISHED   && ndpseg->isHeader() == true   && ndpseg->isDataPacket() == false ) { // 1 read, 2 write
 
 //        MY_COUT  << "  $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " << std::endl;
 //         MY_COUT  << " \n\n\n\n\n $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " <<  getNDPMain()->getFullPath() << std::endl;
         sendNackNdp(ndpseg->getDataSequenceNumber());
-
+        if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
+            std::cout << "\nNACK BEING SENT FOR " << ndpseg->getDataSequenceNumber();
+            isTargetReq = true;
+        }
 
         if (state->isLongFlow == false) {
             ++state->numRcvTrimmedHeader;
@@ -385,7 +413,9 @@ void NDPConnection::addRequestToPullsQueue(){
     char msgname[16];
     sprintf(msgname, "PULL-%d", state->request_id);
     //NdpHeader *ndpseg = createNDPSegment(msgname);
-    Packet *ndppack = new Packet(msgname, 0);
+    //Packet *ndppack = new Packet(msgname, 0);
+    Packet *ndppack = new Packet(msgname);
+
     const auto& ndpseg = makeShared<NdpHeader>();
     //ndppack->setByteLength(10); //maybe bit?
     //ndpseg->setPayloadLength(10);
@@ -434,7 +464,8 @@ void NDPConnection::sendRequestFromPullsQueue(){
         Packet* fp = check_and_cast<Packet *>(pullQueue.pop());
         //const auto& ndpseg = fp->popAtFront<ndp::NdpHeader>();
         auto ndpseg = fp->removeAtFront<ndp::NdpHeader>();
-        ndpseg->setChunkLength(B(1500));
+        //ndpseg->setHeaderLength(B(1500));
+        //ndpseg->setChunkLength(B(1));
         //ndpseg = dynamic_cast<IntrusivePtr<NdpHeader>>(ndpseg);
         //pullQueue.pop();
         EV << "a request has been popped from the Pull queue, the new queue length  = " << pullQueue.getLength()<< " \n\n";

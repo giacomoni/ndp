@@ -114,7 +114,7 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NDPSendQueue::getNdpHeader()
         //auto& appmsg = dataToSendQueue.pop<GenericAppMsgNdp>(b(-1), Chunk::PF_ALLOW_NULLPTR);
         Packet* queuePacket = check_and_cast<Packet *>(dataToSendQueue.pop());
         auto& appmsg = queuePacket->removeAtFront<GenericAppMsgNdp>();
-        appmsg->setChunkLength(B(1500));
+        appmsg->setChunkLength(B(1453));
 
 
         EV_INFO << "\n\n\nDATA SEQUENCE NUMBER :"<< appmsg->getSequenceNumber() << std::endl;
@@ -169,7 +169,7 @@ void NDPSendQueue::moveFrontDataQueue(unsigned int sequenceNumber) {
     const auto& payload = makeShared<GenericAppMsgNdp>();
     Packet *newPacket = new Packet(packetName.c_str());
     payload->setSequenceNumber(sequenceNumber);
-    payload->setChunkLength(B(1500));
+    payload->setChunkLength(B(1453));
     newPacket->insertAtBack(payload);
     if(dataToSendQueue.getLength() > 0){
         dataToSendQueue.insertBefore(dataToSendQueue.front(), newPacket);
@@ -184,7 +184,7 @@ void NDPSendQueue::ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum){
     EV_INFO << "\n ackArrivedFreeBuffer: " <<  packet->str() << "\n";
 //    sentDataQueue.remove(packet);
 //    delete packet;
-    for(int i = 0; i < sentDataQueue.length(); i++){
+    for(int i = 0; i <= sentDataQueue.getLength(); i++){
         Packet* packet = check_and_cast<Packet *>(sentDataQueue.get(i));
         auto& appmsg = packet->peekData<GenericAppMsgNdp>();
         //auto ndpseg = packet->peekAtFront<ndp::NdpHeader>();
@@ -200,7 +200,8 @@ void NDPSendQueue::ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum){
 }
 
 void NDPSendQueue::nackArrivedMoveFront(Packet* packet, unsigned int nackNum){
-    for(int i = 0; i < sentDataQueue.length(); i++){
+    bool found = false;
+    for(int i = 0; i <= sentDataQueue.getLength(); i++){
             Packet* packet = check_and_cast<Packet *>(sentDataQueue.get(i));
             auto& appmsg = packet->peekData<GenericAppMsgNdp>();
             //auto ndpseg = packet->peekAtFront<ndp::NdpHeader>();
@@ -208,11 +209,15 @@ void NDPSendQueue::nackArrivedMoveFront(Packet* packet, unsigned int nackNum){
                 moveFrontDataQueue(nackNum);
                 sentDataQueue.remove(packet);
                 delete packet;
+                found = true;
                 break;
                 //delete ndpseg;
                 //delete packet;
             }
         }
+    if(found == false){
+        EV_INFO << "\n Nack Not Found" << "\n";
+    }
 
     //sentDataQueue.remove(packet);
     //Packet *newPacket = packet->dup();
