@@ -31,6 +31,7 @@ Define_Module(NdpSinkApp);
 
 simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("packetReceived");
 
+simsignal_t goodputSigNdp = NodeStatus::registerSignal("goodputSigNdp");
 simsignal_t fctRecordv3 = NodeStatus::registerSignal("fctRecordv3");
 simsignal_t multicastGroupIdSignal =  NodeStatus::registerSignal("multicastGroupIdSignal");
 simsignal_t multisourceGroupIdSignal =  NodeStatus::registerSignal("multisourceGroupIdSignal");
@@ -44,6 +45,8 @@ void NdpSinkApp::initialize(int stage)
      cSimpleModule::initialize(stage);
 
     isLongFlow = par("isLongFlow");  // moh
+
+
 
     multiCastGroupId = par("multiCastGroupId");
     multiSrcGroupId = par("multiSrcGroupId");
@@ -111,7 +114,10 @@ void NdpSinkApp::handleMessage(cMessage *msg)
        // long packetLength = pk->getByteLength();
 //        bytesRcvd += packetLength;
         Packet *packet = check_and_cast<Packet *>(msg);
-        ++bytesRcvd;
+        //cPacket *packet= PK(msg);
+        //++bytesRcvd;
+        bytesRcvd += packet->getByteLength();
+        //std::cout << "PACKET SIZE" << packet->getByteLength();
         emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
@@ -185,14 +191,16 @@ void NdpSinkApp::finish()
 //     MY_COUT << " NdpSinkApp::finish() fffffffffffffffffffffffffffffffffffffffffffffffffffff \n\n\n";
 
     // MOH Added
-    double throughput = 8 * (double) bytesRcvd / (SIMTIME_DBL(tEndAdded - tStartAdded));
+    double throughput = 8 * (double) bytesRcvd / (tEndAdded - tStartAdded).dbl();
+    std::cout << "\nTIME: " << (tEndAdded - tStartAdded).dbl();
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
      MY_COUT << " FCT:=    " << FCT << "  \n";
      MY_COUT << " isLongFlow:=    " << isLongFlow << "\n";
 
     // don't emit the FCT of the longFlows(no need), we just observe the shortFlows
     if (isLongFlow == false) {
-          emit(fctRecordv3, FCT);
+        emit(fctRecordv3, FCT);
+        emit(goodputSigNdp, throughput);
          emit(multicastGroupIdSignal, multiCastGroupId);
          emit(multisourceGroupIdSignal, multiSrcGroupId);
          std::cout << " numRcvTrimmedHeader   sink  "   << numRcvTrimmedHeader <<  "\n";

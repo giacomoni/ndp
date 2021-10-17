@@ -399,6 +399,7 @@ void CentralSchedulerNdp::scheduleLongFlows()
         newSrcAppModule->par("numPacketsToSend").setIntValue(longFlowSize); // should be longFlowSize
         unsigned int priority = 0; // TODO
         newSrcAppModule->par("priorityValue").setIntValue(priority);
+        newSrcAppModule->par("isLongFlow").setBoolValue(true);
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------

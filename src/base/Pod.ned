@@ -35,7 +35,7 @@ module Pod
         {
             delay =1us;
 //        datarate = 100Mbps;
-      datarate = 1Gbps;
+      		datarate = 1Gbps;
         }
 
     submodules:

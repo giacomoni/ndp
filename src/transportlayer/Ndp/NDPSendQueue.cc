@@ -180,8 +180,8 @@ void NDPSendQueue::moveFrontDataQueue(unsigned int sequenceNumber) {
 
 }
 
-void NDPSendQueue::ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum){
-    EV_INFO << "\n ackArrivedFreeBuffer: " <<  packet->str() << "\n";
+void NDPSendQueue::ackArrivedFreeBuffer(unsigned int ackNum){
+    EV_INFO << "\n ackArrivedFreeBuffer: " <<  ackNum << "\n";
 //    sentDataQueue.remove(packet);
 //    delete packet;
     for(int i = 0; i <= sentDataQueue.getLength(); i++){
@@ -199,7 +199,7 @@ void NDPSendQueue::ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum){
     //printAllInfoInQueue();
 }
 
-void NDPSendQueue::nackArrivedMoveFront(Packet* packet, unsigned int nackNum){
+void NDPSendQueue::nackArrivedMoveFront(unsigned int nackNum){
     bool found = false;
     for(int i = 0; i <= sentDataQueue.getLength(); i++){
             Packet* packet = check_and_cast<Packet *>(sentDataQueue.get(i));

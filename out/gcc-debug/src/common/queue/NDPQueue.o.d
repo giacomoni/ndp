@@ -46,18 +46,19 @@
  ../../inet4/src/inet/networklayer/common/ModuleIdAddress.h \
  ../../inet4/src/inet/networklayer/common/ModulePathAddress.h \
  ../../inet4/src/inet/networklayer/contract/clns/ClnsAddress.h \
- ../../inet4/src/inet/queueing/function/PacketComparatorFunction.h \
- ../../inet4/src/inet/queueing/function/PacketDropperFunction.h \
- common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
- common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h \
- ../../inet4/src/inet/common/packet/chunk/Chunk_m.h \
+ common/queue/../../application/ndpapp/GenericAppMsgNdp_m.h \
  ../../inet4/src/inet/common/Units_m.h \
+ ../../inet4/src/inet/common/packet/chunk/Chunk_m.h \
  ../../inet4/src/inet/common/packet/chunk/BitCountChunk.h \
  ../../inet4/src/inet/common/packet/chunk/ByteCountChunk.h \
  ../../inet4/src/inet/common/packet/chunk/cPacketChunk.h \
  ../../inet4/src/inet/common/packet/chunk/SequenceChunk.h \
  ../../inet4/src/inet/common/packet/chunk/SliceChunk.h \
  ../../inet4/src/inet/common/packet/chunk/FieldsChunk.h \
+ ../../inet4/src/inet/queueing/function/PacketComparatorFunction.h \
+ ../../inet4/src/inet/queueing/function/PacketDropperFunction.h \
+ common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
+ common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h \
  ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h \
  common/queue/../../networklayer/ipv4/Ipv4HeaderNdp_m.h \
  ../../inet4/src/inet/common/TlvOptions_m.h \
@@ -171,17 +172,11 @@ common/queue/NDPQueue.h:
 
 ../../inet4/src/inet/networklayer/contract/clns/ClnsAddress.h:
 
-../../inet4/src/inet/queueing/function/PacketComparatorFunction.h:
-
-../../inet4/src/inet/queueing/function/PacketDropperFunction.h:
-
-common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
-
-common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
-
-../../inet4/src/inet/common/packet/chunk/Chunk_m.h:
+common/queue/../../application/ndpapp/GenericAppMsgNdp_m.h:
 
 ../../inet4/src/inet/common/Units_m.h:
+
+../../inet4/src/inet/common/packet/chunk/Chunk_m.h:
 
 ../../inet4/src/inet/common/packet/chunk/BitCountChunk.h:
 
@@ -194,6 +189,14 @@ common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
 ../../inet4/src/inet/common/packet/chunk/SliceChunk.h:
 
 ../../inet4/src/inet/common/packet/chunk/FieldsChunk.h:
+
+../../inet4/src/inet/queueing/function/PacketComparatorFunction.h:
+
+../../inet4/src/inet/queueing/function/PacketDropperFunction.h:
+
+common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
+
+common/queue/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
 
 ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h:
 

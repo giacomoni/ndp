@@ -187,7 +187,8 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         if (ipv4Header->getTotalLengthField() < packet->getDataLength())
             packet->setBackOffset(B(ipv4Header->getTotalLengthField()) - ipv4Header->getChunkLength());
         auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
-        auto msg = packet->removeAtFront<GenericAppMsgNdp>();
+        packet->removeAtFront<GenericAppMsgNdp>();
+        //packet->eraseAtFront<GenericAppMsgNdp>();
         if (ndpHeader != nullptr) {
             std::string name=packet->getName();
             std::string rename=header+name;
@@ -206,7 +207,10 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         packet->insertAtFront(ndpHeader);
         ipv4Header->setTotalLengthField(ipv4Header->getChunkLength() + packet->getDataLength());
+        //ipv4Header->setTotalLengthField(B(1));
         packet->insertAtFront(ipv4Header);
+        //packet->cPacket::setBitLength(8);
+        //packet->trim();
         headersQueue.insert(packet);
         headersQueueLength=headersQueue.getLength();
         //emit(packetPushedHeadersQueueSignal, packet);

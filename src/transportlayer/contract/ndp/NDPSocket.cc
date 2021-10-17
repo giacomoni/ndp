@@ -178,7 +178,6 @@ void NDPSocket::connect(L3Address  localAddress ,  L3Address remoteAddress, int 
     openCmd->setIsReceiver(isReceiver);
     openCmd->setIsLongFlow(isLongFlow);
 
-
     EV_INFO << "\n\n\nCONTROL INFO SENT";
     request->setControlInfo(openCmd);
     sendToNDP(request);

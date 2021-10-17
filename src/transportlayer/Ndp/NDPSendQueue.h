@@ -96,8 +96,8 @@ class INET_API NDPSendQueue : public cObject
 
     virtual const std::tuple<Ptr<NdpHeader>, Packet*> getNdpHeader();
 
-    virtual void ackArrivedFreeBuffer(Packet* packet, unsigned int ackNum);
-    virtual void nackArrivedMoveFront(Packet* packet, unsigned int nackNum);
+    virtual void ackArrivedFreeBuffer(unsigned int ackNum);
+    virtual void nackArrivedMoveFront(unsigned int nackNum);
 
 
     /**

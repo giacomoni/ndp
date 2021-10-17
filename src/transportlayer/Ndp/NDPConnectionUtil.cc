@@ -228,6 +228,7 @@ void NDPConnection::sendNackNdp(unsigned int nackNum) {
     ndpseg->setNackBit(true);
     ndpseg->setNackNo(nackNum);
 
+    //ndpseg->setChunkLength(B(1));
     //ndpseg->setPayloadLength(1); // ooooooooo
     ndpseg->setSynBit(false);
 

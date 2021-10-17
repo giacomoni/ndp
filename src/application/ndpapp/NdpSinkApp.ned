@@ -35,7 +35,9 @@ simple NdpSinkApp like IApp
 //       @statistic[endToEndDelay](title="end-to-end delay"; source="messageAge(rcvdPk)"; unit=s; record=histogram,vector; interpolationmode=none);
 
         //@statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughput(packetReceived)"; unit=bps; record=mean); //ResultsFilter.cc
-        @statistic[mohThroughputNDP](title="mohThroughputNDP"; source="throughputA(packetReceived)"; unit=bps; record=mean); //ResultsFilter.cc
+         @statistic[instThroughputNDP](title="instThroughputNDP"; source="throughputA(packetReceived)"; unit=bps; record=mean, vector); //ResultsFilter.cc
+         @signal[goodputSigNdp](type=double);
+         @statistic[mohThroughputNDP](title="mohThroughputNDP"; source=goodputSigNdp; unit=bps; record=last); //ResultsFilter.cc
         //TODO
     gates:
         input socketIn @labels(NDPCommand/up);

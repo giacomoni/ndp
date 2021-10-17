@@ -99,7 +99,6 @@ NDPEventCode NDPConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const 
         ndpMain->updateSockPair(this, dest, src,  ndpseg->getDestPort(), ndpseg->getSrcPort());
         event = processSegment1stThru8th(packet, ndpseg);
     }
-
     delete packet;
     return event;
 }
@@ -142,10 +141,10 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 
 
     bool isTargetReq = false;
-    if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
-        std::cout << "\nSENDER";
-        isTargetReq = true;
-    }
+    //if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
+    //    std::cout << "\nSENDER";
+    //    isTargetReq = true;
+    //}
     // (S.1)   at the sender: NACK Arrived at the sender, then prepare the trimmed pkt for retranmission
     //        (not to transmit yet just make it to be the first one to transmit upon getting a pull pkt later)
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
@@ -154,12 +153,12 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     if (fsm.getState() == NDP_S_ESTABLISHED && state->isSender == true && ndpseg->getNackBit() == true) {
 //        MY_COUT  << "  \n\n\n  ££££££££££££££££  Sender   ££££££££££££££ new  ACK arrived: ackNum = " << ndpseg->getNackNo() << std::endl;
 //        ackArrivedFreeBuffer(ndpseg->getNackNo());
-        sendQueue->nackArrivedMoveFront(packet, ndpseg->getNackNo());
+        sendQueue->nackArrivedMoveFront(ndpseg->getNackNo());
         // TODO
-        if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
-            std::cout << "\nNACK ARRIVED FOR SEQ NUM: " << ndpseg->getNackNo();
-            isTargetReq = true;
-        }
+        //if(getLocalAddr().str() == "10.0.0.177" && ndpseg->getDestPort() == 1026){
+        //    std::cout << "\nNACK ARRIVED FOR SEQ NUM: " << ndpseg->getNackNo();
+        //    isTargetReq = true;
+        //}
     }
 
     // (S.2)  at the sender:  ACK arrived, so free the acknowledged pkt from the buffer.
@@ -168,7 +167,7 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     if (fsm.getState() == NDP_S_ESTABLISHED &&  state->isSender == true && ndpseg->getAckBit() == true) {
 //        MY_COUT  << "  \n\n\n  £££££££££ Sender ££££££££ new  ACK arrived: ackNum = "  << ndpseg->getAckNo() << std::endl;
-        sendQueue->ackArrivedFreeBuffer(packet, ndpseg->getAckNo());
+        sendQueue->ackArrivedFreeBuffer(ndpseg->getAckNo());
     }
 
     // (S.3)  at the sender: PULL pkt arrived, this pkt triggers either retransmission of trimmed pkt or sending a new data pkt.
@@ -217,9 +216,9 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 //                    ndpseg->setIsLastPacketsToSend(false);
 //                    ndpseg->setDataSequenceNumber(state->sequenceNumber);
                     //Packet *fp = new Packet("Ndp");
-                    if(isTargetReq){
-                        std::cout << "\nDATA SEQ NUM " << ndpseg->getDataSequenceNumber() << " BEING SENT TO RECEIVER\n\n";
-                    }
+                    //if(isTargetReq){
+                    //    std::cout << "\nDATA SEQ NUM " << ndpseg->getDataSequenceNumber() << " BEING SENT TO RECEIVER\n\n";
+                    //}
                     sendToIP(fp, ndpseg);
                 }
                 //else{
@@ -237,27 +236,26 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
 // header arrived at the receiver==> send new request with pacing (fixed pacing: MTU/1Gbps)
-   if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
-           //std::cout <<  "\nport: " << ndpseg->getDestPort();
-           std::cout << "\nRECEIVER";
-           isTargetReq = true;
-       }
+   //if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
+   //        //std::cout <<  "\nport: " << ndpseg->getDestPort();
+   //        std::cout << "\nRECEIVER";
+   //       isTargetReq = true;
+   //    }
 
     if (fsm.getState() == NDP_S_ESTABLISHED   && ndpseg->isHeader() == true   && ndpseg->isDataPacket() == false ) { // 1 read, 2 write
 
 //        MY_COUT  << "  $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " << std::endl;
 //         MY_COUT  << " \n\n\n\n\n $$$$$$$$$$$$$$$  Receiver $$$$$$$$$$$$$$$$$  HEADER arrived.  " <<  getNDPMain()->getFullPath() << std::endl;
         sendNackNdp(ndpseg->getDataSequenceNumber());
-        if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
-            std::cout << "\nNACK BEING SENT FOR " << ndpseg->getDataSequenceNumber();
-            isTargetReq = true;
-        }
+      //  if(getRemoteAddr().str() == "10.0.0.125" && ndpseg->getDestPort() == 82){
+      //      std::cout << "\nNACK BEING SENT FOR " << ndpseg->getDataSequenceNumber();
+      //      isTargetReq = true;
+       // }
 
         if (state->isLongFlow == false) {
             ++state->numRcvTrimmedHeader;
             addRequestToPullsQueue();
         }
-
         if (state->numberReceivedPackets == 0 && state->connNotAddedYet == true) {
             getNDPMain()->requestCONNMap[getNDPMain()->connIndex] = this; // moh added
 
@@ -301,11 +299,13 @@ NDPEventCode NDPConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
           if (isLongFlowPacket == true) {
 //              std::cout << " hiii \n\n\n";
               addRequestToPullsQueue();
-              Packet *msgRx;
+              Ptr<Chunk> msgRx;
+              msgRx = packet->removeAll();
               uint32 endSeqNo;
               //msgRx = check_and_cast<Packet *>(ndpseg->removeFirstPayloadMessage(endSeqNo)); // each segment has just one packet
               //msgRx = check_and_cast<Packet *>(packet->removeAtFront(b(endSeqNo), 0));
-              msgRx->eraseAll();
+              //msgRx->eraseAll();
+              //delete packet;
               //cMessage *msgRcvd = nullptr;
               //msgRcvd = check_and_cast<cMessage *>(msgRx);
               //delete msgRcvd;
@@ -419,6 +419,7 @@ void NDPConnection::addRequestToPullsQueue(){
     const auto& ndpseg = makeShared<NdpHeader>();
     //ndppack->setByteLength(10); //maybe bit?
     //ndpseg->setPayloadLength(10);
+    //ndpseg->setHeaderLength(B(30));
 
 
     ndpseg->setIsDataPacket(false);

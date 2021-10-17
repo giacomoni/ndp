@@ -3,7 +3,7 @@ find . -name "*.vec" -type f -delete|find . -name  "*.sca"  -type f -delete| fin
 opp_run_release -u Cmdenv -m -n ../..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials:../../../../inet4/showcases -l ../../../src/ndp ../exp1-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
 
 echo "Throughput"
-scavetool export -T s -f "module(**.app[*]) AND ("mohThroughputNDP:mean")"   -F CSV-S -o instThroughput.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("mohThroughputNDP:last")"   -F CSV-S -o instThroughput.csv *.sca
 echo "   "
 scavetool export -T s -f "module(**.app[*]) AND ("multicastGroupIdSignal:last")"   -F CSV-S -o multicastgroups.csv *.sca
 scavetool export -T s -f "module(**.app[*]) AND ("multisourceGroupIdSignal:last")"   -F CSV-S -o multisourcegroups.csv *.sca
@@ -15,7 +15,7 @@ echo "   "
 echo "header"
 scavetool export -T s -f "module(**.app[*]) AND ("numRcvTrimmedHeaderSigNdp:last")"   -F CSV-S -o numRcvHeader.csv *.sca
 echo "   "
- cat numRcvHeader.csv | cut -d, -f11  | sed "1 d" > MatNumRcvHeader.csv
+ cat numRcvHeader.csv | cut -d, -f7  | sed "1 d" > MatNumRcvHeader.csv
 echo "num trimmed packets"
 scavetool export -T s -f 'module(*.CoreRouter[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktCore.csv *.sca
 scavetool export -T s -f 'module(*.aggRouters[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktAgg.csv *.sca
