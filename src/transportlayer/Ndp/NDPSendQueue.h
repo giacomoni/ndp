@@ -112,23 +112,6 @@ class INET_API NDPSendQueue : public cObject
 
 //    void removeFromDataQueueToSentQueue(Chunk::Iterator iter);
     void moveFrontDataQueue(unsigned int sequenceNumber);
-
-    /**
-     * Called when the NDP wants to send or retransmit data, it constructs
-     * a NDP segment which contains the data from the requested sequence
-     * number range. The actually returned segment may contain less than
-     * maxNumBytes bytes if the subclass wants to reproduce the original
-     * segment boundaries when retransmitting.
-     */
-    //virtual Packet *createSegmentWithBytes(uint32 fromSeq, ulong numBytes);
-
-    /**
-     * Tells the queue that bytes up to (but NOT including) seqNum have been
-     * transmitted and ACKed, so they can be removed from the queue.
-     */
-    //virtual void discardUpTo(uint32 seqNum);
-
-//    virtual void removeFromDataQueueToSentQueue(std::list<Chunk>::iterator iter);
 };
 
 } // namespace raptoNDP

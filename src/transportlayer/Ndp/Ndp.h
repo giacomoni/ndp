@@ -156,12 +156,6 @@ class INET_API Ndp : public TransportProtocolBase
     virtual void updateSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
 
     /**
-     * Update conn's socket pair, and register newConn (which'll keep LISTENing).
-     * Also, conn will get a new socketId (and newConn will live on with its old socketId).
-     */
-    virtual void addForkedConnection(NDPConnection *conn, NDPConnection *newConn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
-
-    /**
      * To be called from NDPConnection: reserves an ephemeral port for the connection.
      */
     virtual ushort getEphemeralPort();

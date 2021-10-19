@@ -62,30 +62,6 @@ void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
         socket.destroy();
 }
 
-void NdpBasicClientApp::sendWriteRequest() {
-
-    long requestLength = par("requestLength");
-    long replyLength = par("replyLength");
-
-    if (requestLength < 1)
-        requestLength = 1;
-    if (replyLength < 1)
-        replyLength = 1;
-
-    char msgname[16];
-//    sprintf(msgname, "REQUEST-%d",++requestIndex);
-    sprintf(msgname, "REQUEST-WRITE-INIT");
-
-    const auto& payload = makeShared<GenericAppMsgNdp>();
-    Packet *packet = new Packet("REQUEST-WRITE-INIT");
-    payload->setChunkLength(B(requestLength));
-    //payload->setExpectedReplyLength(B(replyLength));
-    payload->setServerClose(false);
-    payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
-    packet->insertAtBack(payload);
-    sendPacket(packet);
-}
-
 void NdpBasicClientApp::handleTimer(cMessage *msg) {
     /////// Added MOH send requests based on a timer
     switch (msg->getKind()) {
@@ -105,8 +81,6 @@ void NdpBasicClientApp::handleTimer(cMessage *msg) {
 
 void NdpBasicClientApp::socketEstablished(NDPSocket *socket) {
     NdpAppBase::socketEstablished(socket);
-//    sendData();
-//      if (opcode == 2)  sendWriteRequest();   // 1 read, 2 write
 }
 
 void NdpBasicClientApp::rescheduleOrDeleteTimer(simtime_t d,
@@ -122,20 +96,6 @@ void NdpBasicClientApp::rescheduleOrDeleteTimer(simtime_t d,
         timeoutMsg = nullptr;
     }
 }
-
-void NdpBasicClientApp::socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) {
-//    if (msg->getKind() == NDP_I_DATA) {
-//        std::cout << "reply arrived to the client  " << std::endl;
-//        packetsRcvd++;
-//        cPacket *pk = PK(msg);
-//        long packetLength = pk->getByteLength();
-//        bytesRcvd += packetLength;
-//        emit(rcvdSymbolSignal, pk);
-//         std::cout << "NdpBasicClientApp::socketDataArrived , packetsRcvd  " << packetsRcvd << std::endl;
-////        delete msg;
-//    }
-
- }
 
 void NdpBasicClientApp::close()
 {

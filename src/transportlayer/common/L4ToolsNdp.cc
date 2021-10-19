@@ -14,7 +14,7 @@
 // 
 
 #include "inet/transportlayer/common/L4Tools.h"
-#include "../../common/ProtocolNdp.h"
+#include "inet/common/Protocol.h"
 #ifdef WITH_TCP_COMMON
 #include "inet/transportlayer/tcp_common/TcpHeader.h"
 #include "../Ndp/ndp_common/NdpHeader.h"
@@ -37,7 +37,7 @@ bool isTransportProtocol(const Protocol& protocol)
     return
             (protocol == Protocol::tcp)
             || (protocol == Protocol::udp)
-            || (protocol == ProtocolNdp::ndp)
+            || (protocol == Protocol::ndp)
             // TODO: add other L4 protocols
             ;
 }
@@ -52,7 +52,7 @@ const Ptr<const TransportHeaderBase> peekTransportProtocolHeader(Packet *packet,
     if (protocol == Protocol::udp)
         return packet->peekAtFront<UdpHeader>(b(-1), flags);
 #endif
-    if (protocol == ProtocolNdp::ndp)
+    if (protocol == Protocol::ndp)
         return packet->peekAtFront<ndp::NdpHeader>(b(-1), flags);
     // TODO: add other L4 protocols
     if (flags & Chunk::PF_ALLOW_NULLPTR)
@@ -71,7 +71,7 @@ const Ptr<TransportHeaderBase> removeTransportProtocolHeader(Packet *packet, con
     if (protocol == Protocol::udp)
         return removeTransportProtocolHeader<UdpHeader>(packet);
 #endif
-    if (protocol == ProtocolNdp::ndp)
+    if (protocol == Protocol::ndp)
         return removeTransportProtocolHeader<ndp::NdpHeader>(packet);
     // TODO: add other L4 protocols
     throw cRuntimeError("Unknown protocolTEST7: %s", protocol.getName());

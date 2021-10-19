@@ -48,36 +48,11 @@ class INET_API DumbNDP : public NDPAlgorithm
 
     virtual void initialize() override;
 
-    virtual void established(bool active) override;
-
     virtual void connectionClosed() override;
 
     virtual void processTimer(cMessage *timer, NDPEventCode& event) override;
 
-    virtual void sendCommandInvoked(cMessage *msg) override;
-
-    virtual void receivedOutOfOrderSegment() override;
-
-    virtual void receiveSeqChanged() override;
-
-    virtual void receivedDataAck(uint32 firstSeqAcked) override;
-
-    virtual void receivedDuplicateAck() override;
-
-    virtual void receivedAckForDataNotYetSent(uint32 seq) override;
-
-    virtual void ackSent() override;
-
     virtual void dataSent(uint32 fromseq) override;
-
-    virtual void segmentRetransmitted(uint32 fromseq, uint32 toseq) override;
-
-    virtual void restartRexmitTimer() override;
-    virtual void cancelRexmitTimer() override;
-
-
-
-    virtual void rttMeasurementCompleteUsingTS(uint32 echoedTS) override;
 };
 
 } // namespace NDP

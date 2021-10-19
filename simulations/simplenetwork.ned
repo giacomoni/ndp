@@ -31,7 +31,7 @@ network simplenetwork
         client2: StandardHostNdp {
             @display("p=50,312");
         }
-        configurator: Ipv4NetworkConfigurator {
+        configurator: Ipv4NetworkConfiguratorEcmp {
             @display("p=295,91");
         }
         server: StandardHostNdp {

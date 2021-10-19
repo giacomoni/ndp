@@ -84,15 +84,6 @@ class INET_API NDPAlgorithm : public cObject
     virtual void initialize() {}
 
     /**
-     * Called when the connection is going to ESTABLISHED from SYN_SENT or
-     * SYN_RCVD. This is a place to initialize some variables (e.g. set
-     * cwnd to the MSS learned during connection setup). If we are on the
-     * active side, here we also have to finish the 3-way connection setup
-     * procedure by sending an ACK, possibly piggybacked on data.
-     */
-    virtual void established(bool active) = 0;
-
-    /**
      * Called when the connection closes, it should cancel all running timers.
      */
     virtual void connectionClosed() = 0;
@@ -109,84 +100,12 @@ class INET_API NDPAlgorithm : public cObject
     virtual void processTimer(cMessage *timer, NDPEventCode& event) = 0;
 
     /**
-     * Called after user sent NDP_C_SEND command to us.
-     */
-    virtual void sendCommandInvoked(cMessage *msg) = 0;
-
-    /**
-     * Called after receiving data which are in the window, but not at its
-     * left edge (seq != rcv_nxt). This indicates that either segments got
-     * re-ordered in the way, or one segment was lost. RFC 1122 and RFC 2001
-     * recommend sending an immediate ACK here (Fast Retransmit relies on
-     * that).
-     */
-    virtual void receivedOutOfOrderSegment() = 0;
-
-    /**
-     * Called after rcv_nxt got advanced, either because we received in-sequence
-     * data ("text" in RFC 793 lingo) or a FIN. At this point, rcv_nxt has
-     * already been updated. This method should take care to send or schedule
-     * an ACK some time.
-     */
-    virtual void receiveSeqChanged() = 0;
-
-    /**
-     * Called after we received an ACK which acked some data (that is,
-     * we could advance snd_una). At this point the state variables
-     * (snd_una, snd_wnd) have already been updated. The argument firstSeqAcked
-     * is the previous snd_una value, that is, the number of bytes acked is
-     * (snd_una - firstSeqAcked). The dupack counter still reflects the old value
-     * (needed for Reno and NewReno); it'll be reset to 0 after this call returns.
-     */
-    virtual void receivedDataAck(uint32 firstSeqAcked) = 0;
-
-    /**
-     * Called after we received a duplicate ACK (that is: ackNo == snd_una,
-     * no data in segment, segment doesn't carry window update, and also,
-     * we have unacked data). The dupack counter got already updated
-     * when calling this method (i.e. dupacks == 1 on first duplicate ACK.)
-     */
-    virtual void receivedDuplicateAck() = 0;
-
-    /**
-     * Called after we received an ACK for data not yet sent.
-     * According to RFC 793 this function should send an ACK.
-     */
-    virtual void receivedAckForDataNotYetSent(uint32 seq) = 0;
-
-    /**
-     * Called after we sent an ACK. This hook can be used to cancel
-     * the delayed-ACK timer.
-     */
-    virtual void ackSent() = 0;
-
-    /**
      * Called after we sent data. This hook can be used to schedule the
      * retransmission timer, to start round-trip time measurement, etc.
      * The argument is the seqno of the first byte sent.
      */
     virtual void dataSent(uint32 fromseq) = 0;
 
-    /**
-     * Called after we retransmitted segment.
-     * The argument fromseq is the seqno of the first byte sent.
-     * The argument toseq is the seqno of the last byte sent+1.
-     */
-    virtual void segmentRetransmitted(uint32 fromseq, uint32 toseq) = 0;
-
-    /**
-     * Restart REXMIT timer.
-     */
-    virtual void restartRexmitTimer() = 0;
-
-    // added MOH
-     virtual void cancelRexmitTimer() = 0;
-
-    /**
-     * Converting uint32 echoedTS to simtime_t and calling rttMeasurementComplete()
-     * to update state vars with new measured RTT value.
-     */
-    virtual void rttMeasurementCompleteUsingTS(uint32 echoedTS) = 0;
 };
 
 } // namespace NDP

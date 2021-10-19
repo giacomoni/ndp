@@ -25,34 +25,30 @@ namespace ndp {
 Register_Class(NDPReceiveQueue);
 
 NDPReceiveQueue::NDPReceiveQueue() :
-    rcv_nxt(-1)
-{
+        rcv_nxt(-1) {
 }
 
-NDPReceiveQueue::~NDPReceiveQueue()
-{
+NDPReceiveQueue::~NDPReceiveQueue() {
 }
 
-void NDPReceiveQueue::init(uint32 startSeq)
-{
+void NDPReceiveQueue::init(uint32 startSeq) {
     rcv_nxt = startSeq;
 
     reorderBuffer.clear();
     reorderBuffer.setExpectedOffset(B(startSeq));
 }
 
-std::string NDPReceiveQueue::str() const
-{
+std::string NDPReceiveQueue::str() const {
     std::ostringstream buf;
     buf << "rcv_nxt=" << rcv_nxt;
 
     for (int i = 0; i < reorderBuffer.getNumRegions(); i++) {
-        buf << " [" << offsetToSeq(reorderBuffer.getRegionStartOffset(i)) << ".." << offsetToSeq(reorderBuffer.getRegionEndOffset(i)) << ")";
+        buf << " [" << offsetToSeq(reorderBuffer.getRegionStartOffset(i))
+                << ".." << offsetToSeq(reorderBuffer.getRegionEndOffset(i))
+                << ")";
     }
     return buf.str();
 }
-
-
 
 } // namespace tcp
 

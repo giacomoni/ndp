@@ -28,7 +28,7 @@
 #include "inet/networklayer/common/EcnTag_m.h"
 #include "inet/networklayer/common/IpProtocolId_m.h"
 #include "inet/networklayer/common/L3AddressTag_m.h"
-#include "../../common/ProtocolNdp.h"
+#include "inet/common/Protocol.h"
 #ifdef WITH_IPv4
 #include "inet/networklayer/ipv4/IcmpHeader_m.h"
 #endif // ifdef WITH_IPv4
@@ -46,7 +46,6 @@
 #include "NDPReceiveQueue.h"
 #include "NDPSendQueue.h"
 #include "ndp_common/NdpHeader.h"
-#include "../../networklayer/ipv4/Ipv4HeaderNdp_m.h"
 namespace inet {
 namespace ndp {
 
@@ -71,10 +70,6 @@ void Ndp::initialize(int stage)
 
         lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
 
-        requestTimerStamps.setName("requestTimerStamps");
-        msl = par("msl");
-        useDataNotification = par("useDataNotification");
-
         WATCH(lastEphemeralPort);
         WATCH_PTRMAP(ndpConnMap);
         WATCH_PTRMAP(ndpAppConnMap);
@@ -83,8 +78,8 @@ void Ndp::initialize(int stage)
         requestTimerMsg = new cMessage("requestTimerMsg");
         requestTimerMsg->setContextPointer(this);
 
-        registerService(ProtocolNdp::ndp, gate("appIn"), gate("ipIn"));
-        registerProtocol(ProtocolNdp::ndp, gate("ipOut"), gate("appOut"));
+        registerService(Protocol::ndp, gate("appIn"), gate("ipIn"));
+        registerProtocol(Protocol::ndp, gate("ipOut"), gate("appOut"));
     }
 }
 
@@ -149,18 +144,8 @@ void Ndp::handleLowerPacket(Packet *packet)
     EV_INFO << "\n\n\n\nLOWER PACKET DETAILS: " << packet->str() << std::endl;
     // must be a NdpHeader
     auto protocol = packet->getTag<PacketProtocolTag>()->getProtocol();
-    if (protocol == &ProtocolNdp::ndp) {
+    if (protocol == &Protocol::ndp) {
         auto ndpHeader = packet->peekAtFront<NdpHeader>();
-        //TODO Packet does not appear to have NdpHeader at front?
-        //auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
-        //auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
-        //inet::Ptr<NdpHeader> header = makeShared<NdpHeader>();
-        //header->copy(ndpHeader);
-        //header->setPriorityValue(10);   //FIX THIS
-        //ndpHeader->setPriorityValue(10);
-        // get src/dest addresses
-        //packet->insertAtFront(ndpHeader);
-        //packet->insertAtFront(ipv4Header);
         L3Address srcAddr, destAddr;
         srcAddr = packet->getTag<L3AddressInd>()->getSrcAddress();
         destAddr = packet->getTag<L3AddressInd>()->getDestAddress();
@@ -299,15 +284,6 @@ ushort Ndp::getEphemeralPort()
 
     // found a free one, return it
     return lastEphemeralPort;
-}
-
-void Ndp::addForkedConnection(NDPConnection *conn, NDPConnection *newConn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort)
-{
-    // update conn's socket pair, and register newConn
-    addSockPair(newConn, localAddr, remoteAddr, localPort, remotePort);
-
-    // newConn will live on with the new socketId
-    ndpAppConnMap[newConn->socketId] = newConn;
 }
 
 void Ndp::addSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort)
@@ -454,10 +430,6 @@ void Ndp::refreshDisplay() const {
 
         case NDP_S_CLOSE_WAIT:
             numCLOSE_WAIT++;
-            break;
-
-        case NDP_S_LAST_ACK:
-            numLAST_ACK++;
             break;
 
         case NDP_S_FIN_WAIT_1:

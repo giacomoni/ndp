@@ -21,54 +21,6 @@ namespace inet {
 
 namespace ndp {
 
-Register_Class(Sack);
-
-bool Sack::empty() const
-{
-    return start == 0 && end == 0;
-}
-
-bool Sack::contains(const Sack& other) const
-{
-    return seqLE(start, other.start) && seqLE(other.end, end);
-}
-
-void Sack::clear()
-{
-    start = end = 0;
-}
-
-void Sack::setSegment(unsigned int start_par, unsigned int end_par)
-{
-    setStart(start_par);
-    setEnd(end_par);
-}
-
-std::string Sack::str() const
-{
-    std::stringstream out;
-
-    out << "[" << start << ".." << end << ")";
-    return out.str();
-}
-
-B NdpHeader::getHeaderOptionArrayLength()
-{
-    unsigned short usedLength = 0;
-
-    for (uint i = 0; i < getHeaderOptionArraySize(); i++)
-        usedLength += getHeaderOption(i)->getLength();
-
-    return B(usedLength);
-}
-
-void NdpHeader::dropHeaderOptions()
-{
-    setHeaderOptionArraySize(0);
-    setHeaderLength(NDP_MIN_HEADER_LENGTH);
-    setChunkLength(NDP_MIN_HEADER_LENGTH);
-}
-
 std::string NdpHeader::str() const
 {
     std::ostringstream stream;
@@ -78,10 +30,6 @@ std::string NdpHeader::str() const
     static const char *flagEnd = "]";
     stream << getSrcPort() << "->" << getDestPort();
     const char *separ = flagStart;
-    if (getUrgBit()) {
-        stream << separ << "Urg=" << getUrgentPointer();
-        separ = flagSepar;
-    }
     if (getSynBit()) {
         stream << separ << "Syn";
         separ = flagSepar;
@@ -90,23 +38,14 @@ std::string NdpHeader::str() const
         stream << separ << "Ack=" << getAckNo();
         separ = flagSepar;
     }
-    if (getPshBit()) {
-        stream << separ << "Psh";
-        separ = flagSepar;
-    }
     if (getRstBit()) {
         stream << separ << "Rst";
-        separ = flagSepar;
-    }
-    if (getFinBit()) {
-        stream << separ << "Fin";
         separ = flagSepar;
     }
     if (separ == flagSepar)
         stream << flagEnd;
 
     stream << " Seq=" << getDataSequenceNumber()
-           << " Win=" << getWindow()
            << ", length = " << getChunkLength();
 
     //TODO show NDP Options

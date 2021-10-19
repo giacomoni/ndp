@@ -16,7 +16,6 @@ namespace ndp {
 
 class NdpHeader;
 class NDPSendQueue;
-//class NDPSACKRexmitQueue;
 class NDPReceiveQueue;
 class NDPAlgorithm;
 
@@ -89,11 +88,7 @@ enum NDPEventCode {
 
 #define MAX_SYN_REXMIT_COUNT          12  // will only be used with SYN+ACK: with SYN CONN_ESTAB occurs sooner
 #define NDP_MAX_WIN                   65535  // 65535 bytes, largest value (16 bit) for (unscaled) window size
- #define DUPTHRESH                     3  // used for NDPTahoe, NDPReno and SACK (RFC 3517)
-//#define MAX_SACK_BLOCKS               60  // will only be used with SACK
-#define NDP_OPTIONS_MAX_SIZE          40  // 40 bytes, 15 * 4 bytes (15 is the largest number in 4 bits length data offset field), NDP_MAX_HEADER_OCTETS - NDP_HEADER_OCTETS = 40
-//#define NDP_OPTION_SACK_MIN_SIZE      10  // 10 bytes, option length = 8 * n + 2 bytes (NOP)
-#define NDP_OPTION_TS_SIZE            12  // 12 bytes, option length = 10 bytes + 2 bytes (NOP)
+#define DUPTHRESH                     3  // used for NDPTahoe, NDPReno and SACK (RFC 3517)
 #define PAWS_IDLE_TIME_THRESH         (24 * 24 * 3600)  // 24 days in seconds (RFC 1323)
 
 //typedef std::list<Sack> SackList;
@@ -119,7 +114,6 @@ public:
 
 public:
     bool active;    // set if the connection was initiated by an active open
-    //bool fork;
 
     unsigned int request_id;
     unsigned int internal_request_id;
@@ -128,18 +122,14 @@ public:
 
     uint32 IW;  //initial window size
     bool connFinished;
-//    unsigned int  sequenceNumber;
-
     uint32 numPacketsToGet;
     uint32 numPacketsToSend;
-     bool isSender;
-     bool isReceiver;
-    unsigned int  priorityValue;
-
+    bool isSender;
+    bool isReceiver;
+    unsigned int priorityValue;
 
     unsigned int numRcvdPkt;
     unsigned int numRcvTrimmedHeader;
-
 
     uint32 numberReceivedPackets;
     uint32 numberSentPackets;
@@ -157,10 +147,8 @@ public:
 
                     // send sequence number variables (see RFC 793, "3.2. Terminology")
 
-
     uint32 iss;    // initial sequence number (ISS)
     uint32 irs;        // initial receive sequence number
-
 
     // SYN, SYN+ACK retransmission variables (handled separately
     // because normal rexmit belongs to NDPAlgorithm)
@@ -168,13 +156,12 @@ public:
     simtime_t syn_rexmit_timeout;  // current SYN/SYN+ACK retransmission timeout
 };
 
-
-class INET_API NDPConnection : public cSimpleModule{
+class INET_API NDPConnection: public cSimpleModule {
 public:
 
     struct PacketsToSend {
         unsigned int pktId;
-        Packet* msg;
+        Packet *msg;
     };
     typedef std::list<PacketsToSend> PacketsList;
 //    PacketsList sentPacketsList;
@@ -182,17 +169,28 @@ public:
 
     // connection identification by apps: socketId
     int socketId = -1;    // identifies connection within the app
-    int getSocketId() const { return socketId; }
-    void setSocketId(int newSocketId) { ASSERT(socketId == -1); socketId = newSocketId; }
+    int getSocketId() const {
+        return socketId;
+    }
+    void setSocketId(int newSocketId) {
+        ASSERT(socketId == -1);
+        socketId = newSocketId;
+    }
 
-    int listeningSocketId = -1;    // identifies listening connection within the app
-    int getListeningSocketId() const { return listeningSocketId; }
+    int listeningSocketId = -1; // identifies listening connection within the app
+    int getListeningSocketId() const {
+        return listeningSocketId;
+    }
 
     // socket pair
     L3Address localAddr;
-    const L3Address& getLocalAddr() const { return localAddr; }
+    const L3Address& getLocalAddr() const {
+        return localAddr;
+    }
     L3Address remoteAddr;
-    const L3Address& getRemoteAddr() const { return remoteAddr; }
+    const L3Address& getRemoteAddr() const {
+        return remoteAddr;
+    }
     int localPort = -1;
     int remotePort = -1;
 
@@ -210,23 +208,28 @@ protected:
 
     // NDP queues
     NDPSendQueue *sendQueue = nullptr;
-    NDPSendQueue *getSendQueue() const { return sendQueue; }
+    NDPSendQueue* getSendQueue() const {
+        return sendQueue;
+    }
     NDPReceiveQueue *receiveQueue = nullptr;
-    NDPReceiveQueue *getReceiveQueue() const { return receiveQueue; }
-
+    NDPReceiveQueue* getReceiveQueue() const {
+        return receiveQueue;
+    }
 
 public:
     // NDPSACKRexmitQueue *rexmitQueue = nullptr;
     virtual int getNumRcvdPackets();
-    virtual bool  isConnFinished();
-    virtual void  setConnFinished() ;
+    virtual bool isConnFinished();
+    virtual void setConnFinished();
 
 protected:
     //cQueue pullQueue;
     cPacketQueue pullQueue;
     // NDP behavior in data transfer state
     NDPAlgorithm *ndpAlgorithm = nullptr;
-    NDPAlgorithm *getNdpAlgorithm() const { return ndpAlgorithm; }
+    NDPAlgorithm* getNdpAlgorithm() const {
+        return ndpAlgorithm;
+    }
     // timers
     cMessage *requestInternalTimer = nullptr;
 
@@ -237,41 +240,35 @@ protected:
 
     // statistics
 
-
 protected:
     /** @name FSM transitions: analysing events and executing state transitions */
     //@{
     /** Maps app command codes (msg kind of app command msgs) to NDP_E_xxx event codes */
     virtual NDPEventCode preanalyseAppCommandEvent(int commandCode);
     /** Implemements the pure NDP state machine */
-    virtual bool performStateTransition(const NDPEventCode& event);
+    virtual bool performStateTransition(const NDPEventCode &event);
     /** Perform cleanup necessary when entering a new state, e.g. cancelling timers */
     virtual void stateEntered(int state, int oldState, NDPEventCode event);
     //@}
 
     /** @name Processing app commands. Invoked from processAppCommand(). */
     //@{
-    virtual void process_OPEN_ACTIVE(NDPEventCode& event, NDPCommand *NDPCommand, cMessage *msg);
-    virtual void process_OPEN_PASSIVE(NDPEventCode& event, NDPCommand *NDPCommand,  cMessage *msg);
+    virtual void process_OPEN_ACTIVE(NDPEventCode &event,
+            NDPCommand *NDPCommand, cMessage *msg);
+    virtual void process_OPEN_PASSIVE(NDPEventCode &event,
+            NDPCommand *NDPCommand, cMessage *msg);
 
-    virtual void process_OPTIONS(NDPEventCode& event, NDPCommand *ndpCommand, cMessage *msg);
     /**
      * Process incoming NDP segment. Returns a specific event code (e.g. NDP_E_RCV_SYN)
      * which will drive the state machine.
      */
-    virtual NDPEventCode process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
-    virtual NDPEventCode processSegmentInListen(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual NDPEventCode process_RCV_SEGMENT(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
+    virtual NDPEventCode processSegmentInListen(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
 
-
-
-    virtual NDPEventCode processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader>& ndpseg);
-
-    //@}
-
-    /** @name Processing of NDP options. Invoked from readHeaderOptions(). Return value indicates whether the option was valid. */
-    //@{
-    virtual bool processMSSOption(const Ptr<const NdpHeader>& ndpseg, const NdpOptionMaxSegmentSize& option);
-
+    virtual NDPEventCode processSegment1stThru8th(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg);
 
     //@}
 
@@ -280,16 +277,11 @@ protected:
     virtual void process_TIMEOUT_2MSL();
     virtual void process_TIMEOUT_CONN_ESTAB();
     virtual void process_TIMEOUT_FIN_WAIT_2();
-     //@}
-
-   // MOH
-    virtual void process_TIMEOUT_REQUEST_REXMIT();
+    //@}
 
     /** Utility: clone a listening connection. Used for forking. */
     //virtual NDPConnection *cloneListeningConnection();
-
     //virtual void initClonedConnection(NDPConnection *listenerConn);
-
     /** Utility: creates send/receive queues and NDPAlgorithm */
     virtual void initConnection(NDPOpenCommand *openCmd);
 
@@ -299,48 +291,15 @@ protected:
     /** Utility: generates ISS and initializes corresponding state variables */
     virtual void selectInitialSeqNum();
 
-
-
-    /** Utility: readHeaderOptions (Currently only EOL, NOP, MSS, WS, SACK_PERMITTED, SACK and TS are implemented) */
-    virtual void readHeaderOptions(const Ptr<const NdpHeader>& ndpseg);
-    /** Utility: writeHeaderOptions (Currently only EOL, NOP, MSS, WS, SACK_PERMITTED, SACK and TS are implemented) */
-    virtual NdpHeader writeHeaderOptions(const Ptr<NdpHeader>& ndpseg);
-
-    virtual uint32 getTSval(const Ptr<const NdpHeader>& ndpseg) const;
-
-    /** Utility: get TSecr from segments TS header option */
-    virtual uint32 getTSecr(const Ptr<const NdpHeader>& ndpseg) const;
-
     /** Utility: returns true if the connection is not yet accepted by the application */
-    virtual bool isToBeAccepted() const { return listeningSocketId != -1; }
+    virtual bool isToBeAccepted() const {
+        return listeningSocketId != -1;
+    }
 public:
-
-
-    virtual void sendRequest();// MOH: HAS BEEN ADDED
-    virtual void sendRequestSegment();// MOH: HAS BEEN ADDED
     virtual void sendAckNdp(unsigned int AckNum); // MOH: HAS BEEN ADDED
 
     virtual void sendNackNdp(unsigned int nackNum); // MOH: HAS BEEN ADDED
-
-
-    virtual void ackArrivedFreeBuffer(Packet* packet, unsigned int acknum); // MOH: HAS BEEN ADDED
-    virtual void getBufferedPkt(unsigned int seqNum , std::list<PacketsToSend>::iterator& iter );
-    virtual void getFirstBufferedPkt(std::list<PacketsToSend>::iterator& iter );
-
-
-    virtual void generatePacketsList();
     virtual void sendInitialWindow();
-
-    virtual void addNewPacketToSend();
-     /**
-     * Utility: Send data from sendQueue, at most congestionWindow.
-     * If fullSegmentsOnly is set, don't send segments smaller than SMSS (needed for Nagle).
-     * Returns true if some data was actually sent.
-     */
-    virtual bool sendData(bool fullSegmentsOnly, uint32 congestionWindow,  bool isReader ,bool isWriter   , unsigned int opcode );
-
-
-
 
     /** Utility: sends RST; does not use connection state */
     virtual void sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort,
@@ -349,15 +308,10 @@ public:
     virtual void sendRstAck(uint32 seq, uint32 ack, L3Address src,
             L3Address dest, int srcPort, int destPort);
 
-
-
-
     /** Utility: adds control info to segment and sends it to IP */
-    virtual void sendToIP(Packet *packet, const Ptr<NdpHeader>& ndpseg);
-
-    virtual void startRequestRexmitTimer(); // MOH
-    virtual void  addRequestToPullsQueue();
-    virtual void  sendRequestFromPullsQueue();
+    virtual void sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg);
+    virtual void addRequestToPullsQueue();
+    virtual void sendRequestFromPullsQueue();
 
     virtual int getPullsQueueLength();
     /** Utility: signal to user that connection timed out */
@@ -370,12 +324,13 @@ public:
 
 protected:
     /** Utility: cancel a timer */
-    cMessage *cancelEvent(cMessage *msg) {
+    cMessage* cancelEvent(cMessage *msg) {
         return ndpMain->cancelEvent(msg);
     }
 
     /** Utility: send IP packet */
-    virtual void sendToIP(Packet *pkt, const Ptr<NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual void sendToIP(Packet *pkt, const Ptr<NdpHeader> &ndpseg,
+            L3Address src, L3Address dest);
 
     /** Utility: sends packet to application */
     virtual void sendToApp(cMessage *msg);
@@ -383,33 +338,29 @@ protected:
     /** Utility: sends status indication (NDP_I_xxx) to application */
     virtual void sendIndicationToApp(int code, const int id = 0);
 
-    /** Utility: sends NDP_I_AVAILABLE indication with NDPAvailableInfo to application */
-    //virtual void sendAvailableIndicationToApp();
-
     /** Utility: sends NDP_I_ESTABLISHED indication with NDPConnectInfo to application */
     virtual void sendEstabIndicationToApp();
-
 
 public:
     /** Utility: prints local/remote addr/port and app gate index/connId */
     virtual void printConnBrief() const;
     /** Utility: prints important header fields */
-    static void printSegmentBrief(Packet *packet, const Ptr<const NdpHeader>& ndpseg);
+    static void printSegmentBrief(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg);
     /** Utility: returns name of NDP_S_xxx constants */
-    static const char *stateName(int state);
+    static const char* stateName(int state);
     /** Utility: returns name of NDP_E_xxx constants */
-    static const char *eventName(int event);
+    static const char* eventName(int event);
     /** Utility: returns name of NDP_I_xxx constants */
-    static const char *indicationName(int code);
-    /** Utility: returns name of NDPOPTION_xxx constants */
-    static const char *optionName(int option);
-
-
+    static const char* indicationName(int code);
 
 public:
-    NDPConnection() {}
-    NDPConnection(const NDPConnection& other) {}    //FIXME kludge
-    void initialize() {}
+    NDPConnection() {
+    }
+    NDPConnection(const NDPConnection &other) {
+    }    //FIXME kludge
+    void initialize() {
+    }
 
     /**
      * The "normal" constructor.
@@ -421,44 +372,54 @@ public:
      */
     virtual ~NDPConnection();
 
-    int getLocalPort() const { return localPort; }
-        L3Address getLocalAddress() const { return localAddr; }
+    int getLocalPort() const {
+        return localPort;
+    }
+    L3Address getLocalAddress() const {
+        return localAddr;
+    }
 
-    int getRemotePort() const { return remotePort; }
-    L3Address getRemoteAddress() const { return remoteAddr; }
+    int getRemotePort() const {
+        return remotePort;
+    }
+    L3Address getRemoteAddress() const {
+        return remoteAddr;
+    }
 
-    virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual void segmentArrivalWhileClosed(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
 
     /** @name Various getters **/
     //@{
     int getFsmState() const {
         return fsm.getState();
     }
-    NdpStateVariables *getState() {
+    NdpStateVariables* getState() {
         return state;
     }
-    NDPSendQueue *getSendQueue() {
+    NDPSendQueue* getSendQueue() {
         return sendQueue;
     }
     // NDPSACKRexmitQueue *getRexmitQueue() { return rexmitQueue; }
-    NDPReceiveQueue *getReceiveQueue() {
+    NDPReceiveQueue* getReceiveQueue() {
         return receiveQueue;
     }
-    NDPAlgorithm *getNdpAlgorithm() {
+    NDPAlgorithm* getNdpAlgorithm() {
         return ndpAlgorithm;
     }
-    Ndp *getNDPMain() {
+    Ndp* getNDPMain() {
         return ndpMain;
     }
 
     virtual bool processTimer(cMessage *msg);
 
-    virtual bool processNDPSegment(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr);
+    virtual bool processNDPSegment(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr,
+            L3Address destAddr);
 
     virtual bool processAppCommand(cMessage *msg);
 
     virtual void handleMessage(cMessage *msg);
-
 
     /**
      * Utility: converts a given simtime to a timestamp (TS).

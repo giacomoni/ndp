@@ -1,4 +1,3 @@
-
 #ifndef __NDP_NDPSocket_H
 #define __NDP_NDPSocket_H
 
@@ -14,9 +13,8 @@ namespace inet {
 
 class NDPStatusInfo;
 
-class INET_API NDPSocket : public ISocket
-{
-  public:
+class INET_API NDPSocket: public ISocket {
+public:
     /**
      * Abstract base class for your callback objects. See setCallbackObject()
      * and processMessage() for more info.
@@ -25,38 +23,51 @@ class INET_API NDPSocket : public ISocket
      * classes may have both this class and cSimpleModule as base class,
      * and cSimpleModule is already a cObject.
      */
-    class INET_API ICallback
-    {
-      public:
-        virtual ~ICallback() {}
+    class INET_API ICallback {
+    public:
+        virtual ~ICallback() {
+        }
         /**
          * Notifies about data arrival, packet ownership is transferred to the callee.
          */
-        virtual void socketDataArrived(NDPSocket *socket, Packet *packet, bool urgent) = 0;
-        virtual void socketAvailable(NDPSocket *socket, NDPAvailableInfo *availableInfo) = 0;
+        virtual void socketDataArrived(NDPSocket *socket, Packet *packet,
+                bool urgent) = 0;
+        virtual void socketAvailable(NDPSocket *socket,
+                NDPAvailableInfo *availableInfo) = 0;
         virtual void socketEstablished(NDPSocket *socket) = 0;
         virtual void socketPeerClosed(NDPSocket *socket) = 0;
         virtual void socketClosed(NDPSocket *socket) = 0;
         virtual void socketFailure(NDPSocket *socket, int code) = 0;
-        virtual void socketStatusArrived(NDPSocket *socket,NDPStatusInfo *status) = 0;
+        virtual void socketStatusArrived(NDPSocket *socket,
+                NDPStatusInfo *status) = 0;
         virtual void socketDeleted(NDPSocket *socket) = 0;
     };
 
-    class INET_API ReceiveQueueBasedCallback : public ICallback
-    {
-      public:
+    class INET_API ReceiveQueueBasedCallback: public ICallback {
+    public:
         virtual void socketDataArrived(NDPSocket *socket) = 0;
 
-        virtual void socketDataArrived(NDPSocket *socket, Packet *packet, bool urgent) override {
+        virtual void socketDataArrived(NDPSocket *socket, Packet *packet,
+                bool urgent) override {
             socket->getReceiveQueue()->push(packet->peekData());
             delete packet;
             socketDataArrived(socket);
         }
     };
 
-    enum State { NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED, PEER_CLOSED, LOCALLY_CLOSED, CLOSED, SOCKERROR };
+    enum State {
+        NOT_BOUND,
+        BOUND,
+        LISTENING,
+        CONNECTING,
+        CONNECTED,
+        PEER_CLOSED,
+        LOCALLY_CLOSED,
+        CLOSED,
+        SOCKERROR
+    };
 
-  protected:
+protected:
     int connId = -1;
     State sockstate = NOT_BOUND;
 
@@ -65,19 +76,19 @@ class INET_API NDPSocket : public ISocket
     L3Address remoteAddr;
     int remotePrt = -1;
 
-    ICallback *cb  = nullptr;
+    ICallback *cb = nullptr;
     void *userData = nullptr;
     cGate *gateToNdp = nullptr;
     std::string ndpAlgorithmClass;
 
     ChunkQueue *receiveQueue = nullptr;
-  protected:
+protected:
     void sendToNDP(cMessage *msg, int c = -1);
 
     // internal: implementation behind listen() and listenOnce()
     void listen(bool fork);
 
-  public:
+public:
     /**
      * Constructor. The getConnectionId() method returns a valid Id right after
      * constructor call.
@@ -106,42 +117,66 @@ class INET_API NDPSocket : public ISocket
      * to identify the connection when it receives a command from the application
      * (or NDPSocket).
      */
-    int getSocketId() const override { return connId; }
+    int getSocketId() const override {
+        return connId;
+    }
 
-    ChunkQueue *getReceiveQueue() { if (receiveQueue == nullptr) receiveQueue = new ChunkQueue(); return receiveQueue; }
+    ChunkQueue* getReceiveQueue() {
+        if (receiveQueue == nullptr)
+            receiveQueue = new ChunkQueue();
+        return receiveQueue;
+    }
 
-    void *getUserData() const { return userData; }
-    void setUserData(void *userData) { this->userData = userData; }
+    void* getUserData() const {
+        return userData;
+    }
+    void setUserData(void *userData) {
+        this->userData = userData;
+    }
     /**
      * Returns the socket state, one of NOT_BOUND, CLOSED, LISTENING, CONNECTING,
      * CONNECTED, etc. Messages received from NDP must be routed through
      * processMessage() in order to keep socket state up-to-date.
      */
-    NDPSocket::State getState() { return sockstate; }
+    NDPSocket::State getState() {
+        return sockstate;
+    }
 
     /**
      * Returns name of socket state code returned by getState().
      */
-    static const char *stateName(NDPSocket::State state);
+    static const char* stateName(NDPSocket::State state);
 
-    void setState(NDPSocket::State state) { sockstate = state; };
+    void setState(NDPSocket::State state) {
+        sockstate = state;
+    }
+    ;
 
     /** @name Getter functions */
     //@{
-    L3Address getLocalAddress() { return localAddr; }
-    int getLocalPort() { return localPrt; }
-    L3Address getRemoteAddress() { return remoteAddr; }
-    int getRemotePort() { return remotePrt; }
+    L3Address getLocalAddress() {
+        return localAddr;
+    }
+    int getLocalPort() {
+        return localPrt;
+    }
+    L3Address getRemoteAddress() {
+        return remoteAddr;
+    }
+    int getRemotePort() {
+        return remotePrt;
+    }
     //@}
 
     /** @name Opening and closing connections, sending data */
     //@{
-
     /**
      * Sets the gate on which to send to NDP. Must be invoked before socket
      * can be used. Example: <tt>socket.setOutputGate(gate("raptondpOut"));</tt>
      */
-    void setOutputGate(cGate *toNdp) { gateToNdp = toNdp; }
+    void setOutputGate(cGate *toNdp) {
+        gateToNdp = toNdp;
+    }
 
     /**
      * Bind the socket to a local port number.
@@ -154,17 +189,19 @@ class INET_API NDPSocket : public ISocket
      */
     void bind(L3Address localAddr, int localPort);
 
-
     /**
      * Returns the current ndpAlgorithmClass parameter.
      */
-    const char *getNdpAlgorithmClass() const { return ndpAlgorithmClass.c_str(); }
-
+    const char* getNdpAlgorithmClass() const {
+        return ndpAlgorithmClass.c_str();
+    }
 
     /**
      * Sets the ndpAlgorithmClass parameter of the next connect() or listen() call.
      */
-    void setNdpAlgorithmClass(const char *ndpAlgorithmClass) { this->ndpAlgorithmClass = ndpAlgorithmClass; }
+    void setNdpAlgorithmClass(const char *ndpAlgorithmClass) {
+        this->ndpAlgorithmClass = ndpAlgorithmClass;
+    }
 
     /**
      * Initiates passive OPEN, creating a "forking" connection that will listen
@@ -178,7 +215,9 @@ class INET_API NDPSocket : public ISocket
      * class can also be useful, and NDPSrvHostApp shows how to put it all
      * together. See also NDPOpenCommand documentation (neddoc) for more info.
      */
-    void listen() { listen(true); }
+    void listen() {
+        listen(true);
+    }
 
     /**
      * Initiates passive OPEN to create a non-forking listening connection.
@@ -187,7 +226,9 @@ class INET_API NDPSocket : public ISocket
      *
      * See NDPOpenCommand documentation (neddoc) for more info.
      */
-    void listenOnce() { listen(false); }
+    void listenOnce() {
+        listen(false);
+    }
 
     /**
      * Accepts a new incoming connection reported as available.
@@ -196,7 +237,9 @@ class INET_API NDPSocket : public ISocket
     /**
      * Active OPEN to the given remote socket.
      */
-    void connect(L3Address  localAddress , L3Address remoteAddr, int remotePort, bool isSender , bool isReceiver ,  unsigned int numPacketsToSend, bool isLongFlow    , unsigned int priorityValue);
+    void connect(L3Address localAddress, L3Address remoteAddr, int remotePort,
+            bool isSender, bool isReceiver, unsigned int numPacketsToSend,
+            bool isLongFlow, unsigned int priorityValue);
 
     /**
      * Sends data packet.

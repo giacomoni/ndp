@@ -40,7 +40,7 @@ void NdpAppBase::connect() {
 
     unsigned int numPacketsToSend = par("numPacketsToSend").longValue();
     unsigned int priorityValue = par("priorityValue").intValue();
-    bool isLongFlow = par("isLongFlow").boolValue();
+    bool isBackroundFlow = par("isBackroundFlow").boolValue();
     bool isSender = par("isSender").boolValue();
     bool isReceiver = par("isReceiver").boolValue();
 
@@ -68,7 +68,7 @@ void NdpAppBase::connect() {
 //        std::string dd= "10.0.0.86";
 //        L3Address destination2 =L3Address(dd.c_str());
         setStatusString("connecting");
-        socket.connect(localAddress , destination  , connectPort, isSender , isReceiver , numPacketsToSend, isLongFlow, priorityValue);
+        socket.connect(localAddress , destination  , connectPort, isSender , isReceiver , numPacketsToSend, isBackroundFlow, priorityValue);
         EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination  << ") port=" << connectPort << endl;
 
         numSessions++;
@@ -81,14 +81,6 @@ void NdpAppBase::close() {
     socket.close();
 }
 
-void NdpAppBase::sendPacket(Packet *msg) {
-    int numBytes = msg->getByteLength();
-    emit(packetSentSignal, msg);
-    socket.send(msg);
-
-    packetsSent++;
-    bytesSent += numBytes;
-}
 
 void NdpAppBase::setStatusString(const char *s) {
     if (hasGUI())

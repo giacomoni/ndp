@@ -32,63 +32,56 @@ namespace inet {
 
 Register_Class(TopologyEcmp);
 
-TopologyEcmp::LinkIn *TopologyEcmp::Node::getLinkIn(int i)
-{
-    if (i < 0 || i >= (int)inLinks.size())
-        throw cRuntimeError("Topology::Node::getLinkIn: invalid link index %d", i);
-    return (TopologyEcmp::LinkIn *)inLinks[i];
+TopologyEcmp::LinkIn* TopologyEcmp::Node::getLinkIn(int i) {
+    if (i < 0 || i >= (int) inLinks.size())
+        throw cRuntimeError("Topology::Node::getLinkIn: invalid link index %d",
+                i);
+    return (TopologyEcmp::LinkIn*) inLinks[i];
 }
 
-TopologyEcmp::LinkOut *TopologyEcmp::Node::getLinkOut(int i)
-{
-    if (i < 0 || i >= (int)outLinks.size())
+TopologyEcmp::LinkOut* TopologyEcmp::Node::getLinkOut(int i) {
+    if (i < 0 || i >= (int) outLinks.size())
         throw cRuntimeError("Topology::Node::getLinkOut: invalid index %d", i);
-    return (TopologyEcmp::LinkOut *)outLinks[i];
+    return (TopologyEcmp::LinkOut*) outLinks[i];
 }
 
 //----
 
-TopologyEcmp::TopologyEcmp(const char *name) : cOwnedObject(name)
-{
+TopologyEcmp::TopologyEcmp(const char *name) :
+        cOwnedObject(name) {
     target = nullptr;
 }
 
-TopologyEcmp::TopologyEcmp(const TopologyEcmp& topo) : cOwnedObject(topo)
-{
+TopologyEcmp::TopologyEcmp(const TopologyEcmp &topo) :
+        cOwnedObject(topo) {
     throw cRuntimeError(this, "copy ctor not implemented yet");
 }
 
-TopologyEcmp::~TopologyEcmp()
-{
+TopologyEcmp::~TopologyEcmp() {
     clear();
 }
 
-std::string TopologyEcmp::str() const
-{
+std::string TopologyEcmp::str() const {
     std::stringstream out;
     out << "n=" << nodes.size();
     return out.str();
 }
 
-void TopologyEcmp::parsimPack(cCommBuffer *buffer) const
-{
+void TopologyEcmp::parsimPack(cCommBuffer *buffer) const {
     throw cRuntimeError(this, "parsimPack() not implemented");
 }
 
-void TopologyEcmp::parsimUnpack(cCommBuffer *buffer)
-{
+void TopologyEcmp::parsimUnpack(cCommBuffer *buffer) {
     throw cRuntimeError(this, "parsimUnpack() not implemented");
 }
 
-TopologyEcmp& TopologyEcmp::operator=(const TopologyEcmp&)
-{
+TopologyEcmp& TopologyEcmp::operator=(const TopologyEcmp&) {
     throw cRuntimeError(this, "operator= not implemented yet");
 }
 
-void TopologyEcmp::clear()
-{
-    for (auto & elem : nodes) {
-        for (auto & _j : elem->outLinks)
+void TopologyEcmp::clear() {
+    for (auto &elem : nodes) {
+        for (auto &_j : elem->outLinks)
             delete _j; // delete links from their source side
         delete elem;
     }
@@ -97,34 +90,31 @@ void TopologyEcmp::clear()
 
 //---
 
-static bool selectByModulePath(cModule *mod, void *data)
-{
+static bool selectByModulePath(cModule *mod, void *data) {
     using inet::PatternMatcher;
 
     // actually, this is selectByModuleFullPathPattern()
-    const std::vector<std::string>& v = *(const std::vector<std::string> *)data;
+    const std::vector<std::string> &v = *(const std::vector<std::string>*) data;
     std::string path = mod->getFullPath();
-    for (auto & elem : v)
-        if (PatternMatcher(elem.c_str(), true, true, true).matches(path.c_str()))
+    for (auto &elem : v)
+        if (PatternMatcher(elem.c_str(), true, true, true).matches(
+                path.c_str()))
             return true;
 
     return false;
 }
 
-static bool selectByNedTypeName(cModule *mod, void *data)
-{
-    const std::vector<std::string>& v = *(const std::vector<std::string> *)data;
+static bool selectByNedTypeName(cModule *mod, void *data) {
+    const std::vector<std::string> &v = *(const std::vector<std::string>*) data;
     return std::find(v.begin(), v.end(), mod->getNedTypeName()) != v.end();
 }
 
-static bool selectByProperty(cModule *mod, void *data)
-{
-    struct ParamData
-    {
+static bool selectByProperty(cModule *mod, void *data) {
+    struct ParamData {
         const char *name;
         const char *value;
     };
-    ParamData *d = (ParamData *)data;
+    ParamData *d = (ParamData*) data;
     cProperty *prop = mod->getProperties()->get(d->name);
     if (!prop)
         return false;
@@ -135,74 +125,66 @@ static bool selectByProperty(cModule *mod, void *data)
         return opp_strcmp(value, "false") != 0;
 }
 
-static bool selectByParameter(cModule *mod, void *data)
-{
-    struct PropertyData
-    {
+static bool selectByParameter(cModule *mod, void *data) {
+    struct PropertyData {
         const char *name;
         const char *value;
     };
-    PropertyData *d = (PropertyData *)data;
-    return mod->hasPar(d->name) && (d->value == nullptr || mod->par(d->name).str() == std::string(d->value));
+    PropertyData *d = (PropertyData*) data;
+    return mod->hasPar(d->name)
+            && (d->value == nullptr
+                    || mod->par(d->name).str() == std::string(d->value));
 }
 
 //---
 
-void TopologyEcmp::extractByModulePath(const std::vector<std::string>& fullPathPatterns)
-{
-    extractFromNetwork(selectByModulePath, (void *)&fullPathPatterns);
+void TopologyEcmp::extractByModulePath(
+        const std::vector<std::string> &fullPathPatterns) {
+    extractFromNetwork(selectByModulePath, (void*) &fullPathPatterns);
 }
 
-void TopologyEcmp::extractByNedTypeName(const std::vector<std::string>& nedTypeNames)
-{
-    extractFromNetwork(selectByNedTypeName, (void *)&nedTypeNames);
+void TopologyEcmp::extractByNedTypeName(
+        const std::vector<std::string> &nedTypeNames) {
+    extractFromNetwork(selectByNedTypeName, (void*) &nedTypeNames);
 }
 
-void TopologyEcmp::extractByProperty(const char *propertyName, const char *value)
-{
-    struct
-    {
+void TopologyEcmp::extractByProperty(const char *propertyName,
+        const char *value) {
+    struct {
         const char *name;
         const char *value;
-    } data = {
-        propertyName, value
-    };
-    extractFromNetwork(selectByProperty, (void *)&data);
+    } data = { propertyName, value };
+    extractFromNetwork(selectByProperty, (void*) &data);
 }
 
-void TopologyEcmp::extractByParameter(const char *paramName, const char *paramValue)
-{
-    struct
-    {
+void TopologyEcmp::extractByParameter(const char *paramName,
+        const char *paramValue) {
+    struct {
         const char *name;
         const char *value;
-    } data = {
-        paramName, paramValue
-    };
-    extractFromNetwork(selectByParameter, (void *)&data);
+    } data = { paramName, paramValue };
+    extractFromNetwork(selectByParameter, (void*) &data);
 }
 
 //---
 
-static bool selectByPredicate(cModule *mod, void *data)
-{
-    TopologyEcmp::Predicate *predicate = (TopologyEcmp::Predicate *)data;
+static bool selectByPredicate(cModule *mod, void *data) {
+    TopologyEcmp::Predicate *predicate = (TopologyEcmp::Predicate*) data;
     return predicate->matches(mod);
 }
 
-void TopologyEcmp::extractFromNetwork(Predicate *predicate)
-{
-    extractFromNetwork(selectByPredicate, (void *)predicate);
+void TopologyEcmp::extractFromNetwork(Predicate *predicate) {
+    extractFromNetwork(selectByPredicate, (void*) predicate);
 }
 
-void TopologyEcmp::extractFromNetwork(bool (*predicate)(cModule *, void *), void *data)
-{
+void TopologyEcmp::extractFromNetwork(bool (*predicate)(cModule*, void*),
+        void *data) {
     clear();
 
     // Loop through all modules and find those that satisfy the criteria
     int networkId = 0;
-    for (int modId = 0; modId <= getSimulation()->getLastComponentId(); modId++)
-    {
+    for (int modId = 0; modId <= getSimulation()->getLastComponentId();
+            modId++) {
         cModule *module = getSimulation()->getModule(modId);
         if (module && predicate(module, data)) {
             Node *node = createNode(module);
@@ -212,7 +194,7 @@ void TopologyEcmp::extractFromNetwork(bool (*predicate)(cModule *, void *), void
     }
 
     // Discover out neighbors too.
-    for (auto & elem : nodes) {
+    for (auto &elem : nodes) {
         // Loop through all its gates and find those which come
         // from or go to modules included in the topology.
 
@@ -243,36 +225,34 @@ void TopologyEcmp::extractFromNetwork(bool (*predicate)(cModule *, void *), void
     }
 
     // fill inLinks vectors
-    for (auto & elem : nodes) {
-        for (auto & _l : elem->outLinks) {
+    for (auto &elem : nodes) {
+        for (auto &_l : elem->outLinks) {
             TopologyEcmp::Link *link = _l;
             link->destNode->inLinks.push_back(link);
         }
     }
 
-    for (auto & elem : nodes)
+    for (auto &elem : nodes)
         findNetworks(elem);
 }
 
-int TopologyEcmp::addNode(Node *node)
-{
+int TopologyEcmp::addNode(Node *node) {
     if (node->moduleId == -1) {
         // elements without module ID are stored at the end
         nodes.push_back(node);
         return nodes.size() - 1;
-    }
-    else {
+    } else {
         // must find an insertion point because nodes[] is ordered by module ID
-        auto it = std::lower_bound(nodes.begin(), nodes.end(), node, lessByModuleId);
+        auto it = std::lower_bound(nodes.begin(), nodes.end(), node,
+                lessByModuleId);
         it = nodes.insert(it, node);
         return it - nodes.begin();
     }
 }
 
-void TopologyEcmp::deleteNode(Node *node)
-{
+void TopologyEcmp::deleteNode(Node *node) {
     // remove outgoing links
-    for (auto & elem : node->outLinks) {
+    for (auto &elem : node->outLinks) {
         Link *link = elem;
         unlinkFromDestNode(link);
         delete link;
@@ -280,7 +260,7 @@ void TopologyEcmp::deleteNode(Node *node)
     node->outLinks.clear();
 
     // remove incoming links
-    for (auto & elem : node->inLinks) {
+    for (auto &elem : node->inLinks) {
         Link *link = elem;
         unlinkFromSourceNode(link);
         delete link;
@@ -295,8 +275,7 @@ void TopologyEcmp::deleteNode(Node *node)
     delete node;
 }
 
-void TopologyEcmp::addLink(Link *link, Node *srcNode, Node *destNode)
-{
+void TopologyEcmp::addLink(Link *link, Node *srcNode, Node *destNode) {
     // remove from graph if it's already in
     if (link->srcNode)
         unlinkFromSourceNode(link);
@@ -314,8 +293,7 @@ void TopologyEcmp::addLink(Link *link, Node *srcNode, Node *destNode)
     destNode->inLinks.push_back(link);
 }
 
-void TopologyEcmp::addLink(Link *link, cGate *srcGate, cGate *destGate)
-{
+void TopologyEcmp::addLink(Link *link, cGate *srcGate, cGate *destGate) {
     // remove from graph if it's already in
     if (link->srcNode)
         unlinkFromSourceNode(link);
@@ -326,9 +304,13 @@ void TopologyEcmp::addLink(Link *link, cGate *srcGate, cGate *destGate)
     Node *srcNode = getNodeFor(srcGate->getOwnerModule());
     Node *destNode = getNodeFor(destGate->getOwnerModule());
     if (!srcNode)
-        throw cRuntimeError("cTopology::addLink: module of source gate \"%s\" is not in the graph", srcGate->getFullPath().c_str());
+        throw cRuntimeError(
+                "cTopology::addLink: module of source gate \"%s\" is not in the graph",
+                srcGate->getFullPath().c_str());
     if (!destNode)
-        throw cRuntimeError("cTopology::addLink: module of destination gate \"%s\" is not in the graph", destGate->getFullPath().c_str());
+        throw cRuntimeError(
+                "cTopology::addLink: module of destination gate \"%s\" is not in the graph",
+                destGate->getFullPath().c_str());
     link->srcNode = srcNode;
     link->destNode = destNode;
     link->srcGateId = srcGate->getId();
@@ -337,60 +319,55 @@ void TopologyEcmp::addLink(Link *link, cGate *srcGate, cGate *destGate)
     destNode->inLinks.push_back(link);
 }
 
-void TopologyEcmp::deleteLink(Link *link)
-{
+void TopologyEcmp::deleteLink(Link *link) {
     unlinkFromSourceNode(link);
     unlinkFromDestNode(link);
     delete link;
 }
 
-void TopologyEcmp::unlinkFromSourceNode(Link *link)
-{
-    std::vector<Link *>& srcOutLinks = link->srcNode->outLinks;
+void TopologyEcmp::unlinkFromSourceNode(Link *link) {
+    std::vector<Link*> &srcOutLinks = link->srcNode->outLinks;
     auto it = find(srcOutLinks, link);
     ASSERT(it != srcOutLinks.end());
     srcOutLinks.erase(it);
 }
 
-void TopologyEcmp::unlinkFromDestNode(Link *link)
-{
-    std::vector<Link *>& destInLinks = link->destNode->inLinks;
+void TopologyEcmp::unlinkFromDestNode(Link *link) {
+    std::vector<Link*> &destInLinks = link->destNode->inLinks;
     auto it = find(destInLinks, link);
     ASSERT(it != destInLinks.end());
     destInLinks.erase(it);
 }
 
-TopologyEcmp::Node *TopologyEcmp::getNode(int i)
-{
-    if (i < 0 || i >= (int)nodes.size())
+TopologyEcmp::Node* TopologyEcmp::getNode(int i) {
+    if (i < 0 || i >= (int) nodes.size())
         throw cRuntimeError(this, "invalid node index %d", i);
     return nodes[i];
 }
 
-TopologyEcmp::Node *TopologyEcmp::getNodeFor(cModule *mod)
-{
+TopologyEcmp::Node* TopologyEcmp::getNodeFor(cModule *mod) {
     // binary search because nodes[] is ordered by module ID
     Node tmpNode(mod->getId());
-    auto it = std::lower_bound(nodes.begin(), nodes.end(), &tmpNode, lessByModuleId);
+    auto it = std::lower_bound(nodes.begin(), nodes.end(), &tmpNode,
+            lessByModuleId);
 //TODO: this does not compile with VC9 (VC10 is OK): auto it = std::lower_bound(nodes.begin(), nodes.end(), mod->getId(), isModuleIdLess);
     return it == nodes.end() || (*it)->moduleId != mod->getId() ? nullptr : *it;
 }
 
-void TopologyEcmp::calculateUnweightedSingleShortestPathsTo(Node *_target)
-{
+void TopologyEcmp::calculateUnweightedSingleShortestPathsTo(Node *_target) {
     // multiple paths not supported :-(
 
     if (!_target)
         throw cRuntimeError(this, "..ShortestPathTo(): target node is nullptr");
     target = _target;
 
-    for (auto & elem : nodes) {
+    for (auto &elem : nodes) {
         elem->dist = INFINITY;
         elem->outPath = nullptr;
     }
     target->dist = 0;
 
-    std::deque<Node *> q;
+    std::deque<Node*> q;
 
     q.push_back(target);
 
@@ -416,14 +393,13 @@ void TopologyEcmp::calculateUnweightedSingleShortestPathsTo(Node *_target)
     }
 }
 
-void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target)
-{
+void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target) {
     if (!_target)
         throw cRuntimeError(this, "..ShortestPathTo(): target node is nullptr");
     target = _target;
 
     // clean path infos
-    for (auto & elem : nodes) {
+    for (auto &elem : nodes) {
         elem->dist = INFINITY;
         elem->outPath = nullptr;
         elem->outPathEcmp.clear(); // MOH: added
@@ -431,7 +407,7 @@ void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target)
 
     target->dist = 0;
 
-    std::list<Node *> q;
+    std::list<Node*> q;
 
     q.push_back(target);
 
@@ -458,7 +434,7 @@ void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target)
             double newdist = dest->dist + linkWeight;
             if (dest != target)
                 newdist += dest->getWeight(); // dest is not the target, uses weight of dest node as price of routing (infinity means dest node doesn't route between interfaces)
-            if (newdist != INFINITY && src->dist >= newdist) {    // it's a valid shorter path from src to target node
+            if (newdist != INFINITY && src->dist >= newdist) { // it's a valid shorter path from src to target node
                 if (src->dist != INFINITY)
                     q.remove(src); // src is in the queue
                 src->dist = newdist;
@@ -466,7 +442,7 @@ void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target)
                 src->outPathEcmp.push_back(dest->inLinks[i]);
                 // insert src node to ordered list
                 auto it = q.begin();
-                for ( ; it != q.end(); ++it)
+                for (; it != q.end(); ++it)
                     if ((*it)->dist > newdist)
                         break;
 
@@ -476,8 +452,7 @@ void TopologyEcmp::calculateWeightedSingleShortestPathsTo(Node *_target)
     }
 }
 
-void TopologyEcmp::findNetworks(Node *node)
-{
+void TopologyEcmp::findNetworks(Node *node) {
     if (node->isVisited())
         return;
 

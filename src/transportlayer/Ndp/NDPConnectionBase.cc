@@ -157,7 +157,6 @@ bool NDPConnection::processTimer(cMessage *msg) {
 
     if (msg == requestInternalTimer) {
         event = NDP_E_IGNORE;
-        process_TIMEOUT_REQUEST_REXMIT();
 //            sendRequest();   // based on my congestion control, I send requests after receiving  a packet not based on a timer
     }
 
@@ -211,11 +210,7 @@ bool NDPConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader>
     case NDP_E_OPEN_PASSIVE:
         process_OPEN_PASSIVE(event, ndpCommand, msg);
         break;
-    case NDP_E_SETOPTION:
-        process_OPTIONS(event, ndpCommand, msg);
-        break;
     case NDP_E_CLOSE:
-//        process_CLOSE(event, ndpCommand, msg);
         break;
 
 

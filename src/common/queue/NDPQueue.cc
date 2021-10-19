@@ -30,7 +30,7 @@
 //#include "inet/queueing/queue/CompoundPacketQueue.h"
 #include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 //#include "../../networklayer/ipv4/Ipv4Ndp.h"
-#include "../../networklayer/ipv4/Ipv4HeaderNdp_m.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
 #include "inet/queueing/base/PacketQueueBase.h"
 //#include "../../common/ProtocolNdp.h"
 //#include "inet/networklayer/common/L3Tools.h"
@@ -137,62 +137,36 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
     Enter_Method("pushPacket");
     emit(packetPushedSignal, packet);
     EV_INFO << "\nPACKET STRING" << packet->str() << std::endl;
-    //auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
-    //auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
-    //auto& ipv4Header = removeNetworkProtocolHeader<Ipv4HeaderNdp>(packet);
-    //auto& ndpHeader = removeTransportProtocolHeader<ndp::NdpHeader>(packet);
-    //EV_INFO << "\nENCAPSULATED PACKET STRING" << ipv4Header->str() << std::endl;
-    //EV_INFO << "\nENCAPSULATED PACKET STRING" << ndpHeader->str() << std::endl;
-    //auto ipv4Header = Ipv4::removeNetworkProtocolHeader<Ipv4Header>(packet);
     EV_INFO << "Pushing packet " << packet->getName() << " into the queue." << endl;
-    const auto& ipv4Datagram = packet->peekAtFront<Ipv4HeaderNdp>();
+    const auto& ipv4Datagram = packet->peekAtFront<Ipv4Header>();
     const auto& ndpHeaderPeek = packet->peekDataAt<ndp::NdpHeader>(ipv4Datagram->getChunkLength());
     if ( ndpHeaderPeek->getAckBit()==true || ndpHeaderPeek->getSynBit()==true || ndpHeaderPeek->getNackBit()==true) {
-       //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-       //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
-       //packet->insertAtFront(ndpHeader);
-       //packet->insertAtFront(ipv4Header);
        synAckQueue.insert(packet);
        synAckQueueLength=synAckQueue.getLength();
-
-       //emit(packetPushedSynAckQueueSignal, packet);
-       //emit(synAckQueueLengthSignal, cPar(synAckQueue.getLength()));
        return;
     }
     if (ndpHeaderPeek->isHeader() == true ) {
-        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
-        //packet->insertAtFront(ndpHeader);
-        //packet->insertAtFront(ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
-        //emit(packetPushedHeadersQueueSignal, packet);
         return;
     }
     if (ndpHeaderPeek->isPullPacket() == true ) {
-        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         EV_INFO << "\n\n\n\nPACKET INFO ROUTER: " << packet->str() << "\n\n\n";
-        //packet->insertAtFront(ndpHeader);
-        //packet->insertAtFront(ipv4Header);
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
-        //emit(packetPushedHeadersQueueSignal, packet);
         return;
     }
     if (isOverloaded()) {
         std::string header="Header-";
-        auto ipv4Header = packet->removeAtFront<Ipv4HeaderNdp>();
+        auto ipv4Header = packet->removeAtFront<Ipv4Header>();
         ASSERT(B(ipv4Header->getTotalLengthField()) >= ipv4Header->getChunkLength());
         if (ipv4Header->getTotalLengthField() < packet->getDataLength())
             packet->setBackOffset(B(ipv4Header->getTotalLengthField()) - ipv4Header->getChunkLength());
         auto ndpHeader = packet->removeAtFront<ndp::NdpHeader>();
         packet->removeAtFront<GenericAppMsgNdp>();
-        //packet->eraseAtFront<GenericAppMsgNdp>();
         if (ndpHeader != nullptr) {
             std::string name=packet->getName();
             std::string rename=header+name;
-            //ndpHeader->setName(rename.c_str());
             packet->setName(rename.c_str());
             ndpHeader->setIsHeader(true);
             ndpHeader->setIsDataPacket(false);
@@ -203,14 +177,9 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
             EV << "   hhh   " << destPort << "\n\n\n\n";
             EV << "   hhh   " << ndpHeader->getFullName() << "\n\n\n\n";
         }
-        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
         packet->insertAtFront(ndpHeader);
         ipv4Header->setTotalLengthField(ipv4Header->getChunkLength() + packet->getDataLength());
-        //ipv4Header->setTotalLengthField(B(1));
         packet->insertAtFront(ipv4Header);
-        //packet->cPacket::setBitLength(8);
-        //packet->trim();
         headersQueue.insert(packet);
         headersQueueLength=headersQueue.getLength();
         //emit(packetPushedHeadersQueueSignal, packet);
@@ -220,13 +189,7 @@ void NDPQueue::pushPacket(Packet *packet, cGate *gate)
         return;
         }
     else {
-        //insertTransportProtocolHeader(packet, ProtocolNdp::ndp, ndpHeader);
-        //insertNetworkProtocolHeader(packet, Protocol::ipv4, ipv4Header);
-        //packet->insertAtFront(ndpHeader);
-        //packet->insertAtFront(ipv4Header);
-       // dataQueue is not full ==> insert the incoming packet in the dataQueue
         dataQueue.insert(packet);
-        //emit(packetPushedDataQueueSignal, packet);
         dataQueueLength=dataQueue.getLength();
         return;
     }
@@ -239,8 +202,6 @@ Packet *NDPQueue::popPacket(cGate *gate) {
         return nullptr;
     if (synAckQueue.getLength()!=0){
         auto packet = check_and_cast<Packet *>(synAckQueue.pop());
-        //synAckQueue.pop();
-        //cSimpleModule::emit(synAckQueueLengthSignal, synAckQueue.getLength());
         cSimpleModule::emit(packetRemovedSignal, packet);
         updateDisplayString();
         animateSend(packet, outputGate);
@@ -248,7 +209,6 @@ Packet *NDPQueue::popPacket(cGate *gate) {
     }
     if (headersQueue.getLength() == 0 && dataQueue.getLength() != 0) {
         auto packet = check_and_cast<Packet *>(dataQueue.pop());
-        //dataQueue.pop();
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
         emit(packetRemovedSignal, packet);
         updateDisplayString();
@@ -257,7 +217,6 @@ Packet *NDPQueue::popPacket(cGate *gate) {
     }
     if (headersQueue.getLength() != 0 && dataQueue.getLength() == 0) {
         auto packet = check_and_cast<Packet *>(headersQueue.pop());
-        //headersQueue.pop();
         cSimpleModule::emit(headersQueueLengthSignal, headersQueue.getLength());
         emit(packetRemovedSignal, packet);
         updateDisplayString();
@@ -266,7 +225,6 @@ Packet *NDPQueue::popPacket(cGate *gate) {
     }
     if ( headersQueue.getLength() != 0 && dataQueue.getLength() != 0 && weight%10 == 0) {
         auto packet = check_and_cast<Packet *>(dataQueue.pop());
-        //dataQueue.pop();
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
         emit(packetRemovedSignal, packet);
         ++weight;
@@ -275,7 +233,6 @@ Packet *NDPQueue::popPacket(cGate *gate) {
     }
     if (headersQueue.getLength() != 0 && dataQueue.getLength() != 0 ) {
         auto packet = check_and_cast<Packet *>(headersQueue.pop());
-        //headersQueue.pop();
         emit(packetRemovedSignal, packet);
         EV_INFO << " get from header queue- size = " << packet->getByteLength() << "\n\n\n\n\n\n";
         cSimpleModule::emit(headersQueueLengthSignal, headersQueue.getLength());
@@ -293,7 +250,6 @@ void NDPQueue::removePacket(Packet *packet)
     EV_INFO << "Removing packet " << packet->getName() << " from the queue." << endl;
     dataQueue.remove(packet);
     emit(packetRemovedSignal, packet);
-    //emit(packetRemovedSignal, packet);
     updateDisplayString();
 }
 
@@ -311,16 +267,7 @@ bool NDPQueue::isEmpty() const
     }
 
     return d;
-//    return  dataQueue.isEmpty();
 }
-
-
-//void NDPQueue::refreshDisplay() const
-//{
-//     char buf[100];
-//    sprintf(buf, "q dataLen: %d\nq headersLen: %d\nq rcvd: %d\nq dropped: %d", dataQueueLength, headersQueueLength,numQueueReceived,numQueueDropped );
-//    getDisplayString().setTagArg("t", 0, buf);
-//}
 
 void NDPQueue::receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details)
 {

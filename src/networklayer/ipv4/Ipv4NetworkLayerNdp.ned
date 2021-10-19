@@ -23,11 +23,11 @@ import inet.networklayer.contract.IArp;
 import inet.networklayer.contract.INetworkLayer;
 import inet.networklayer.ipv4.Ipv4RoutingTable;
 import ndp.networklayer.ipv4.Ipv4RoutingTableEcmp;
-import ndp.networklayer.ipv4.Ipv4NatTableNdp;
+import inet.networklayer.ipv4.Ipv4NatTable;
 import inet.networklayer.ipv4.IIgmp;
 import inet.networklayer.ipv4.Icmp;
-import ndp.networklayer.ipv4.IcmpNdp;
-import ndp.networklayer.ipv4.Igmpv2Ndp;
+import inet.networklayer.ipv4.Icmp;
+import inet.networklayer.ipv4.Igmpv2;
 import inet.networklayer.ipv4.IIpv4;
 import ndp.networklayer.ipv4.IIpv4Ndp;
 //
@@ -66,7 +66,7 @@ module Ipv4NetworkLayerNdp like INetworkLayer
             parameters:
                 @display("p=100,200;is=s");
         }
-        natTable: Ipv4NatTableNdp {
+        natTable: Ipv4NatTable {
             parameters:
                 @display("p=100,300;is=s");
         }
@@ -74,11 +74,11 @@ module Ipv4NetworkLayerNdp like INetworkLayer
             parameters:
                 @display("p=550,100;b=600,5");
         }
-        igmp: Igmpv2Ndp {
+        igmp: Igmpv2 {
             parameters:
                 @display("p=400,200");
         }
-        icmp: IcmpNdp {
+        icmp: Icmp {
             parameters:
                 @display("p=700,200");
         }

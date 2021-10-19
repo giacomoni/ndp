@@ -33,9 +33,6 @@ class INET_API NdpBasicClientApp : public NdpAppBase
     simtime_t request_rexmit_timeout;              // (Added) current request retransmission timeout
     cMessage *requestRexmitTimer = nullptr;        // (Added) for retransmitting request
 
-
-    virtual void sendWriteRequest();
-
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 //    virtual void  startRequestRexmitTimer(); // Added
 
@@ -44,7 +41,7 @@ class INET_API NdpBasicClientApp : public NdpAppBase
     virtual void handleTimer(cMessage *msg) override;
 
     virtual void socketEstablished(NDPSocket *socket) override;
-    virtual void socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) override;
+    virtual void socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent) override {return;};
     virtual void socketClosed(NDPSocket *socket) override;
     virtual void socketFailure(NDPSocket *socket, int code) override;
 

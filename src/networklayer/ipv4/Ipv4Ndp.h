@@ -29,10 +29,10 @@
 #include "inet/networklayer/contract/INetfilter.h"
 #include "inet/networklayer/contract/INetworkProtocol.h"
 //#include "inet/networklayer/ipv4/Icmp.h"
-#include "IcmpNdp.h"
+#include "inet/networklayer/ipv4/Icmp.h"
 #include "inet/networklayer/ipv4/Ipv4FragBuf.h"
-#include "Ipv4FragBufNdp.h"
-#include "Ipv4HeaderNdp_m.h"
+#include "inet/networklayer/ipv4/Ipv4FragBuf.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
 
 namespace inet {
 
@@ -77,7 +77,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     IIpv4RoutingTable *rt = nullptr;  //TODO CHANGE BACK
     IInterfaceTable *ift = nullptr;
     IArp *arp = nullptr;
-    IcmpNdp *icmp = nullptr;
+    Icmp *icmp = nullptr;
     int transportInGateBaseId = -1;
 
     // config
@@ -92,7 +92,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
 
     // working vars
     uint16_t curFragmentId = -1;    // counter, used to assign unique fragmentIds to datagrams
-    Ipv4FragBufNdp fragbuf;    // fragmentation reassembly buffer
+    Ipv4FragBuf fragbuf;    // fragmentation reassembly buffer
     simtime_t lastCheckTime;    // when fragbuf was last checked for state fragments
     std::set<const Protocol *> upperProtocols;    // where to send packets after decapsulation
     std::map<int, SocketDescriptor *> socketIdToSocketDescriptor;
@@ -118,7 +118,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     virtual Ipv4Address getNextHop(Packet *packet);
 
     // utility: look up route to the source of the datagram and return its interface
-    virtual const InterfaceEntry *getShortestPathInterfaceToSource(const Ptr<const Ipv4HeaderNdp>& ipv4Header) const;
+    virtual const InterfaceEntry *getShortestPathInterfaceToSource(const Ptr<const Ipv4Header>& ipv4Header) const;
 
     // utility: show current statistics above the icon
     virtual void refreshDisplay() const override;
@@ -130,13 +130,13 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     void arpResolutionTimedOut(IArp::Notification *entry);
 
     // utility: verifying CRC
-    bool verifyCrc(const Ptr<const Ipv4HeaderNdp>& ipv4Header);
+    bool verifyCrc(const Ptr<const Ipv4Header>& ipv4Header);
 
     // utility: calculate and set CRC
-    void setComputedCrc(Ptr<Ipv4HeaderNdp>& ipv4Header);
+    void setComputedCrc(Ptr<Ipv4Header>& ipv4Header);
 
   public:
-    static void insertCrc(const Ptr<Ipv4HeaderNdp>& ipv4Header);
+    static void insertCrc(const Ptr<Ipv4Header>& ipv4Header);
 
   protected:
     /**
@@ -185,7 +185,7 @@ class INET_API Ipv4Ndp : public OperationalBase, public NetfilterBase, public IN
     /**
      * Determines the output interface for the given multicast datagram.
      */
-    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4HeaderNdp>& ipv4Header, const InterfaceEntry *multicastIFOption);
+    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4Header>& ipv4Header, const InterfaceEntry *multicastIFOption);
 
     /**
      * Forwards packets to all multicast destinations, using fragmentAndSend().

@@ -35,7 +35,7 @@
 #include "inet/common/packet/Packet.h"
 
 #include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
-#include "Ipv4HeaderNdp_m.h"
+#include "inet/networklayer/ipv4/Ipv4Header_m.h"
 
 #include "inet/networklayer/common/L3Tools.h"
 #include "../../transportlayer/common/L4ToolsNdp.h"

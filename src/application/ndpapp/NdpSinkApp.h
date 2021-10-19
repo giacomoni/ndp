@@ -2,12 +2,10 @@
 #ifndef __INET_NdpSinkApp_H
 #define __INET_NdpSinkApp_H
 
-#include "NdpServerHostApp.h"
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"
-//#include "inet/transportlayer/contract/tcp/TCPSocket.h"
 #include "../../transportlayer/contract/ndp/NDPSocket.h"
-
+#include "inet/common/lifecycle/ILifecycle.h"
 namespace inet {
 
 /**
@@ -36,20 +34,14 @@ class INET_API NdpSinkApp : public cSimpleModule, public ILifecycle
 
 
     bool firstDataReceived = true;
-    bool isLongFlow;
+    bool isBackroundFlow;
 
     cGate *gateToNdp;
-
-
-    virtual void sendRequest();
     virtual void initialize(int stage) override;
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
     virtual void refreshDisplay() const override;
-
-    virtual void allReceivedCloseAllMultiSourcingConns(); // for multi sourcing
-
 
     virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override
     { Enter_Method_Silent(); throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName()); return true; }

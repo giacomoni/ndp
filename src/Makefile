@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for $(LIB_PREFIX)ndp
 #
 # This file was generated with the command:
-#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
+#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -KNDP_PROJ=.. -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -28,12 +28,7 @@ OBJS = \
     $O/application/base/ApplicationBaseNdp.o \
     $O/application/ndpapp/NdpAppBase.o \
     $O/application/ndpapp/NdpBasicClientApp.o \
-    $O/application/ndpapp/NdpEchoApp.o \
-    $O/application/ndpapp/NdpServerHostApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
-    $O/common/MessageDispatcherNdp.o \
-    $O/common/ProtocolGroupNdp.o \
-    $O/common/ProtocolNdp.o \
     $O/common/ResultFiltersThroughput.o \
     $O/common/TopologyEcmp.o \
     $O/common/queue/NDPQueue.o \
@@ -41,11 +36,6 @@ OBJS = \
     $O/networklayer/configurator/base/NetworkConfiguratorBaseEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.o \
-    $O/networklayer/ipv4/IcmpNdp.o \
-    $O/networklayer/ipv4/Igmpv2Ndp.o \
-    $O/networklayer/ipv4/Ipv4FragBufNdp.o \
-    $O/networklayer/ipv4/Ipv4HeaderNdp.o \
-    $O/networklayer/ipv4/Ipv4NatTableNdp.o \
     $O/networklayer/ipv4/Ipv4Ndp.o \
     $O/networklayer/ipv4/Ipv4NetworkLayerNdp.o \
     $O/networklayer/ipv4/Ipv4RoutingTableEcmp.o \
@@ -58,16 +48,11 @@ OBJS = \
     $O/transportlayer/Ndp/NDPReceiveQueue.o \
     $O/transportlayer/Ndp/NDPSendQueue.o \
     $O/transportlayer/Ndp/flavours/DumbNDP.o \
-    $O/transportlayer/Ndp/flavours/NDPBaseAlg.o \
-    $O/transportlayer/Ndp/flavours/NDPSegmentTransmitInfoList.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader.o \
     $O/transportlayer/common/L4ToolsNdp.o \
     $O/transportlayer/contract/ndp/NDPSocket.o \
     $O/application/base/ApplicationPacketNdp_m.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
-    $O/common/ProtocolNdp_m.o \
-    $O/networklayer/ipv4/Ipv4HeaderNdp_m.o \
-    $O/networklayer/ipv4/Ipv4OptionsTagNdp_m.o \
     $O/transportlayer/Ndp/NDPConnection_m.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader_m.o \
     $O/transportlayer/contract/ndp/NDPCommand_m.o
@@ -76,9 +61,6 @@ OBJS = \
 MSGFILES = \
     application/base/ApplicationPacketNdp.msg \
     application/ndpapp/GenericAppMsgNdp.msg \
-    common/ProtocolNdp.msg \
-    networklayer/ipv4/Ipv4HeaderNdp.msg \
-    networklayer/ipv4/Ipv4OptionsTagNdp.msg \
     transportlayer/Ndp/NDPConnection.msg \
     transportlayer/Ndp/ndp_common/NdpHeader.msg \
     transportlayer/contract/ndp/NDPCommand.msg
@@ -88,6 +70,7 @@ SMFILES =
 
 # Other makefile variables (-K)
 INET4_PROJ=../../inet4
+NDP_PROJ=..
 
 #------------------------------------------------------------------------------
 

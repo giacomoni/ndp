@@ -29,7 +29,6 @@ struct NdpStateVariables
     
     unsigned int request_id;
     unsigned int internal_request_id;
-    bool isLongFlow;
     bool isHeader;
     uint32 IW;
     bool connFinished;

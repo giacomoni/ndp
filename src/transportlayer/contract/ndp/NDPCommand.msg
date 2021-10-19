@@ -25,7 +25,6 @@ enum NDPCommandCode
     NDP_C_QUEUE_BYTES_LIMIT = 8; // set send queue limit (in bytes)
     NDP_C_READ = 9;       // send request to NDP to deliver data
     NDP_C_DESTROY = 10;      // send request to NDP to destroy the socket descriptor
-    NDP_SETOPTION = 11;    // setting NDP socket options
 }
 
 
@@ -93,15 +92,6 @@ class NDPOpenCommand extends NDPCommand
 
 class NDPAcceptCommand extends NDPCommand
 {
-}
-
-class NDPSetOptionCommand extends NDPCommand
-{
-}
-
-class NDPSetTimeToLiveCommand extends NDPSetOptionCommand
-{
-    int ttl;
 }
 
 class NDPSendCommand extends NDPCommand

@@ -62,19 +62,8 @@ class INET_API NDPQueue : public PacketQueueBase, public cListener
     // statistics
     static simsignal_t dataQueueLengthSignal;
     static simsignal_t headersQueueLengthSignal;
-    //static simsignal_t synAckQueueLengthSignal;
     static simsignal_t numTrimmedPktSig;
-
-    /** Signal with packet when received it */
-   //static simsignal_t rcvdPkSignal;
-   /** Signal with packet when enqueued it */
-   //static simsignal_t enqueuePkSignal;
-   /** Signal with packet when sent out it */
-   //static simsignal_t dequeuePkSignal;
-   /** Signal with packet when dropped it */
-   //static simsignal_t dropPkByQueueSignal;
-   /** Signal with value of delaying time when sent out a packet. */
-   static simsignal_t queueingTimeSignal;
+    static simsignal_t queueingTimeSignal;
 
   protected:
     virtual void initialize(int stage) override;
