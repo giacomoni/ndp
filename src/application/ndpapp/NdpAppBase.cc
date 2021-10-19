@@ -1,12 +1,11 @@
 
-
 #include "NdpAppBase.h"
 
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include  "../../transportlayer/contract/ndp/NDPSocket.h"
 
 namespace inet {
-void NdpAppBase::initialize(int stage){
+void NdpAppBase::initialize(int stage) {
 
     ApplicationBase::initialize(stage);
 
@@ -18,7 +17,10 @@ void NdpAppBase::initialize(int stage){
         const char *localAddress = par("localAddress");
         int localPort = par("localPort");
 
-        socket.bind( *localAddress ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
+        socket.bind(
+                *localAddress ?
+                        L3AddressResolver().resolve(localAddress) : L3Address(),
+                localPort);
         socket.setCallback(this);
         socket.setOutputGate(gate("socketOut"));
         setStatusString("Sender ready ...");
@@ -29,8 +31,7 @@ void NdpAppBase::handleMessageWhenUp(cMessage *msg) {
 
     if (msg->isSelfMessage()) {
         handleTimer(msg);
-    }
-    else
+    } else
         socket.processMessage(msg);
 }
 
@@ -44,8 +45,7 @@ void NdpAppBase::connect() {
     bool isSender = par("isSender").boolValue();
     bool isReceiver = par("isReceiver").boolValue();
 
-
-   // connect
+    // connect
     const char *connectAddress = par("connectAddress");
     int connectPort = par("connectPort");
 
@@ -56,20 +56,21 @@ void NdpAppBase::connect() {
     const char *srcAddress = par("localAddress");
     L3Address localAddress;
     L3AddressResolver().tryResolve(srcAddress, localAddress);
-    EV_INFO << "\n\n\n AAAA localAddress add " << localAddress  <<"\n\n\n" ;
+    EV_INFO << "\n\n\n AAAA localAddress add " << localAddress << "\n\n\n";
 
     if (destination.isUnspecified()) {
-        EV_ERROR << "Connecting to " << connectAddress << " port=" << connectPort  << ": cannot resolve destination address\n";
-//        std::cout << "NdpAppBase::connect() Connecting to " << connectAddress << " port=" << connectPort  << ": cannot resolve destination address\n";
-
+        EV_ERROR << "Connecting to " << connectAddress << " port="
+                        << connectPort
+                        << ": cannot resolve destination address\n";
     } else {
-        EV_INFO << "Connecting to " << connectAddress << "(" << destination << ") port=" << connectPort << endl;
+        EV_INFO << "Connecting to " << connectAddress << "(" << destination
+                       << ") port=" << connectPort << endl;
 
-//        std::string dd= "10.0.0.86";
-//        L3Address destination2 =L3Address(dd.c_str());
         setStatusString("connecting");
-        socket.connect(localAddress , destination  , connectPort, isSender , isReceiver , numPacketsToSend, isBackroundFlow, priorityValue);
-        EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination  << ") port=" << connectPort << endl;
+        socket.connect(localAddress, destination, connectPort, isSender,
+                isReceiver, numPacketsToSend, isBackroundFlow, priorityValue);
+        EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination
+                       << ") port=" << connectPort << endl;
 
         numSessions++;
     }
@@ -81,21 +82,19 @@ void NdpAppBase::close() {
     socket.close();
 }
 
-
 void NdpAppBase::setStatusString(const char *s) {
     if (hasGUI())
         getDisplayString().setTagArg("t", 0, s);
 }
 
-void NdpAppBase::socketEstablished(NDPSocket *) {
+void NdpAppBase::socketEstablished(NDPSocket*) {
 
     // *redefine* to perform or schedule first sending
     EV_INFO << "\n\n\n\n\n\n\n\n connected\n";
     setStatusString("Established");
 }
 
-
-void NdpAppBase::socketDataArrived(NDPSocket *, Packet *msg, bool) {
+void NdpAppBase::socketDataArrived(NDPSocket*, Packet *msg, bool) {
     // *redefine* to perform or schedule next sending
     packetsRcvd++;
     bytesRcvd += msg->getByteLength();
@@ -111,13 +110,13 @@ void NdpAppBase::socketPeerClosed(NDPSocket *socket_) {
     }
 }
 
-void NdpAppBase::socketClosed(NDPSocket *) {
+void NdpAppBase::socketClosed(NDPSocket*) {
     // *redefine* to start another session etc.
     EV_INFO << "connection closed\n";
     setStatusString("closed");
 }
 
-void NdpAppBase::socketFailure(NDPSocket *, int code) {
+void NdpAppBase::socketFailure(NDPSocket*, int code) {
     // subclasses may override this function, and add code try to reconnect after a delay.
     EV_WARN << "connection broken\n";
     setStatusString("broken");
@@ -129,8 +128,10 @@ void NdpAppBase::finish() {
     std::string modulePath = getFullPath();
 
     EV_INFO << modulePath << ": opened " << numSessions << " sessions\n";
-    EV_INFO << modulePath << ": sent " << bytesSent << " bytes in " << packetsSent << " packets\n";
-    EV_INFO << modulePath << ": received " << bytesRcvd << " bytes in " << packetsRcvd << " packets\n";
+    EV_INFO << modulePath << ": sent " << bytesSent << " bytes in "
+                   << packetsSent << " packets\n";
+    EV_INFO << modulePath << ": received " << bytesRcvd << " bytes in "
+                   << packetsRcvd << " packets\n";
 
 }
 

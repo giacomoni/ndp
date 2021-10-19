@@ -38,25 +38,21 @@ class NDPConnection;
 class NDPSendQueue;
 class NDPReceiveQueue;
 
-class INET_API Ndp : public TransportProtocolBase
-{
-  public:
+class INET_API Ndp: public TransportProtocolBase {
+public:
     static simsignal_t numRequestsRTOs;
 
     enum PortRange {
-        EPHEMERAL_PORTRANGE_START = 1024,
-        EPHEMERAL_PORTRANGE_END   = 5000
+        EPHEMERAL_PORTRANGE_START = 1024, EPHEMERAL_PORTRANGE_END = 5000
     };
 
-    struct SockPair
-    {
+    struct SockPair {
         L3Address localAddr;
         L3Address remoteAddr;
         int localPort;    // -1: unspec
         int remotePort;    // -1: unspec
 
-        inline bool operator<(const SockPair& b) const
-        {
+        inline bool operator<(const SockPair &b) const {
             if (remoteAddr != b.remoteAddr)
                 return remoteAddr < b.remoteAddr;
             else if (localAddr != b.localAddr)
@@ -67,42 +63,32 @@ class INET_API Ndp : public TransportProtocolBase
                 return localPort < b.localPort;
         }
     };
-    struct SockPairMulticast
-        {
-            L3Address localAddr;
-    //        L3Address remoteAddr;
-            int localPort;    // -1: unspec
-    //        int remotePort;    // -1: unspec
-
-             int multicastGid;    // multicast group id
-
-            inline bool operator<(const SockPairMulticast& b) const
-            {
-                if (localAddr != b.localAddr)
-                    return localAddr < b.localAddr;
-    //            else if (localAddr != b.localAddr)
-    //                return localAddr < b.localAddr;
-    //            else if (remotePort != b.remotePort)
-    //                return remotePort < b.remotePort;
-                else
-                    return localPort < b.localPort;
-            }
-        };
+    struct SockPairMulticast {
+        L3Address localAddr;
+        int localPort;    // -1: unspec
+        int multicastGid;    // multicast group id
+        inline bool operator<(const SockPairMulticast &b) const {
+            if (localAddr != b.localAddr)
+                return localAddr < b.localAddr;
+            else
+                return localPort < b.localPort;
+        }
+    };
     cMessage *requestTimerMsg = nullptr;
 
-    std::map<int, int> appGateIndexTimeOutMap;  // moh: contains num of timeouts for each app
+    std::map<int, int> appGateIndexTimeOutMap; // moh: contains num of timeouts for each app
     bool test = true;
-    std::map< int,  NDPConnection * > requestCONNMap;
+    std::map<int, NDPConnection*> requestCONNMap;
     int connIndex = 0;
 
-   int counter=0;
-   int timeOut = 0;
-   int times=0;
-   bool nap=false;
+    int counter = 0;
+    int timeOut = 0;
+    int times = 0;
+    bool nap = false;
 
-  protected:
-    typedef std::map<int /*socketId*/, NDPConnection *> NdpAppConnMap;
-    typedef std::map<SockPair, NDPConnection *> NdpConnMap;
+protected:
+    typedef std::map<int /*socketId*/, NDPConnection*> NdpAppConnMap;
+    typedef std::map<SockPair, NDPConnection*> NdpConnMap;
 
     NdpAppConnMap ndpAppConnMap;
     NdpConnMap ndpConnMap;
@@ -111,27 +97,33 @@ class INET_API Ndp : public TransportProtocolBase
     ushort lastEphemeralPort = static_cast<ushort>(-1);
     std::multiset<ushort> usedEphemeralPorts;
 
-  protected:
+protected:
     /** Factory method; may be overriden for customizing Tcp */
-    virtual NDPConnection *createConnection(int socketId);
+    virtual NDPConnection* createConnection(int socketId);
 
     // utility methods
-    virtual NDPConnection *findConnForSegment(const Ptr<const NdpHeader>& ndpseg, L3Address srcAddr, L3Address destAddr);
-    virtual NDPConnection *findConnForApp(int socketId);
-    virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address src, L3Address dest);
+    virtual NDPConnection* findConnForSegment(
+            const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr,
+            L3Address destAddr);
+    virtual NDPConnection* findConnForApp(int socketId);
+    virtual void segmentArrivalWhileClosed(Packet *packet,
+            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
     virtual void refreshDisplay() const override; //was updateDisplayString()
 
-  public:
+public:
     bool useDataNotification = false;
     int msl;
 
-  public:
-    Ndp() {}
+public:
+    Ndp() {
+    }
     virtual ~Ndp();
 
-  protected:
+protected:
     virtual void initialize(int stage) override;
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+    virtual int numInitStages() const override {
+        return NUM_INIT_STAGES;
+    }
     virtual void finish() override;
 
     virtual void handleSelfMessage(cMessage *message) override;
@@ -139,21 +131,24 @@ class INET_API Ndp : public TransportProtocolBase
     virtual void handleUpperPacket(Packet *packet) override;
     virtual void handleLowerPacket(Packet *packet) override;
 
-  public:
+public:
     /**
      * To be called from NDPConnection when a new connection gets created,
      * during processing of OPEN_ACTIVE or OPEN_PASSIVE.
      */
-    virtual void addSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
+    virtual void addSockPair(NDPConnection *conn, L3Address localAddr,
+            L3Address remoteAddr, int localPort, int remotePort);
 
     virtual void removeConnection(NDPConnection *conn); //new
-    virtual void sendFromConn(cMessage *msg, const char *gatename, int gateindex = -1); //new
+    virtual void sendFromConn(cMessage *msg, const char *gatename,
+            int gateindex = -1); //new
 
     /**
      * To be called from NDPConnection when socket pair (key for NDPConnMap) changes
      * (e.g. becomes fully qualified).
      */
-    virtual void updateSockPair(NDPConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort);
+    virtual void updateSockPair(NDPConnection *conn, L3Address localAddr,
+            L3Address remoteAddr, int localPort, int remotePort);
 
     /**
      * To be called from NDPConnection: reserves an ephemeral port for the connection.
@@ -163,12 +158,12 @@ class INET_API Ndp : public TransportProtocolBase
     /**
      * To be called from NDPConnection: create a new send queue.
      */
-    virtual NDPSendQueue *createSendQueue();
+    virtual NDPSendQueue* createSendQueue();
 
     /**
      * To be called from TcpConnection: create a new receive queue.
      */
-    virtual NDPReceiveQueue *createReceiveQueue();
+    virtual NDPReceiveQueue* createReceiveQueue();
 
     // ILifeCycle:
     virtual void handleStartOperation(LifecycleOperation *operation) override;
@@ -178,18 +173,20 @@ class INET_API Ndp : public TransportProtocolBase
     // called at shutdown/crash
     virtual void reset();
 
-    int getMsl() { return msl; }
+    int getMsl() {
+        return msl;
+    }
 
     //Added
-    virtual void  requestTimer();
-    virtual void  cancelRequestTimer();
-    virtual bool   getNapState();
+    virtual void requestTimer();
+    virtual void cancelRequestTimer();
+    virtual bool getNapState();
     virtual bool allPullQueuesEmpty();
     virtual bool allConnFinished();
     virtual void updateConnMap();
-    virtual void  sendFirstRequest();
-    virtual void  process_REQUEST_TIMER();
-    virtual void  printConnRequestMap();
+    virtual void sendFirstRequest();
+    virtual void process_REQUEST_TIMER();
+    virtual void printConnRequestMap();
 };
 
 } // namespace tcp

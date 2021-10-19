@@ -6,9 +6,7 @@
 #include "NDPAlgorithm.h"
 #include "NDPReceiveQueue.h"
 #include "NDPSendQueue.h"
-#include "../contract/ndp/NDPCommand_m.h"
 #include "NDPConnection.h"
-
 
 using namespace std;
 namespace inet {
@@ -16,24 +14,6 @@ namespace inet {
 namespace ndp {
 Define_Module(NDPConnection);
 
-//simsignal_t NDPConnection::stateSignal = registerSignal("state");    // FSM state
-//simsignal_t NDPConnection::sndWndSignal = registerSignal("sndWnd");    // snd_wnd
-//simsignal_t NDPConnection::rcvWndSignal = registerSignal("rcvWnd");    // rcv_wnd
-//simsignal_t NDPConnection::rcvAdvSignal = registerSignal("rcvAdv");    // current advertised window (=rcv_adv)
-//simsignal_t NDPConnection::sndNxtSignal = registerSignal("sndNxt");    // sent seqNo
-//simsignal_t NDPConnection::sndAckSignal = registerSignal("sndAck");    // sent ackNo
-//simsignal_t NDPConnection::rcvSeqSignal = registerSignal("rcvSeq");    // received seqNo
-//simsignal_t NDPConnection::rcvAckSignal = registerSignal("rcvAck");    // received ackNo (=snd_una)
-//simsignal_t NDPConnection::unackedSignal = registerSignal("unacked");    // number of bytes unacknowledged
-//simsignal_t NDPConnection::dupAcksSignal = registerSignal("dupAcks");    // current number of received dupAcks
-//simsignal_t NDPConnection::pipeSignal = registerSignal("pipe");    // current sender's estimate of bytes outstanding in the network
-//simsignal_t NDPConnection::sndSacksSignal = registerSignal("sndSacks");    // number of sent Sacks
-//simsignal_t NDPConnection::rcvSacksSignal = registerSignal("rcvSacks");    // number of received Sacks
-//simsignal_t NDPConnection::rcvOooSegSignal = registerSignal("rcvOooSeg");    // number of received out-of-order segments
-//simsignal_t NDPConnection::rcvNASegSignal = registerSignal("rcvNASeg");    // number of received not acceptable segments
-//simsignal_t NDPConnection::sackedBytesSignal = registerSignal("sackedBytes");    // current number of received sacked bytes
-//simsignal_t NDPConnection::tcpRcvQueueBytesSignal = registerSignal("ndpRcvQueueBytes");    // current amount of used bytes in tcp receive queue
-//simsignal_t NDPConnection::tcpRcvQueueDropsSignal = registerSignal("ndpRcvQueueDrops");    // number of drops in tcp receive queue
 NdpStateVariables::NdpStateVariables() {
     internal_request_id = 0;
     request_id = 0;  // source block number (8-bit unsigned integer)
@@ -43,19 +23,15 @@ NdpStateVariables::NdpStateVariables() {
     priorityValue = 0;
     isLongFlow = false;
     isSender = false;
-    isReceiver =false;
+    isReceiver = false;
 
     numRcvTrimmedHeader = 0;
     numberReceivedPackets = 0;
-    numberSentPackets=0;
+    numberSentPackets = 0;
     IW = 0; // send the initial window (12 Packets as in NDP) IWWWWWWWWWWWW
-    connFinished= false;
-
+    connFinished = false;
     isfinalReceivedPrintedOut = false;
-//    sequenceNumber = 0;
-
-    numRcvdPkt=0;
-
+    numRcvdPkt = 0;
     request_rexmit_count = 0;
     request_rexmit_timeout = 0;
     numPullsTimeOuts = 0;
@@ -63,7 +39,6 @@ NdpStateVariables::NdpStateVariables() {
     connNotAddedYet = true;
 
     active = false;
-    //fork = false;
     snd_mss = 0;
     iss = 0;
 
@@ -86,7 +61,8 @@ std::string NdpStateVariables::detailedInfo() const {
 }
 
 void NDPConnection::initConnection(Ndp *_mod, int _socketId) {
-    Enter_Method_Silent();
+    Enter_Method_Silent
+    ();
 
     ndpMain = _mod;
     socketId = _socketId;
@@ -119,7 +95,6 @@ NDPConnection::~NDPConnection() {
     }
 
     delete sendQueue;
-//    delete rexmitQueue;
     delete receiveQueue;
     delete ndpAlgorithm;
     delete state;
@@ -136,15 +111,13 @@ NDPConnection::~NDPConnection() {
         delete cancelEvent(requestInternalTimer);
 }
 
-void NDPConnection::handleMessage(cMessage *msg)
-{
+void NDPConnection::handleMessage(cMessage *msg) {
     if (msg->isSelfMessage()) {
         if (!processTimer(msg))
             EV_INFO << "\nConnection Attempted Removal!\n";
-            //ndpMain->removeConnection(this);
-    }
-    else
-        throw cRuntimeError("model error: NDPConnection allows only self messages");
+    } else
+        throw cRuntimeError(
+                "model error: NDPConnection allows only self messages");
 }
 
 bool NDPConnection::processTimer(cMessage *msg) {
@@ -181,24 +154,27 @@ bool NDPConnection::processTimer(cMessage *msg) {
     return performStateTransition(event);
 }
 
-
-
-bool NDPConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader>& ndpseg, L3Address segSrcAddr, L3Address segDestAddr)
-{
-    Enter_Method_Silent();
+bool NDPConnection::processNDPSegment(Packet *packet,
+        const Ptr<const NdpHeader> &ndpseg, L3Address segSrcAddr,
+        L3Address segDestAddr) {
+    Enter_Method_Silent
+    ();
 
     printConnBrief();
-    NDPEventCode event = process_RCV_SEGMENT(packet, ndpseg, segSrcAddr, segDestAddr);
+    NDPEventCode event = process_RCV_SEGMENT(packet, ndpseg, segSrcAddr,
+            segDestAddr);
     // then state transitions
     return performStateTransition(event);
 }
 
- bool NDPConnection::processAppCommand(cMessage *msg) {
-    Enter_Method_Silent();
+bool NDPConnection::processAppCommand(cMessage *msg) {
+    Enter_Method_Silent
+    ();
 
     printConnBrief();
 
-    NDPCommand *ndpCommand = check_and_cast_nullable<NDPCommand *>(msg->removeControlInfo());
+    NDPCommand *ndpCommand = check_and_cast_nullable<NDPCommand*>(
+            msg->removeControlInfo());
     NDPEventCode event = preanalyseAppCommandEvent(msg->getKind());
     EV_INFO << "App command eventName: " << eventName(event) << "\n";
 //     std::cout << "App command: " << eventName(event) << std::endl;
@@ -212,7 +188,6 @@ bool NDPConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader>
         break;
     case NDP_E_CLOSE:
         break;
-
 
     default:
         throw cRuntimeError(ndpMain, "wrong event code");
@@ -241,7 +216,7 @@ NDPEventCode NDPConnection::preanalyseAppCommandEvent(int commandCode) {
     }
 }
 
-bool NDPConnection::performStateTransition(const NDPEventCode& event) {
+bool NDPConnection::performStateTransition(const NDPEventCode &event) {
     ASSERT(fsm.getState() != NDP_S_CLOSED); // closed connections should be deleted immediately
 
     if (event == NDP_E_IGNORE) {    // e.g. discarded segment
@@ -598,7 +573,7 @@ void NDPConnection::stateEntered(int state, int oldState, NDPEventCode event) {
     case NDP_S_FIN_WAIT_2:
     case NDP_S_CLOSING:
         if (state == NDP_S_CLOSE_WAIT)
-            sendIndicationToApp(NDP_I_PEER_CLOSED);
+            sendIndicationToApp (NDP_I_PEER_CLOSED);
         // whether connection setup succeeded (ESTABLISHED) or not (others),
         // cancel these timers
         if (connEstabTimer)
@@ -608,7 +583,7 @@ void NDPConnection::stateEntered(int state, int oldState, NDPEventCode event) {
         break;
 
     case NDP_S_TIME_WAIT:
-        sendIndicationToApp(NDP_I_CLOSED);
+        sendIndicationToApp (NDP_I_CLOSED);
         break;
 
     case NDP_S_CLOSED:
@@ -627,7 +602,6 @@ void NDPConnection::stateEntered(int state, int oldState, NDPEventCode event) {
         break;
     }
 }
-
 } // namespace NDP
 } // namespace inet
 
