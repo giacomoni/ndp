@@ -77,7 +77,7 @@ void NdpSinkApp::handleMessage(cMessage *msg) {
                     newNumFinishedFlows);
             EV_INFO
                            << "\nNdpSinkApp::handleMessage  numCompletedShortFlows "
-                           << newNumFinishedFlows << "\n\n\n";
+                           << newNumFinishedFlows << "\n";
         }
         delete msg;
     } else if (msg->getKind() == NDP_I_DATA

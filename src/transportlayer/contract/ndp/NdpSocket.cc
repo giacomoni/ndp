@@ -48,7 +48,6 @@ NdpSocket::NdpSocket(NdpAvailableInfo *availableInfo) {
     remoteAddr = availableInfo->getRemoteAddr();
     localPrt = availableInfo->getLocalPort();
     remotePrt = availableInfo->getRemotePort();
-    EV_INFO << "\n\n\n\nMARKER LOCAL ADDRESS: " << localAddr.str();
 }
 
 NdpSocket::~NdpSocket() {
@@ -84,7 +83,7 @@ void NdpSocket::sendToNDP(cMessage *msg, int connId) {
                 "NdpSocket: setOutputGate() must be invoked before socket can be used");
 
     auto &tags = getTags(msg);
-    //tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&ProtocolNdp::ndp);
+    // tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&ProtocolNdp::ndp);
     tags.addTagIfAbsent<DispatchProtocolReq>()->setProtocol(&Protocol::ndp);
     tags.addTagIfAbsent<SocketReq>()->setSocketId(
             connId == -1 ? this->connId : connId);
@@ -110,7 +109,6 @@ void NdpSocket::bind(L3Address lAddr, int lPort) {
     // allow -1 here, to make it possible to specify address only
     if ((lPort < 0 || lPort > 65535) && lPort != -1)
         throw cRuntimeError("NdpSocket::bind(): invalid port number %d", lPort);
-//std::cout << " bind localAddr " << lAddr << "\n";
     localAddr = lAddr;
     localPrt = lPort;
     sockstate = BOUND;
@@ -136,7 +134,6 @@ void NdpSocket::listen(bool fork) {
     request->setControlInfo(openCmd);
     sendToNDP(request);
     sockstate = LISTENING;
-    //throw cRuntimeError( "Local address %d Local Port %d", localAddr, localPrt);
 }
 void NdpSocket::accept(int socketId) {
     auto request = new Request("ACCEPT", NDP_C_ACCEPT);
@@ -182,19 +179,19 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress,
 
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
 
-    EV_INFO << "\n\n\n\nNUMBER OF PACKETS TO SEND: " << numPacketsToSend
-                   << "\n\n\n\n";
+    EV_INFO << "\nNUMBER OF PACKETS TO SEND: " << numPacketsToSend
+                   << "\n";
     openCmd->setNumPacketsToSend(numPacketsToSend);
     openCmd->setPriorityValue(priorityValue);
     openCmd->setIsSender(isSender);
     openCmd->setIsReceiver(isReceiver);
     openCmd->setIsLongFlow(isLongFlow);
 
-    EV_INFO << "\n\n\nCONTROL INFO SENT";
+    EV_INFO << "\nCONTROL INFO SENT";
     request->setControlInfo(openCmd);
     sendToNDP(request);
     sockstate = CONNECTING;
-    EV_INFO << "\n\n\nCONNECTING FINISHED";
+    EV_INFO << "\nCONNECTING FINISHED";
 }
 
 void NdpSocket::send(Packet *msg) {
@@ -291,7 +288,6 @@ void NdpSocket::setCallback(ICallback *callback) {
 void NdpSocket::processMessage(cMessage *msg) {
 
     ASSERT(belongsToSocket(msg));
-
     NdpStatusInfo *status;
     NdpAvailableInfo *availableInfo;
     NdpConnectInfo *connectInfo;
