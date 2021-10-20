@@ -30,7 +30,8 @@ namespace inet {
 
 /**
  * Routing support. The Topology class was designed primarily to support
- * routing in telecommunication or multiprocessor networks.
+ * routing in telecommunication or multiprocessor networks. The code has been
+ * extended with a ECMP implementation.
  *
  * A Topology object stores an abstract representation of the network
  * in graph form:

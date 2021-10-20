@@ -1,10 +1,10 @@
 
 package ndp.base;
+
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 import inet.node.inet.StandardHost;
 import inet.node.inet.Router;
-import ndp.base.RouterNdp;
 import inet.node.ethernet.EtherLink;
 import ned.DatarateChannel;
 import ned.IBidirectionalChannel;
@@ -13,6 +13,7 @@ import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import ned.DatarateChannel;
 import ned.IdealChannel;
 
+import ndp.base.RouterNdp;
 import ndp.node.StandardHostNdp;
  
 module Rack
@@ -40,7 +41,7 @@ module Rack
         // k/2 servers are connected with one edge router.
         servers[int(k/2)]: StandardHostNdp {
             // Reach value down.
-  //           position = index;
+            // position = index;
             @display("p=80,160,r,80");
             @display("i=device/device");
         }
@@ -51,12 +52,6 @@ module Rack
           //  forwarding = default(true);
         }
 
-//        ipconfig: EdgeIPConfig {
-//            @display("p=560,31");
-//        }
-        
-    //      configurator: IPv4NetworkConfigurator;
-
     connections:
         // Connect all servers with the one edge switch.
         for i=0..sizeof(servers)-1 {
@@ -64,7 +59,6 @@ module Rack
         }
         // Connect the ports of the edge switch with the gates of the compound module.
         for i=0..int(k/2)-1 {
-            edgeSwitch.pppg++ <--> IdealChannel <--> rackg++;
-              
+            edgeSwitch.pppg++ <--> IdealChannel <--> rackg++; 
         }
 }

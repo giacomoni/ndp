@@ -18,7 +18,7 @@ package ndp.networklayer.ipv4;
 import inet.networklayer.contract.IRoutingTable;
 
 //
-// Stores the routing table. (Per-interface configuration is stored in
+// Stores the routing table - with ECMP implementation. (Per-interface configuration is stored in
 // ~InterfaceTable.)
 //
 // For hosts, the routerId module parameter should be empty (""),

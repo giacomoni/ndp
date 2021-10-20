@@ -1,7 +1,7 @@
 ../out/gcc-release/src/transportlayer/contract/ndp/NDPSocket.o: \
  transportlayer/contract/ndp/NDPSocket.cc \
  transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NDPSocket.h \
- transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NDPCommand_m.h \
+ transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NdpCommand_m.h \
  /home/aiden178/omnetpp-5.6.2/include/omnetpp.h \
  ../../inet4/src/inet/common/INETDefs_m.h \
  ../../inet4/src/inet/common/INETDefs.h \
@@ -52,7 +52,7 @@
 
 transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NDPSocket.h:
 
-transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NDPCommand_m.h:
+transportlayer/contract/ndp/../../../transportlayer/contract/ndp/NdpCommand_m.h:
 
 /home/aiden178/omnetpp-5.6.2/include/omnetpp.h:
 

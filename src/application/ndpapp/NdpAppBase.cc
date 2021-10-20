@@ -1,8 +1,7 @@
-
 #include "NdpAppBase.h"
 
 #include "inet/networklayer/common/L3AddressResolver.h"
-#include  "../../transportlayer/contract/ndp/NDPSocket.h"
+#include  "../../transportlayer/contract/ndp/NdpSocket.h"
 
 namespace inet {
 void NdpAppBase::initialize(int stage) {
@@ -39,8 +38,8 @@ void NdpAppBase::connect() {
     // we need a new connId if this is not the first connection
     socket.renewSocket();
 
-    unsigned int numPacketsToSend = par("numPacketsToSend").longValue();
-    unsigned int priorityValue = par("priorityValue").intValue();
+    int numPacketsToSend = par("numPacketsToSend").intValue();
+    int priorityValue = par("priorityValue").intValue();
     bool isBackroundFlow = par("isBackroundFlow").boolValue();
     bool isSender = par("isSender").boolValue();
     bool isReceiver = par("isReceiver").boolValue();
@@ -87,46 +86,44 @@ void NdpAppBase::setStatusString(const char *s) {
         getDisplayString().setTagArg("t", 0, s);
 }
 
-void NdpAppBase::socketEstablished(NDPSocket*) {
+void NdpAppBase::socketEstablished(NdpSocket*) {
 
     // *redefine* to perform or schedule first sending
     EV_INFO << "\n\n\n\n\n\n\n\n connected\n";
     setStatusString("Established");
 }
 
-void NdpAppBase::socketDataArrived(NDPSocket*, Packet *msg, bool) {
+void NdpAppBase::socketDataArrived(NdpSocket*, Packet *msg, bool) {
     // *redefine* to perform or schedule next sending
     packetsRcvd++;
     bytesRcvd += msg->getByteLength();
     delete msg;
 }
 
-void NdpAppBase::socketPeerClosed(NDPSocket *socket_) {
+void NdpAppBase::socketPeerClosed(NdpSocket *socket_) {
     ASSERT(socket_ == &socket);
     // close the connection (if not already closed)
-    if (socket.getState() == NDPSocket::PEER_CLOSED) {
+    if (socket.getState() == NdpSocket::PEER_CLOSED) {
         EV_INFO << "remote NDP closed, closing here as well\n";
         close();
     }
 }
 
-void NdpAppBase::socketClosed(NDPSocket*) {
+void NdpAppBase::socketClosed(NdpSocket*) {
     // *redefine* to start another session etc.
     EV_INFO << "connection closed\n";
     setStatusString("closed");
 }
 
-void NdpAppBase::socketFailure(NDPSocket*, int code) {
+void NdpAppBase::socketFailure(NdpSocket*, int code) {
     // subclasses may override this function, and add code try to reconnect after a delay.
     EV_WARN << "connection broken\n";
     setStatusString("broken");
-
     numBroken++;
 }
 
 void NdpAppBase::finish() {
     std::string modulePath = getFullPath();
-
     EV_INFO << modulePath << ": opened " << numSessions << " sessions\n";
     EV_INFO << modulePath << ": sent " << bytesSent << " bytes in "
                    << packetsSent << " packets\n";

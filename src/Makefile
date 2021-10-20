@@ -25,45 +25,41 @@ O = $(PROJECT_OUTPUT_DIR)/$(CONFIGNAME)/$(PROJECTRELATIVE_PATH)
 
 # Object files for local .cc, .msg and .sm files
 OBJS = \
-    $O/application/base/ApplicationBaseNdp.o \
     $O/application/ndpapp/NdpAppBase.o \
     $O/application/ndpapp/NdpBasicClientApp.o \
     $O/application/ndpapp/NdpSinkApp.o \
     $O/common/ResultFiltersThroughput.o \
     $O/common/TopologyEcmp.o \
-    $O/common/queue/NDPQueue.o \
+    $O/common/queue/NdpSwitchQueue.o \
     $O/common/scheduler/CentralSchedulerNdp.o \
     $O/networklayer/configurator/base/NetworkConfiguratorBaseEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.o \
     $O/networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.o \
-    $O/networklayer/ipv4/Ipv4Ndp.o \
-    $O/networklayer/ipv4/Ipv4NetworkLayerNdp.o \
+    $O/networklayer/ipv4/Ipv4Ecmp.o \
+    $O/networklayer/ipv4/Ipv4NetworkLayerEcmp.o \
     $O/networklayer/ipv4/Ipv4RoutingTableEcmp.o \
     $O/networklayer/ipv4/RoutingTableParserEcmp.o \
     $O/transportlayer/Ndp/Ndp.o \
-    $O/transportlayer/Ndp/NDPConnectionBase.o \
-    $O/transportlayer/Ndp/NDPConnectionEventProc.o \
-    $O/transportlayer/Ndp/NDPConnectionRcvSegment.o \
-    $O/transportlayer/Ndp/NDPConnectionUtil.o \
-    $O/transportlayer/Ndp/NDPReceiveQueue.o \
-    $O/transportlayer/Ndp/NDPSendQueue.o \
-    $O/transportlayer/Ndp/flavours/DumbNDP.o \
+    $O/transportlayer/Ndp/NdpConnectionBase.o \
+    $O/transportlayer/Ndp/NdpConnectionEventProc.o \
+    $O/transportlayer/Ndp/NdpConnectionRcvSegment.o \
+    $O/transportlayer/Ndp/NdpConnectionUtil.o \
+    $O/transportlayer/Ndp/NdpSendQueue.o \
+    $O/transportlayer/Ndp/flavours/DumbNdp.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader.o \
     $O/transportlayer/common/L4ToolsNdp.o \
-    $O/transportlayer/contract/ndp/NDPSocket.o \
-    $O/application/base/ApplicationPacketNdp_m.o \
+    $O/transportlayer/contract/ndp/NdpSocket.o \
     $O/application/ndpapp/GenericAppMsgNdp_m.o \
-    $O/transportlayer/Ndp/NDPConnection_m.o \
+    $O/transportlayer/Ndp/NdpConnection_m.o \
     $O/transportlayer/Ndp/ndp_common/NdpHeader_m.o \
-    $O/transportlayer/contract/ndp/NDPCommand_m.o
+    $O/transportlayer/contract/ndp/NdpCommand_m.o
 
 # Message files
 MSGFILES = \
-    application/base/ApplicationPacketNdp.msg \
     application/ndpapp/GenericAppMsgNdp.msg \
-    transportlayer/Ndp/NDPConnection.msg \
+    transportlayer/Ndp/NdpConnection.msg \
     transportlayer/Ndp/ndp_common/NdpHeader.msg \
-    transportlayer/contract/ndp/NDPCommand.msg
+    transportlayer/contract/ndp/NdpCommand.msg
 
 # SM files
 SMFILES =

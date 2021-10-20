@@ -29,8 +29,8 @@
  ../../inet4/src/inet/common/lifecycle/ILifecycle.h \
  common/scheduler/../../application/ndpapp/NdpBasicClientApp.h \
  common/scheduler/../../application/ndpapp/NdpAppBase.h \
- common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h \
- common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
+ common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h \
+ common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  ../../inet4/src/inet/common/packet/ChunkQueue.h \
@@ -116,9 +116,9 @@ common/scheduler/../../application/ndpapp/NdpBasicClientApp.h:
 
 common/scheduler/../../application/ndpapp/NdpAppBase.h:
 
-common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h:
+common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h:
 
-common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
+common/scheduler/../../application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h:
 
 ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h:
 

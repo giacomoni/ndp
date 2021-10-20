@@ -1,28 +1,12 @@
-//
-// This program is free software: you can redistribute it and/or modify
-// it under the terms of the GNU Lesser General Public License as published by
-// the Free Software Foundation, either version 3 of the License, or
-// (at your option) any later version.
-// 
-// This program is distributed in the hope that it will be useful,
-// but WITHOUT ANY WARRANTY; without even the implied warranty of
-// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-// GNU Lesser General Public License for more details.
-// 
-// You should have received a copy of the GNU Lesser General Public License
-// along with this program.  If not, see http://www.gnu.org/licenses/.
-// 
-
 package ndp.base;
 
 import inet.applications.contract.IApp;
-import ndp.node.ApplicationLayerNodeBaseNdp;
 import inet.routing.contract.IBgp;
 import inet.routing.contract.IOspf;
 import inet.routing.contract.IPim;
-
+import ndp.node.ApplicationLayerNodeBaseEcmp;
 //
-// IPv4 router that supports wireless, Ethernet, PPP and external interfaces.
+// IPv4 router with NDP compatability that supports wireless, Ethernet, PPP and external interfaces.
 // By default, no wireless and external interfaces are added; the number of
 // Ethernet and PPP ports depends on the external connections.
 //
@@ -44,7 +28,8 @@ import inet.routing.contract.IPim;
 // By default, dynamic routing is not supported. Specific routing protocols can
 // be added by setting the hasOspf/hasRip/hasBgp parameters.
 //
-module RouterNdp extends ApplicationLayerNodeBaseNdp
+//
+module RouterNdp extends ApplicationLayerNodeBaseEcmp
 {
     parameters:
         @display("i=abstract/router");

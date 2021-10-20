@@ -30,16 +30,14 @@
 #include "inet/networklayer/contract/IInterfaceTable.h"
 #include "inet/networklayer/ipv4/Ipv4InterfaceData.h"
 #include "inet/networklayer/ipv4/Ipv4Route.h"
-#include "Ipv4RoutingTableEcmp.h"
 #include "inet/networklayer/ipv4/RoutingTableParser.h"
 #include "inet/common/packet/Packet.h"
-
-#include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 #include "inet/networklayer/ipv4/Ipv4Header_m.h"
-
 #include "inet/networklayer/common/L3Tools.h"
-#include "../../transportlayer/common/L4ToolsNdp.h"
 
+#include "../../transportlayer/common/L4ToolsNdp.h"
+#include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
+#include "Ipv4RoutingTableEcmp.h"
 namespace inet {
 
 using namespace utils;

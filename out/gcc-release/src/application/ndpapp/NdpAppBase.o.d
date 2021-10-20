@@ -1,15 +1,15 @@
 ../out/gcc-release/src/application/ndpapp/NdpAppBase.o: \
  application/ndpapp/NdpAppBase.cc application/ndpapp/NdpAppBase.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h \
+ /home/aiden178/omnetpp-5.6.2/include/omnetpp.h \
+ ../../inet4/src/inet/common/INETDefs_m.h \
  ../../inet4/src/inet/common/INETDefs.h \
  ../../inet4/src/inet/common/precompiled_release.h \
  ../../inet4/src/inet/common/precompiled.h \
- /home/aiden178/omnetpp-5.6.2/include/omnetpp.h \
  ../../inet4/src/inet/opp_defines.h ../../inet4/src/inet/features.h \
  ../../inet4/src/inet/common/Compat.h \
  ../../inet4/src/inet/common/InitStages.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
- ../../inet4/src/inet/common/INETDefs_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address.h \
@@ -51,13 +51,19 @@
 
 application/ndpapp/NdpAppBase.h:
 
+application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h:
+
+application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h:
+
+/home/aiden178/omnetpp-5.6.2/include/omnetpp.h:
+
+../../inet4/src/inet/common/INETDefs_m.h:
+
 ../../inet4/src/inet/common/INETDefs.h:
 
 ../../inet4/src/inet/common/precompiled_release.h:
 
 ../../inet4/src/inet/common/precompiled.h:
-
-/home/aiden178/omnetpp-5.6.2/include/omnetpp.h:
 
 ../../inet4/src/inet/opp_defines.h:
 
@@ -66,12 +72,6 @@ application/ndpapp/NdpAppBase.h:
 ../../inet4/src/inet/common/Compat.h:
 
 ../../inet4/src/inet/common/InitStages.h:
-
-application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h:
-
-application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
-
-../../inet4/src/inet/common/INETDefs_m.h:
 
 ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h:
 

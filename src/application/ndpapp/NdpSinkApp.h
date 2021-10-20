@@ -4,7 +4,7 @@
 
 #include "inet/common/INETDefs.h"
 #include "inet/common/lifecycle/LifecycleOperation.h"
-#include "../../transportlayer/contract/ndp/NDPSocket.h"
+#include "../../transportlayer/contract/ndp/NdpSocket.h"
 #include "inet/common/lifecycle/ILifecycle.h"
 namespace inet {
 
@@ -16,7 +16,7 @@ class INET_API NdpSinkApp : public cSimpleModule, public ILifecycle
 {
   protected:
     long bytesRcvd;
-    NDPSocket socket;
+    NdpSocket socket;
 
     double multiCastGroupId;
     double multiSrcGroupId;

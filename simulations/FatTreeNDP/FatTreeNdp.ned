@@ -8,7 +8,7 @@ import ndp.base.RouterNdp;
 import ndp.base.Pod;
 import ndp.base.Rack;
 import inet.node.ethernet.Eth100M;
-import ndp.common.queue.NDPQueue;
+import ndp.common.queue.NdpSwitchQueue;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
 import ndp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
 import inet.visualizer.contract.IIntegratedVisualizer;

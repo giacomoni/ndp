@@ -1,6 +1,5 @@
 package ndp.transportlayer.Ndp;
 
-
 import  ndp.transportlayer.contract.INdp;
 
 simple Ndp like INdp
@@ -10,9 +9,6 @@ simple Ndp like INdp
         string ndpAlgorithmClass =default("NDPSimpleAlg");
         @display("i=block/wheelbarrow");
 		
-		@signal[numRequestsRTOs](type=double);
-        @statistic[numRequestsRTOs](title="numRequestsRTOs "; source=numRequestsRTOs; record=vector); 
-        
         @signal[packetReceivedFromUpper](type=cPacket);
         @signal[packetReceivedFromLower](type=cPacket);
     gates:

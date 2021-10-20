@@ -32,8 +32,8 @@
  ../../inet4/src/inet/common/packet/chunk/SliceChunk.h \
  ../../inet4/src/inet/common/packet/chunk/FieldsChunk.h \
  application/ndpapp/NdpBasicClientApp.h application/ndpapp/NdpAppBase.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address.h \
@@ -129,9 +129,9 @@ application/ndpapp/NdpBasicClientApp.h:
 
 application/ndpapp/NdpAppBase.h:
 
-application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h:
+application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h:
 
-application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
+application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h:
 
 ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h:
 

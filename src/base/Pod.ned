@@ -3,18 +3,18 @@ package ndp.base;
  
 import ned.DatarateChannel;
 import ned.IdealChannel;
+import ned.DatarateChannel;
+import ned.IBidirectionalChannel;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.contract.INetworkLayer;
 import inet.node.inet.StandardHost;
 import inet.node.inet.Router;
-import ndp.base.RouterNdp;
 import inet.node.ethernet.EtherLink;
-import ned.DatarateChannel;
-import ned.IBidirectionalChannel;
 import inet.node.ethernet.Eth10M;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
+
 import ndp.node.StandardHostNdp;
- 
+import ndp.base.RouterNdp;
  
 module Pod
 {
@@ -34,7 +34,6 @@ module Pod
         channel ethernetline extends DatarateChannel
         {
             delay =1us;
-//        datarate = 100Mbps;
       		datarate = 1Gbps;
         }
 

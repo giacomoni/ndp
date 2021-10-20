@@ -16,7 +16,6 @@
 #include "inet/applications/base/ApplicationPacket_m.h"
 #include "inet/common/geometry/common/Coord.h"
 #include "inet/common/packet/Packet.h"
-#include "ResultFiltersThroughput.h"
 #include "inet/common/ResultRecorders.h"
 #include "inet/common/Simsignals_m.h"
 #include "inet/common/TimeTag_m.h"
@@ -24,7 +23,7 @@
 #include "inet/networklayer/common/L3AddressTag_m.h"
 #include "inet/physicallayer/base/packetlevel/FlatReceptionBase.h"
 #include "inet/physicallayer/contract/packetlevel/SignalTag_m.h"
-
+#include "ResultFiltersThroughput.h"
 namespace inet {
 namespace utils {
 namespace filters {
@@ -36,16 +35,9 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
     if (auto packet = dynamic_cast<cPacket*>(object)) {
         const simtime_t now = simTime();
         packets++;
-        //if (packets >= packetLimit) {
-        //    bytes += packet->getByteLength();
-        //    emitThroughput(now, details);
-        //}
         if (packets >= 1) { // MOH modified
-            //std::cout << "\n" << packet->getByteLength();
             bytes += packet->getByteLength();
             double throughput = 8 * bytes / (now - lastSignal).dbl();
-            //std::cout << "\nBYTES: " << bytes;
-            //std::cout << "\nDifference: " << (now - lastSignal).dbl();
             fire(this, now, throughput, details);
             lastSignal = now;
             bytes = 0;
@@ -58,7 +50,7 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             packets = 0;
             if (emitIntermediateZeros) {
                 while (now - lastSignal >= interval) {
-//                     fire(this, lastSignal + interval, 0.0, details); // MOH commented
+                    // fire(this, lastSignal + interval, 0.0, details); // MOH commented
                     lastSignal = lastSignal + interval;
                 }
             } else {

@@ -8,8 +8,8 @@
  ../../inet4/src/inet/common/Compat.h \
  ../../inet4/src/inet/common/InitStages.h \
  ../../inet4/src/inet/common/lifecycle/LifecycleOperation.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h \
  ../../inet4/src/inet/common/INETDefs_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
@@ -62,7 +62,7 @@
  ../../inet4/src/inet/common/Protocol.h \
  ../../inet4/src/inet/common/TagBase_m.h \
  ../../inet4/src/inet/common/lifecycle/NodeStatus.h \
- application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h \
+ application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h \
  ../../inet4/src/inet/common/ResultFilters.h
 
 application/ndpapp/NdpSinkApp.h:
@@ -85,9 +85,9 @@ application/ndpapp/NdpSinkApp.h:
 
 ../../inet4/src/inet/common/lifecycle/LifecycleOperation.h:
 
-application/ndpapp/../../transportlayer/contract/ndp/NDPSocket.h:
+application/ndpapp/../../transportlayer/contract/ndp/NdpSocket.h:
 
-application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
+application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h:
 
 ../../inet4/src/inet/common/INETDefs_m.h:
 
@@ -193,6 +193,6 @@ application/ndpapp/GenericAppMsgNdp_m.h:
 
 ../../inet4/src/inet/common/lifecycle/NodeStatus.h:
 
-application/ndpapp/../../transportlayer/contract/ndp/NDPCommand_m.h:
+application/ndpapp/../../transportlayer/contract/ndp/NdpCommand_m.h:
 
 ../../inet4/src/inet/common/ResultFilters.h:

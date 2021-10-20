@@ -3,8 +3,8 @@
 #define __NDP_RAPTONDPAPPBASE_H
 
 #include "inet/common/INETDefs.h"
-#include "../../transportlayer/contract/ndp/NDPSocket.h"
 #include "inet/applications/base/ApplicationBase.h"
+#include "../../transportlayer/contract/ndp/NdpSocket.h"
 
 namespace inet {
 
@@ -14,9 +14,9 @@ namespace inet {
  *
  * It needs the following NED parameters: localAddress, localPort, connectAddress, connectPort.
  */
-class INET_API NdpAppBase: public ApplicationBase, public NDPSocket::ICallback {
+class INET_API NdpAppBase: public ApplicationBase, public NdpSocket::ICallback {
 protected:
-    NDPSocket socket;
+    NdpSocket socket;
 
     // statistics
     int numSessions;
@@ -39,24 +39,24 @@ protected:
     virtual void close();
     virtual void setStatusString(const char *s);
 
-    /* NDPSocket::ICallback callback methods */
+    /* NdpSocket::ICallback callback methods */
     virtual void handleTimer(cMessage *msg) = 0;
 
-    virtual void socketEstablished(NDPSocket *socket) override;
-    virtual void socketDataArrived(NDPSocket *socket, Packet *msg, bool urgent)
+    virtual void socketEstablished(NdpSocket *socket) override;
+    virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent)
             override;
-    virtual void socketAvailable(NDPSocket *socket,
-            NDPAvailableInfo *availableInfo) override {
+    virtual void socketAvailable(NdpSocket *socket,
+            NdpAvailableInfo *availableInfo) override {
         socket->accept(availableInfo->getNewSocketId());
     }
-    virtual void socketPeerClosed(NDPSocket *socket) override;
-    virtual void socketClosed(NDPSocket *socket) override;
-    virtual void socketFailure(NDPSocket *socket, int code) override;
-    virtual void socketStatusArrived(NDPSocket *socket, NDPStatusInfo *status)
+    virtual void socketPeerClosed(NdpSocket *socket) override;
+    virtual void socketClosed(NdpSocket *socket) override;
+    virtual void socketFailure(NdpSocket *socket, int code) override;
+    virtual void socketStatusArrived(NdpSocket *socket, NdpStatusInfo *status)
             override {
         delete status;
     }
-    virtual void socketDeleted(NDPSocket *socket) override {
+    virtual void socketDeleted(NdpSocket *socket) override {
     }
 };
 

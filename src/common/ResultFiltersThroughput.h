@@ -24,7 +24,6 @@ namespace utils {
 
 namespace filters {
 
-
 /**
  * Filter that expects a cPacket and outputs the throughput as double.
  * Throughput is computed for the *past* interval every 0.1s or 100 packets,
@@ -51,7 +50,6 @@ class INET_API ThroughputFilterA : public cObjectResultFilter
     void emitThroughput(simtime_t endInterval, cObject *details);
   public:
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details) override;
-    //virtual void finish(cComponent *component, simsignal_t signalID) override;
 };
 
 }

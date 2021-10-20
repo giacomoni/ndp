@@ -129,7 +129,7 @@ void CentralSchedulerNdp::handleMessage(cMessage *msg) {
     // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
     if (oneToMany == true && manyToOne == false && oneToOne == false
             && daisyChainGFS == false) {
-        for (unsigned int i = 1; i <= numRunningMulticastGroups; i++) {
+        for (int i = 1; i <= numRunningMulticastGroups; i++) {
             std::cout << "\n\n\n multicast Group ID: " << i << std::endl;
             std::vector<std::string> replicasNodes;
             getNewThreeDestRandTMForMulticast(itsSrc, replicasNodes); // ndp multicasting (3 replicas) based on multi Unicasting
@@ -139,7 +139,7 @@ void CentralSchedulerNdp::handleMessage(cMessage *msg) {
     ////// daisyChainGFS  multicast
     else if (oneToMany == false && manyToOne == false && oneToOne == false
             && daisyChainGFS == true) {
-        for (unsigned int i = 1; i <= numRunningMulticastGroups; i++) {
+        for (int i = 1; i <= numRunningMulticastGroups; i++) {
             std::cout << "\n\n\n daisyChainGFS ::: multicast Group ID: " << i
                     << std::endl;
             std::vector<std::string> replicasNodes;
@@ -150,7 +150,7 @@ void CentralSchedulerNdp::handleMessage(cMessage *msg) {
     ////////// ^^^^^^^
     else if (oneToMany == false && manyToOne == true && oneToOne == false
             && daisyChainGFS == false) {
-        for (unsigned int i = 1; i <= numRunningMultiSourcingGroups; i++) {
+        for (int i = 1; i <= numRunningMultiSourcingGroups; i++) {
             std::cout << "\n\n\n multi-sourcing Group ID: " << i << std::endl;
             std::vector<std::string> senders;
             getNewThreeSrcRandTMForMultiSourcing(newDest, senders); // ndp multisourcing (3 replicas) based on multi Unicasting
@@ -163,7 +163,7 @@ void CentralSchedulerNdp::handleMessage(cMessage *msg) {
         if (isWebSearchWorkLoad == true)
             getWebSearchWorkLoad();
 
-        for (unsigned int i = 1; i <= numShortFlows; i++) {
+        for (int i = 1; i <= numShortFlows; i++) {
             std::cout
                     << "\n\n ******************** schedule Short flows .. ********************  \n";
             std::cout << " Shortflow ID: " << i << std::endl;
@@ -221,8 +221,8 @@ void CentralSchedulerNdp::getNewDestRandTM(std::string &itsSrc,
     std::cout
             << "******************** getNewDestination RandTM .. ********************  \n";
 //    int newDestination = test;
-    unsigned int newDestination = 0;
-    unsigned int srcNewDestination = 0;
+    int newDestination = 0;
+    int srcNewDestination = 0;
     while (newDestination == srcNewDestination) { // the dest should be different from the src
         newDestination = permServers.at(
                 numlongflowsRunningServers
@@ -283,25 +283,25 @@ void CentralSchedulerNdp::generateTM() {
     }
 
     std::cout << "permServers:                ";
-    for (std::vector<unsigned int>::iterator it = permServers.begin();
+    for (std::vector<int>::iterator it = permServers.begin();
             it != permServers.end(); ++it)
         std::cout << ' ' << *it;
     std::cout << '\n';
 
     std::cout << "permLongFlowsServers:       ";
-    for (std::vector<unsigned int>::iterator it = permLongFlowsServers.begin();
+    for (std::vector<int>::iterator it = permLongFlowsServers.begin();
             it != permLongFlowsServers.end(); ++it)
         std::cout << ' ' << *it;
     std::cout << '\n';
 
     std::cout << "permShortFlowsServers:      ";
-    for (std::vector<unsigned int>::iterator it = permShortFlowsServers.begin();
+    for (std::vector<int>::iterator it = permShortFlowsServers.begin();
             it != permShortFlowsServers.end(); ++it)
         std::cout << ' ' << *it;
     std::cout << '\n';
 
     std::cout << "permMapLongFlows:                 \n";
-    for (std::map<unsigned int, unsigned int>::iterator iter =
+    for (std::map<int, int>::iterator iter =
             permMapLongFlows.begin(); iter != permMapLongFlows.end(); ++iter) {
         cout << "  src " << iter->second << " ==> ";
         cout << "  dest " << iter->first << "\n";
@@ -310,7 +310,7 @@ void CentralSchedulerNdp::generateTM() {
     }
 
     std::cout << "permMapShortFlows:                 \n";
-    for (std::map<unsigned int, unsigned int>::iterator iter =
+    for (std::map<int, int>::iterator iter =
             permMapShortFlows.begin(); iter != permMapShortFlows.end();
             ++iter) {
         cout << "   src " << iter->second << " ==> ";
@@ -348,7 +348,7 @@ void CentralSchedulerNdp::getNewDestPremTM(std::string &itsSrc,
     permMapShortFlowsVector.record(newDestination);
 }
 
-void CentralSchedulerNdp::findLocation(unsigned int nodeIndex,
+void CentralSchedulerNdp::findLocation(int nodeIndex,
         std::string &nodePodRackLoc) {
     std::list<NodeLocation>::iterator itt;
     itt = nodeLocationList.begin();
@@ -369,7 +369,7 @@ void CentralSchedulerNdp::scheduleLongFlows() {
     std::string source;
 
 // iterate permMapLongFlows
-    for (std::map<unsigned int, unsigned int>::iterator iter =
+    for (std::map<int, int>::iterator iter =
             permMapLongFlows.begin(); iter != permMapLongFlows.end(); ++iter) {
         cout << "\n\n NEW LONGFLOW :)   ";
         cout << "  host(SRC.)= " << iter->second << " ==> " << "  host(DEST.)= "
@@ -446,7 +446,7 @@ void CentralSchedulerNdp::scheduleLongFlows() {
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl());
         // >>>>>>
         newSrcAppModule->par("numPacketsToSend").setIntValue(longFlowSize); // should be longFlowSize
-        unsigned int priority = 0; // TODO
+        int priority = 0; // TODO
         newSrcAppModule->par("priorityValue").setIntValue(priority);
         newSrcAppModule->par("isBackroundFlow").setBoolValue(true);
         //   --------<ndpIn         appOut[]<----------
@@ -466,11 +466,11 @@ void CentralSchedulerNdp::scheduleLongFlows() {
     }
 }
 
-void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders) {
+void CentralSchedulerNdp::scheduleIncast(int numSenders) {
 
     std::string itsSrc;
     std::string newDest;
-    unsigned int newDestination = 0;
+    int newDestination = 0;
     CentralSchedulerNdp::findLocation(newDestination, newDest);
 
     sumArrivalTimes = 0;
@@ -478,11 +478,11 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders) {
     // get the src ndp module
     cModule *destModule = getModuleByPath(newDest.c_str());
     cModule *ndpDestModule = destModule->getSubmodule("at");
-    unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
-    unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+    int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+    int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
     ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
     ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
-    unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
+    int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
             "ndp.application.ndpapp.NdpSinkApp") + 1;
     cModuleType *moduleTypeDest = cModuleType::get(
             "ndp.application.ndpapp.NdpSinkApp");
@@ -507,7 +507,7 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders) {
 
     for (int i = 0; i < numSenders; ++i) {
 
-        unsigned int srcNewDestination = 0;
+        int srcNewDestination = 0;
         while (newDestination == srcNewDestination) {
             srcNewDestination = permServers.at(
                     numlongflowsRunningServers
@@ -518,11 +518,11 @@ void CentralSchedulerNdp::scheduleIncast(unsigned int numSenders) {
 
         cModule *srcModule = getModuleByPath(itsSrc.c_str()); // const char* c_str Return pointer to the string.
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
-        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
-        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
         ndpSrcModule->setGateSize("out", newNDPGateOutSizeSrc);
         ndpSrcModule->setGateSize("in", newNDPGateInSizeSrc);
-        unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
+        int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
                 "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         cModuleType *moduleTypeSrc = cModuleType::get(
                 "ndp.application.ndpapp.NdpBasicClientApp");
@@ -571,11 +571,11 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
     // sink app
     auto ndpDestModule = destModule->getSubmodule("at"); //FatTreeNdp.Pod[3].racks[0].servers[0]
     //dispatcher->setGateSize("in", dispatcher->gateSize("in") + 1);
-    unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
-    unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+    int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+    int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
     ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
     ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
-    unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
+    int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
             "ndp.application.ndpapp.NdpSinkApp") + 1;
     // find factory object
     cModuleType *moduleTypeDest = cModuleType::get(
@@ -613,11 +613,11 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
 
     // src app
     cModule *ndpSrcModule = srcModule->getSubmodule("at");
-    unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
-    unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+    int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+    int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
     ndpSrcModule->setGateSize("out", newNDPGateOutSizeSrc);
     ndpSrcModule->setGateSize("in", newNDPGateInSizeSrc);
-    unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
+    int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
             "ndp.application.ndpapp.NdpBasicClientApp") + 1;
     // find factory object
     cModuleType *moduleTypeSrc = cModuleType::get(
@@ -635,12 +635,12 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
     // >>>>>>
     if (isWebSearchWorkLoad == false) {
         newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
-        unsigned int priority = getPriorityValue(flowSize);
+        int priority = getPriorityValue(flowSize);
         newSrcAppModule->par("priorityValue").setIntValue(priority);
     } else if (isWebSearchWorkLoad == true) {
-        unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
+        int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
         newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
-        unsigned int priority = getPriorityValue(newFlowSize);
+        int priority = getPriorityValue(newFlowSize);
         newSrcAppModule->par("priorityValue").setIntValue(priority);
     }
     // <<<<<<<<
@@ -665,7 +665,7 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
 
 int CentralSchedulerNdp::findNumSumbodules(cModule *nodeModule,
         const char *subModuleType) {
-    unsigned int rep = 0;
+    int rep = 0;
     for (cModule::SubmoduleIterator iter(nodeModule); !iter.end(); iter++) {
         cModule *subModule = *iter;
         if (strcmp(subModule->getModuleType()->getFullName(), subModuleType)
@@ -707,7 +707,7 @@ void CentralSchedulerNdp::deleteAllSubModuleApp(
 
 void CentralSchedulerNdp::finish() {
     myfile.close();
-    for (std::vector<unsigned int>::iterator iter = permServers.begin();
+    for (std::vector<int>::iterator iter = permServers.begin();
             iter != permServers.end(); ++iter) {
         cout << "  NODE= " << *iter << "  ";
         nodes.record(*iter);
@@ -734,7 +734,7 @@ void CentralSchedulerNdp::finish() {
             << std::endl;
 
     std::cout << "permLongFlowsServers:       ";
-    for (std::vector<unsigned int>::iterator it = permLongFlowsServers.begin();
+    for (std::vector<int>::iterator it = permLongFlowsServers.begin();
             it != permLongFlowsServers.end(); ++it)
         std::cout << ' ' << *it;
     std::cout << '\n';
@@ -824,7 +824,7 @@ void CentralSchedulerNdp::handleParameterChange(const char *parname) {
 }
 
 void CentralSchedulerNdp::getWebSearchWorkLoad() {
-    unsigned int numFlows = numShortFlows;
+    int numFlows = numShortFlows;
     double a[numFlows];
     std::ifstream myfile("../inputWokLoad.txt");
     if (myfile.is_open()) {
@@ -844,8 +844,8 @@ void CentralSchedulerNdp::getWebSearchWorkLoad() {
     }
 }
 
-unsigned int CentralSchedulerNdp::getNewFlowSizeFromWebSearchWorkLoad() {
-    unsigned int newFLowSize = flowSizeWebSeachWorkLoad.at(indexWorkLoad);
+int CentralSchedulerNdp::getNewFlowSizeFromWebSearchWorkLoad() {
+    int newFLowSize = flowSizeWebSeachWorkLoad.at(indexWorkLoad);
     ++indexWorkLoad;
     return newFLowSize;
 }
@@ -855,9 +855,9 @@ unsigned int CentralSchedulerNdp::getNewFlowSizeFromWebSearchWorkLoad() {
 // 100KB --> 1MB     P=3
 // 1MB   --> 10MB    P=4
 // otherwise (longflows)         P=0 (RaptorQBasicClientApp.ned --> int priorityValue = default(0);)
-unsigned int CentralSchedulerNdp::getPriorityValue(unsigned int flowSize) {
+int CentralSchedulerNdp::getPriorityValue(int flowSize) {
 //    std::cout << "CentralSchedulerNdp::getPriorityValue \n\n ";
-    unsigned int priorityValue;
+    int priorityValue;
     if (flowSize >= 1 && flowSize <= 7) {
         priorityValue = 1;
         return priorityValue;
@@ -891,12 +891,12 @@ void CentralSchedulerNdp::getNewThreeDestRandTMForMulticast(std::string &itsSrc,
     std::cout
             << "******************** getNewThreeDestRandTMForoneToMany    3 replicas multicast .. ********************  \n";
 //    int newDestination = test;
-    unsigned int newDestination = 0;
-    unsigned int srcNewDestination = 0;
-    unsigned int oldDest;
+    int newDestination = 0;
+    int srcNewDestination = 0;
+    int oldDest;
 
-    std::vector<unsigned int> destinationNodes;
-    std::vector<unsigned int> sortedNodes;
+    std::vector<int> destinationNodes;
+    std::vector<int> sortedNodes;
 
     srcNewDestination = permServers.at(
             numlongflowsRunningServers
@@ -935,15 +935,15 @@ void CentralSchedulerNdp::getNewThreeDestRandTMForMulticast(std::string &itsSrc,
     sortDaisyChainNodesBasedOnTopologicallyNearest(srcNewDestination,
             destinationNodes, sortedNodes);
 
-    std::vector<unsigned int> sortedNodes2(2);
+    std::vector<int> sortedNodes2(2);
     sortedNodes2.at(0) = sortedNodes.at(1);
     sortedNodes2.at(1) = sortedNodes.at(2);
-    std::vector<unsigned int> sortedNodes3;
+    std::vector<int> sortedNodes3;
 
     sortDaisyChainNodesBasedOnTopologicallyNearest(sortedNodes.at(0),
             sortedNodes2, sortedNodes3);
 
-    std::vector<unsigned int> sortedNodes4(3);
+    std::vector<int> sortedNodes4(3);
     sortedNodes4.at(0) = sortedNodes.at(0);
     sortedNodes4.at(1) = sortedNodes3.at(0);
     sortedNodes4.at(2) = sortedNodes3.at(1);
@@ -961,13 +961,13 @@ void CentralSchedulerNdp::getNewThreeDestRandTMForMulticast(std::string &itsSrc,
 // daisy chain GFS sorting the selected destination nodes (src-->replica1-->replica2-->replica3) based on nearest
 //  Sender writes to the topologically nearest replica
 void CentralSchedulerNdp::sortDaisyChainNodesBasedOnTopologicallyNearest(
-        unsigned int sourceNode, std::vector<unsigned int> destinationNodes,
-        std::vector<unsigned int> &sortedNodes) {
-    std::vector<unsigned int> diff;
+        int sourceNode, std::vector<int> destinationNodes,
+        std::vector<int> &sortedNodes) {
+    std::vector<int> diff;
 //    struct diffDest {
-//        unsigned int diff, dest ;
+//        int diff, dest ;
 //    };
-    unsigned int difference;
+    int difference;
     std::vector<differenceBetweenSrcNodeAndDestNode> diffDestValues;
     differenceBetweenSrcNodeAndDestNode diffDestStru;
     for (auto iter = destinationNodes.begin(); iter != destinationNodes.end();
@@ -1005,9 +1005,9 @@ void CentralSchedulerNdp::getNewThreeSrcRandTMForMultiSourcing(
     std::cout
             << "******************** getNew  Three  Src RandTM  For   MultiSourcing   fetch 3 replicas   .. ********************  \n";
     //    int newDestination = test;
-    unsigned int src = 0;
-    unsigned int destination = 0;
-    unsigned int oldDest;
+    int src = 0;
+    int destination = 0;
+    int oldDest;
 
     destination = permServers.at(
             numlongflowsRunningServers
@@ -1040,7 +1040,7 @@ void CentralSchedulerNdp::getNewThreeSrcRandTMForMultiSourcing(
 }
 
 void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
-        std::vector<std::string> newDest, unsigned int multicastGrpId) // three replicas
+        std::vector<std::string> newDest, int multicastGrpId) // three replicas
         {
     std::cout
             << "@@@@@@@@@@@@@@@@@@@@@@@@@ scheduleNewMultiCastSession three replicas .. @@@@@@@@@@@@@@@@@@@@@@@@@  \n";
@@ -1081,11 +1081,11 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
         std::cout << " newDest " << thisDest << "\n";
         cModule *destModule = getModuleByPath(thisDest.c_str());
         cModule *ndpDestModule = destModule->getSubmodule("at");
-        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
-        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
         ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
         ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
-        unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
+        int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
                 "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumTCPSinkApp   =  " << newNumNdpSinkAppsDest
                 << "\n";
@@ -1125,11 +1125,11 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
         // get the src ndp module
         cModule *srcModule = getModuleByPath(itsSrc.c_str()); // const char* c_str Return pointer to the string.
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
-        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
-        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
         ndpSrcModule->setGateSize("out", newNDPGateOutSizeSrc);
         ndpSrcModule->setGateSize("in", newNDPGateInSizeSrc);
-        unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
+        int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
                 "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         std::cout << "Src  numTCPSessionApp =  " << newNumNdpSessionAppsSrc
                 << "\n";
@@ -1152,15 +1152,15 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
         if (isWebSearchWorkLoad == false) {
             newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
             // aha .....
-            unsigned int priority = getPriorityValue(flowSize);
+            int priority = getPriorityValue(flowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
-            unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
+            int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
-            unsigned int priority = getPriorityValue(newFlowSize);
+            int priority = getPriorityValue(newFlowSize);
 
             std::cout << " getPriorityValueppp = " << priority << "\n\n";
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
@@ -1188,7 +1188,7 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
 }
 
 void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
-        std::vector<std::string> newDest, unsigned int multicastGrpId) // three replicas
+        std::vector<std::string> newDest, int multicastGrpId) // three replicas
         {
     std::cout
             << "@@@@@@@@@@@@@@@@@@@@@@@@@ scheduleNewMultiCastSession three replicas .. @@@@@@@@@@@@@@@@@@@@@@@@@  \n";
@@ -1218,11 +1218,11 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
         std::cout << " newDest " << thisDest << "\n";
         cModule *destModule = getModuleByPath(thisDest.c_str());
         cModule *ndpDestModule = destModule->getSubmodule("at");
-        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
-        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
         ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
         ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
-        unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
+        int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
                 "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumTCPSinkApp   =  " << newNumNdpSinkAppsDest
                 << "\n";
@@ -1260,11 +1260,11 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
         // get the src ndp module
         cModule *srcModule = getModuleByPath(itsSrc.c_str()); // const char* c_str Return pointer to the string.
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
-        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
-        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
         ndpSrcModule->setGateSize("out", newNDPGateOutSizeSrc);
         ndpSrcModule->setGateSize("in", newNDPGateInSizeSrc);
-        unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
+        int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
                 "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         std::cout << "Src  numTCPSessionApp =  " << newNumNdpSessionAppsSrc
                 << "\n";
@@ -1287,15 +1287,15 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
         if (isWebSearchWorkLoad == false) {
             newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
             // aha .....
-            unsigned int priority = getPriorityValue(flowSize);
+            int priority = getPriorityValue(flowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
-            unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
+            int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
-            unsigned int priority = getPriorityValue(newFlowSize);
+            int priority = getPriorityValue(newFlowSize);
 
             std::cout << " getPriorityValueppp = " << priority << "\n\n";
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
@@ -1318,7 +1318,7 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
 }
 
 void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
-        std::vector<std::string> senders, unsigned int multiSrcGroupId) // three replicas
+        std::vector<std::string> senders, int multiSrcGroupId) // three replicas
         {
     std::cout
             << "@@@@@@@@@@@@@@@@@@@@@@@@@ scheduleNewMultiSourcingSession fetch three replicas  multi sourcing .. @@@@@@@@@@@@@@@@@@@@@@@@@  \n";
@@ -1371,11 +1371,11 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
         std::cout << " dest: " << dest << "\n";
         cModule *destModule = getModuleByPath(dest.c_str());
         cModule *ndpDestModule = destModule->getSubmodule("at");
-        unsigned int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
-        unsigned int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
+        int newNdpGateOutSizeDest = ndpDestModule->gateSize("out") + 1;
+        int newNdpGateInSizeDest = ndpDestModule->gateSize("in") + 1;
         ndpDestModule->setGateSize("out", newNdpGateOutSizeDest);
         ndpDestModule->setGateSize("in", newNdpGateInSizeDest);
-        unsigned int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
+        int newNumNdpSinkAppsDest = findNumSumbodules(destModule,
                 "ndp.application.ndpapp.NdpSinkApp") + 1;
         std::cout << "Dest  NumNDPSinkApp   =  " << newNumNdpSinkAppsDest
                 << "\n";
@@ -1411,11 +1411,11 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
         std::string itsSender = *iter;
         cModule *srcModule = getModuleByPath(itsSender.c_str()); // const char* c_str Return pointer to the string.
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
-        unsigned int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
-        unsigned int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
+        int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;
+        int newNDPGateInSizeSrc = ndpSrcModule->gateSize("in") + 1;
         ndpSrcModule->setGateSize("out", newNDPGateOutSizeSrc);
         ndpSrcModule->setGateSize("in", newNDPGateInSizeSrc);
-        unsigned int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
+        int newNumNdpSessionAppsSrc = findNumSumbodules(srcModule,
                 "ndp.application.ndpapp.NdpBasicClientApp") + 1;
         std::cout << "Src  numTCPSessionApp =  " << newNumNdpSessionAppsSrc
                 << "\n";
@@ -1438,15 +1438,15 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
 //               flowSize = flowSize/3; ??????????????????
             newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
             // aha .....
-            unsigned int priority = getPriorityValue(flowSize);
+            int priority = getPriorityValue(flowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
-            unsigned int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
+            int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
 
-            unsigned int priority = getPriorityValue(newFlowSize);
+            int priority = getPriorityValue(newFlowSize);
             newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
         /// >>>>>>>>>>>>

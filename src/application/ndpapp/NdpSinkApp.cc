@@ -1,30 +1,20 @@
 
-#include "NdpSinkApp.h"
-#include "GenericAppMsgNdp_m.h"
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/ProtocolTag_m.h"
 #include "inet/common/lifecycle/NodeStatus.h"
 #include "inet/common/packet/Message.h"
-#include "../../transportlayer/contract/ndp/NDPCommand_m.h"
-//#include "/Volumes/LocalDataHD/m/ma/ma777/Desktop/omnetpp-5.2.1-hpc/omnetpp-5.2.1/samples/inet-myprojects/inet/src/inet/common/ResultFilters.h"
-#include "../../transportlayer/contract/ndp/NDPCommand_m.h"
-
 #include "inet/common/ResultFilters.h"
-#ifdef ShowOut
-#define MY_COUT std::cout
-#else
-#define MY_COUT if(false) std::cout
-#endif
+
+#include "../../transportlayer/contract/ndp/NdpCommand_m.h"
+#include "../../transportlayer/contract/ndp/NdpCommand_m.h"
+#include "NdpSinkApp.h"
+#include "GenericAppMsgNdp_m.h"
 
 namespace inet {
 #define SEND_INIT_REQUEST_TO_READ    0
 
-//NdpSinkApp::~NdpSinkApp() {
-//    cancelAndDelete(timeoutMsg);
-//
-//}
 Define_Module(NdpSinkApp);
 
 simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("packetReceived");
@@ -37,9 +27,6 @@ simsignal_t multisourceGroupIdSignal = NodeStatus::registerSignal(
         "multisourceGroupIdSignal");
 simsignal_t numRcvTrimmedHeaderSigNdp = NodeStatus::registerSignal(
         "numRcvTrimmedHeaderSigNdp");
-
-// MOH ADDED
-//simsignal_t throughputRecordv1eee = NodeStatus::registerSignal("throughputRecordv1eee");
 
 void NdpSinkApp::initialize(int stage) {
     cSimpleModule::initialize(stage);
@@ -72,26 +59,24 @@ void NdpSinkApp::initialize(int stage) {
         timeoutMsg->setKind(SEND_INIT_REQUEST_TO_READ);
         scheduleAt(simTime(), timeoutMsg);
     }
-
 }
 
 void NdpSinkApp::handleMessage(cMessage *msg) {
     EV_INFO << "\n\nMESSAGE KIND: " << msg->getKind() << "\n\n";
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
         tEndAdded = simTime();
-        NDPCommand *controlInfo = check_and_cast<NDPCommand*>(
+        NdpCommand *controlInfo = check_and_cast<NdpCommand*>(
                 msg->getControlInfo());
         numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
         std::string mod = "FatTreeNdp.centralSchedulerNdp";
         cModule *centralMod = getModuleByPath(mod.c_str());
-        //if (centralMod && bytesRcvd==mm) { // for multi source   ZZZZZZZZZ  for multi-source  use this in the sink  mm =flowSize*1500*numReplicas
         if (centralMod && isBackroundFlow == false) {
             int numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows + 1;
             centralMod->par("numCompletedShortFlows").setIntValue(
                     newNumFinishedFlows);
             EV_INFO
-                           << "\n\n\n\nNdpSinkApp::handleMessage  numCompletedShortFlows "
+                           << "\nNdpSinkApp::handleMessage  numCompletedShortFlows "
                            << newNumFinishedFlows << "\n\n\n";
         }
         delete msg;
@@ -123,8 +108,8 @@ void NdpSinkApp::finish() {
             / (tEndAdded - tStartAdded).dbl();
     std::cout << "\nTIME: " << (tEndAdded - tStartAdded).dbl();
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
-    MY_COUT << " FCT:=    " << FCT << "  \n";
-    MY_COUT << " isBackroundFlow:=    " << isBackroundFlow << "\n";
+    std::cout << " FCT:=    " << FCT << "  \n";
+    std::cout << " isBackroundFlow:=    " << isBackroundFlow << "\n";
 
     // don't emit the FCT of the background flows(no need), we just observe the shorter length flows
     if (isBackroundFlow == false) {
@@ -135,7 +120,7 @@ void NdpSinkApp::finish() {
         std::cout << " numRcvTrimmedHeader   sink  " << numRcvTrimmedHeader
                 << "\n";
         emit(numRcvTrimmedHeaderSigNdp, numRcvTrimmedHeader);
-        MY_COUT << "mmmmmmmmmm NdpSinkApp::finish() bytesRcvd ";
+        std::cout << "mmmmmmmmmm NdpSinkApp::finish() bytesRcvd ";
         std::cout << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath()
                 << "\n\n\n";
     }

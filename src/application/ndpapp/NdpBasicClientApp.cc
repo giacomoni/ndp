@@ -1,25 +1,20 @@
-#include "GenericAppMsgNdp_m.h"
-#include "NdpBasicClientApp.h"
+#include <iostream>
+#include <random>
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/common/ModuleAccess.h"
 #include "inet/common/TimeTag_m.h"
-#include <iostream>
-#include <random>
 
+#include "GenericAppMsgNdp_m.h"
+#include "NdpBasicClientApp.h"
 namespace inet {
 
 #define MSGKIND_CONNECT    0
 #define MSGKIND_SEND       1
 
 Define_Module(NdpBasicClientApp);
-//simsignal_t NdpBasicClientApp::packetReceivedSignal =  registerSignal("packetReceived");
 
 NdpBasicClientApp::~NdpBasicClientApp() {
     cancelAndDelete(timeoutMsg);
-
-    // Added
-//    if (requestRexmitTimer)
-//        delete cancelEvent(requestRexmitTimer);
 }
 
 void NdpBasicClientApp::initialize(int stage) {
@@ -29,7 +24,6 @@ void NdpBasicClientApp::initialize(int stage) {
         packetsRcvd=0;
         WATCH(bytesRcvd);
         sendBytes = par("sendBytes");   // commented moh
-
         startTime = par("startTime");
         stopTime = par("stopTime");
         if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
@@ -51,7 +45,7 @@ void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
 void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
 {
     cancelEvent(timeoutMsg);
-    if (socket.getState() == NDPSocket::CONNECTED || socket.getState() == NDPSocket::CONNECTING || socket.getState() == NDPSocket::PEER_CLOSED)
+    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING || socket.getState() == NdpSocket::PEER_CLOSED)
         close();
 }
 
@@ -63,7 +57,7 @@ void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
 }
 
 void NdpBasicClientApp::handleTimer(cMessage *msg) {
-    /////// Added MOH send requests based on a timer
+    // Added MOH send requests based on a timer
     switch (msg->getKind()) {
 
     case MSGKIND_CONNECT:
@@ -71,7 +65,6 @@ void NdpBasicClientApp::handleTimer(cMessage *msg) {
         break;
 
     case MSGKIND_SEND:   // not used now MHO see  NdpBasicClientApp::socketEstablished
-//        sendRequest();
         break;
 
     default:
@@ -79,7 +72,7 @@ void NdpBasicClientApp::handleTimer(cMessage *msg) {
     }
 }
 
-void NdpBasicClientApp::socketEstablished(NDPSocket *socket) {
+void NdpBasicClientApp::socketEstablished(NdpSocket *socket) {
     NdpAppBase::socketEstablished(socket);
 }
 
@@ -102,13 +95,12 @@ void NdpBasicClientApp::close()
     NdpAppBase::close();
     cancelEvent(timeoutMsg);
 }
-void NdpBasicClientApp::socketClosed(NDPSocket *socket) {
+void NdpBasicClientApp::socketClosed(NdpSocket *socket) {
     NdpAppBase::socketClosed(socket);
 }
 
-void NdpBasicClientApp::socketFailure(NDPSocket *socket, int code) {
+void NdpBasicClientApp::socketFailure(NdpSocket *socket, int code) {
     NdpAppBase::socketFailure(socket, code);
-
     // reconnect after a delay
     if (timeoutMsg) {
         simtime_t d = simTime() + (simtime_t) par("reconnectInterval");

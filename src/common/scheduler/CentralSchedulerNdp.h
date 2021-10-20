@@ -26,14 +26,14 @@ class INET_API CentralSchedulerNdp: public cSimpleModule, public ILifecycle {
 
 protected:
     bool isWebSearchWorkLoad;
-    unsigned int indexWorkLoad;
-    std::vector<unsigned int> flowSizeWebSeachWorkLoad;
+    int indexWorkLoad;
+    std::vector<int> flowSizeWebSeachWorkLoad;
 
     std::ofstream myfile;
 
     // daisyChainGFS: sorting the nodes (1 source& 3 replicas) based on how far is each dest from the source
     struct differenceBetweenSrcNodeAndDestNode {
-        unsigned int diff, dest ;
+        int diff, dest ;
         bool operator<(const differenceBetweenSrcNodeAndDestNode& a) const
           {
               return diff < a.diff; // ascending order
@@ -58,40 +58,40 @@ protected:
     cMessage *startManagerNode;
     int kValue;
 
-    unsigned int IW;
-    unsigned int ndpSwitchQueueLength;
+    int IW;
+    int ndpSwitchQueueLength;
     bool perFlowEcmp;
     bool perPacketEcmp;
 
     const char *trafficMatrixType; // either "permTM"  or "randTM"
-    unsigned int test = 0;
-    unsigned int arrivalRate; // lamda of an exponential distribution (Morteza uses 256 and 2560)
-    unsigned int flowSize;
-    unsigned int numServers;
-    unsigned int numShortFlows;
-    unsigned int longFlowSize;
+    int test = 0;
+    int arrivalRate; // lamda of an exponential distribution (Morteza uses 256 and 2560)
+    int flowSize;
+    int numServers;
+    int numShortFlows;
+    int longFlowSize;
     double percentLongFlowNodes;
-    unsigned int numCompletedShortFlows = 0;
+    int numCompletedShortFlows = 0;
     cMessage *stopSimulation;
-    std::vector<unsigned int> permServers;
+    std::vector<int> permServers;
 
-    std::vector<unsigned int> permLongFlowsServers;
-    std::vector<unsigned int> permShortFlowsServers;
+    std::vector<int> permLongFlowsServers;
+    std::vector<int> permShortFlowsServers;
 
-    unsigned int numlongflowsRunningServers; // 33% of nodes run long flows
-    unsigned int numshortflowRunningServers;
+    int numlongflowsRunningServers; // 33% of nodes run long flows
+    int numshortflowRunningServers;
 
-    unsigned int numIncastSenders;
+    int numIncastSenders;
     ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
     bool oneToOne = false;
 //    const char *runMulticast; // for   multicasting
     bool oneToMany; // for   multicasting
-    unsigned int numRunningMulticastGroups;
+    int numRunningMulticastGroups;
 //    const char * manyToOne;
     bool manyToOne;
-    unsigned int  numRunningMultiSourcingGroups;
-    unsigned int  numReplica;
+    int  numRunningMultiSourcingGroups;
+    int  numReplica;
     bool daisyChainGFS;
 ////////////////////////////////////////////////////////////////
  ////////////////////////////////////////////////////////////////
@@ -101,8 +101,8 @@ protected:
         Enter_Method_Silent(); throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName()); return true;}
 
     //  <dest, src>
-    std::map<unsigned int, unsigned int> permMapLongFlows;
-    std::map<unsigned int, unsigned int> permMapShortFlows;
+    std::map<int, int> permMapLongFlows;
+    std::map<int, int> permMapShortFlows;
 
     double sumArrivalTimes = 0;
     double newArrivalTime;
@@ -110,26 +110,26 @@ protected:
 
     struct NodeLocation
     {
-        unsigned int pod;
-        unsigned int rack;
-        unsigned int node;
-        unsigned int index;
+        int pod;
+        int rack;
+        int node;
+        int index;
 
-        unsigned int numTCPSink;
-        unsigned int numTCPSession;
+        int numTCPSink;
+        int numTCPSession;
     };
 
     typedef std::list<NodeLocation> NodeLocationList;
     NodeLocationList nodeLocationList;
 
-    unsigned int seedValue;
+    int seedValue;
     std::mt19937 PRNG;
     std::exponential_distribution<double> expDistribution;
 
     struct RecordMat
     {
-        unsigned int recordSrc;
-        unsigned int recordDest;
+        int recordSrc;
+        int recordDest;
     };
     typedef std::list<RecordMat> RecordMatList;
     RecordMatList recordMatList;
@@ -154,7 +154,7 @@ protected:
     void getNewDestRandTM(std::string& itsSrc, std::string& newDest);
     void getNewDestPremTM(std::string& itsSrc, std::string& newDest);
 
-    void findLocation(unsigned int nodeIndex, std::string& nodePodRackLoc);
+    void findLocation(int nodeIndex, std::string& nodePodRackLoc);
     void scheduleLongFlows();
     void deleteAllSubModuleApp(const char *subModuleToBeRemoved);
     int findNumSumbodules(cModule* nodeModule, const char *subModuleType);
@@ -163,17 +163,17 @@ protected:
 
     // multicast & multiSourcing
     void getNewThreeDestRandTMForMulticast(std::string& itsSrc, std::vector<std::string>& newDest );
-    void scheduleNewMultiCastSession(std::string itsSrc, std::vector<std::string> newDest , unsigned int multicastGrpId);
-    void scheduleNewDaisyChainSession(std::string itsSrc, std::vector<std::string> newDest , unsigned int multicastGrpId);
+    void scheduleNewMultiCastSession(std::string itsSrc, std::vector<std::string> newDest , int multicastGrpId);
+    void scheduleNewDaisyChainSession(std::string itsSrc, std::vector<std::string> newDest , int multicastGrpId);
 
-    void sortDaisyChainNodesBasedOnTopologicallyNearest(unsigned int sourceNode, std::vector<unsigned int> destinationNodes,  std::vector<unsigned int>& sortedNodes);
+    void sortDaisyChainNodesBasedOnTopologicallyNearest(int sourceNode, std::vector<int> destinationNodes,  std::vector<int>& sortedNodes);
     void getNewThreeSrcRandTMForMultiSourcing(std::string& destNode, std::vector<std::string>& senders );
-    void scheduleNewMultiSourcingSession(std::string dest, std::vector<std::string> senders , unsigned int multiSrcGroupId);
+    void scheduleNewMultiSourcingSession(std::string dest, std::vector<std::string> senders , int multiSrcGroupId);
 
-    void scheduleIncast(unsigned int numSenders);
+    void scheduleIncast(int numSenders);
     void getWebSearchWorkLoad();
-    unsigned int getNewFlowSizeFromWebSearchWorkLoad();
-    unsigned int getPriorityValue(unsigned int flowSize);
+    int getNewFlowSizeFromWebSearchWorkLoad();
+    int getPriorityValue(int flowSize);
 
 
 };

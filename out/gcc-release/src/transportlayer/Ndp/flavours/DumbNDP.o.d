@@ -1,8 +1,8 @@
 ../out/gcc-release/src/transportlayer/Ndp/flavours/DumbNDP.o: \
  transportlayer/Ndp/flavours/DumbNDP.cc \
  transportlayer/Ndp/flavours/DumbNDP.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/NDPAlgorithm.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
+ transportlayer/Ndp/flavours/../NdpAlgorithm.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader.h \
  ../../inet4/src/inet/common/INETDefs.h \
  ../../inet4/src/inet/common/precompiled_release.h \
  ../../inet4/src/inet/common/precompiled.h \
@@ -10,7 +10,7 @@
  ../../inet4/src/inet/opp_defines.h ../../inet4/src/inet/features.h \
  ../../inet4/src/inet/common/Compat.h \
  ../../inet4/src/inet/common/InitStages.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader_m.h \
  ../../inet4/src/inet/common/INETDefs_m.h \
  ../../inet4/src/inet/common/packet/chunk/Chunk_m.h \
  ../../inet4/src/inet/common/Units_m.h \
@@ -35,8 +35,8 @@
  ../../inet4/src/inet/common/packet/chunk/SliceChunk.h \
  ../../inet4/src/inet/common/packet/chunk/FieldsChunk.h \
  ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/NDPConnection.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/NdpConnection.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h \
  ../../inet4/src/inet/common/lifecycle/ModuleOperations.h \
  ../../inet4/src/inet/common/lifecycle/LifecycleOperation.h \
  ../../inet4/src/inet/common/packet/Packet.h \
@@ -49,20 +49,20 @@
  ../../inet4/src/inet/common/LayeredProtocolBase.h \
  ../../inet4/src/inet/common/lifecycle/OperationalBase.h \
  ../../inet4/src/inet/common/lifecycle/ILifecycle.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h \
  ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h \
  ../../inet4/src/inet/networklayer/common/L3Address_m.h \
- transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
  transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h \
+ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader.h \
  ../../inet4/src/inet/common/packet/ChunkQueue.h \
  ../../inet4/src/inet/common/packet/chunk/EmptyChunk.h \
  transportlayer/Ndp/flavours/../Ndp.h
 
 transportlayer/Ndp/flavours/DumbNDP.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/NDPAlgorithm.h:
+transportlayer/Ndp/flavours/../NdpAlgorithm.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
 ../../inet4/src/inet/common/INETDefs.h:
 
@@ -80,7 +80,7 @@ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp
 
 ../../inet4/src/inet/common/InitStages.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader_m.h:
 
 ../../inet4/src/inet/common/INETDefs_m.h:
 
@@ -130,9 +130,9 @@ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp
 
 ../../inet4/src/inet/transportlayer/contract/TransportHeaderBase_m.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/NDPConnection.h:
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/NdpConnection.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h:
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/Ndp.h:
 
 ../../inet4/src/inet/common/lifecycle/ModuleOperations.h:
 
@@ -158,15 +158,15 @@ transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp
 
 ../../inet4/src/inet/common/lifecycle/ILifecycle.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h:
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../contract/ndp/NDPCommand_m.h:
 
 ../../inet4/src/inet/networklayer/common/IpProtocolId_m.h:
 
 ../../inet4/src/inet/networklayer/common/L3Address_m.h:
 
-transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
-
 transportlayer/Ndp/flavours/../../../transportlayer/Ndp/../../transportlayer/Ndp/ndp_common/NdpHeader.h:
+
+transportlayer/Ndp/flavours/../../../transportlayer/Ndp/ndp_common/NdpHeader.h:
 
 ../../inet4/src/inet/common/packet/ChunkQueue.h:
 

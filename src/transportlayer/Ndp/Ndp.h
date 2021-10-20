@@ -27,16 +27,16 @@
 #include "inet/common/packet/Packet.h"
 #include "inet/networklayer/common/L3Address.h"
 #include "inet/transportlayer/base/TransportProtocolBase.h"
-#include "../contract/ndp/NDPCommand_m.h"
+
+#include "../contract/ndp/NdpCommand_m.h"
 #include "ndp_common/NdpHeader.h"
 
 namespace inet {
 namespace ndp {
 
 // Forward declarations:
-class NDPConnection;
-class NDPSendQueue;
-class NDPReceiveQueue;
+class NdpConnection;
+class NdpSendQueue;
 
 class INET_API Ndp: public TransportProtocolBase {
 public:
@@ -78,7 +78,7 @@ public:
 
     std::map<int, int> appGateIndexTimeOutMap; // moh: contains num of timeouts for each app
     bool test = true;
-    std::map<int, NDPConnection*> requestCONNMap;
+    std::map<int, NdpConnection*> requestCONNMap;
     int connIndex = 0;
 
     int counter = 0;
@@ -87,8 +87,8 @@ public:
     bool nap = false;
 
 protected:
-    typedef std::map<int /*socketId*/, NDPConnection*> NdpAppConnMap;
-    typedef std::map<SockPair, NDPConnection*> NdpConnMap;
+    typedef std::map<int /*socketId*/, NdpConnection*> NdpAppConnMap;
+    typedef std::map<SockPair, NdpConnection*> NdpConnMap;
 
     NdpAppConnMap ndpAppConnMap;
     NdpConnMap ndpConnMap;
@@ -99,13 +99,13 @@ protected:
 
 protected:
     /** Factory method; may be overriden for customizing Tcp */
-    virtual NDPConnection* createConnection(int socketId);
+    virtual NdpConnection* createConnection(int socketId);
 
     // utility methods
-    virtual NDPConnection* findConnForSegment(
+    virtual NdpConnection* findConnForSegment(
             const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr,
             L3Address destAddr);
-    virtual NDPConnection* findConnForApp(int socketId);
+    virtual NdpConnection* findConnForApp(int socketId);
     virtual void segmentArrivalWhileClosed(Packet *packet,
             const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
     virtual void refreshDisplay() const override; //was updateDisplayString()
@@ -133,37 +133,33 @@ protected:
 
 public:
     /**
-     * To be called from NDPConnection when a new connection gets created,
+     * To be called from NdpConnection when a new connection gets created,
      * during processing of OPEN_ACTIVE or OPEN_PASSIVE.
      */
-    virtual void addSockPair(NDPConnection *conn, L3Address localAddr,
+    virtual void addSockPair(NdpConnection *conn, L3Address localAddr,
             L3Address remoteAddr, int localPort, int remotePort);
 
-    virtual void removeConnection(NDPConnection *conn); //new
+    virtual void removeConnection(NdpConnection *conn); //new
     virtual void sendFromConn(cMessage *msg, const char *gatename,
             int gateindex = -1); //new
 
     /**
-     * To be called from NDPConnection when socket pair (key for NDPConnMap) changes
+     * To be called from NdpConnection when socket pair (key for NDPConnMap) changes
      * (e.g. becomes fully qualified).
      */
-    virtual void updateSockPair(NDPConnection *conn, L3Address localAddr,
+    virtual void updateSockPair(NdpConnection *conn, L3Address localAddr,
             L3Address remoteAddr, int localPort, int remotePort);
 
     /**
-     * To be called from NDPConnection: reserves an ephemeral port for the connection.
+     * To be called from NdpConnection: reserves an ephemeral port for the connection.
      */
     virtual ushort getEphemeralPort();
 
     /**
-     * To be called from NDPConnection: create a new send queue.
+     * To be called from NdpConnection: create a new send queue.
      */
-    virtual NDPSendQueue* createSendQueue();
+    virtual NdpSendQueue* createSendQueue();
 
-    /**
-     * To be called from TcpConnection: create a new receive queue.
-     */
-    virtual NDPReceiveQueue* createReceiveQueue();
 
     // ILifeCycle:
     virtual void handleStartOperation(LifecycleOperation *operation) override;
@@ -177,7 +173,6 @@ public:
         return msl;
     }
 
-    //Added
     virtual void requestTimer();
     virtual void cancelRequestTimer();
     virtual bool getNapState();
@@ -189,7 +184,7 @@ public:
     virtual void printConnRequestMap();
 };
 
-} // namespace tcp
+} // namespace ndp
 } // namespace inet
 
 #endif // ifndef __INET_NDP_H
