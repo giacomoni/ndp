@@ -1,7 +1,8 @@
 
 package ndp.application.ndpapp;
-import ndp.application.contract.INdpApp;
+
 import inet.applications.contract.IApp;
+
 simple NdpSinkApp like IApp
 {
     parameters:

@@ -12,7 +12,6 @@ import inet.applications.tunapp.TunnelApp;
 import ndp.node.ApplicationLayerNodeBaseEcmp;
 import ndp.networklayer.ipv4.Ipv4NetworkLayerEcmp;
 import ndp.transportlayer.contract.INdp;
-import ndp.application.contract.INdpApp;
 
 module StandardHostNdp extends ApplicationLayerNodeBaseEcmp
 {
