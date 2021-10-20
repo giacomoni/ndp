@@ -26,6 +26,8 @@ precompiled_*.h.*
 *.sim
 *.pyc
 *.pcap
+*.anf
+*.elog
 *.sca
 *.vec
 *.vci
