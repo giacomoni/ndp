@@ -1,2 +1,0 @@
-package ndp;
-@license(LGPL);
