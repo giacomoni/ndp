@@ -83,7 +83,6 @@ NdpConnection::~NdpConnection() {
     }
 
     delete sendQueue;
-    delete receiveQueue;
     delete ndpAlgorithm;
     delete state;
 
@@ -111,14 +110,13 @@ void NdpConnection::handleMessage(cMessage *msg) {
 bool NdpConnection::processTimer(cMessage *msg) {
     printConnBrief();
     EV_DETAIL << msg->getName() << " timer expired\n";
-    std::cout << msg->getFullPath() << " timer expired\n";
 
     // first do actions
     NdpEventCode event;
 
     if (msg == requestInternalTimer) {
         event = NDP_E_IGNORE;
-//            sendRequest();   // based on my congestion control, I send requests after receiving  a packet not based on a timer
+    // based on my congestion control, I send requests after receiving  a packet not based on a timer
     }
 
     else if (msg == the2MSLTimer) {
@@ -137,7 +135,6 @@ bool NdpConnection::processTimer(cMessage *msg) {
         event = NDP_E_IGNORE;
         ndpAlgorithm->processTimer(msg, event); // seeeee processTimer method in NDPBaseAlg.cc
     }
-
     // then state transitions
     return performStateTransition(event);
 }

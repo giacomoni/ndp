@@ -1,4 +1,3 @@
-
 #include "inet/common/lifecycle/ModuleOperations.h"
 #include "inet/networklayer/common/L3AddressResolver.h"
 #include "inet/common/ModuleAccess.h"
@@ -21,18 +20,12 @@ simsignal_t NdpSinkApp::rcvdPkSignalNDP = registerSignal("packetReceived");
 
 simsignal_t goodputSigNdp = NodeStatus::registerSignal("goodputSigNdp");
 simsignal_t fctRecordv3 = NodeStatus::registerSignal("fctRecordv3");
-simsignal_t multicastGroupIdSignal = NodeStatus::registerSignal(
-        "multicastGroupIdSignal");
-simsignal_t multisourceGroupIdSignal = NodeStatus::registerSignal(
-        "multisourceGroupIdSignal");
 simsignal_t numRcvTrimmedHeaderSigNdp = NodeStatus::registerSignal(
         "numRcvTrimmedHeaderSigNdp");
 
 void NdpSinkApp::initialize(int stage) {
+    EV_TRACE << "NdpSinkApp::initialize";
     cSimpleModule::initialize(stage);
-    isBackroundFlow = par("isBackroundFlow");  // moh
-    multiCastGroupId = par("multiCastGroupId");
-    multiSrcGroupId = par("multiSrcGroupId");
     if (stage == INITSTAGE_LOCAL) {
         bytesRcvd = 0;
         WATCH(bytesRcvd);
@@ -49,7 +42,6 @@ void NdpSinkApp::initialize(int stage) {
                     "This module doesn't support starting in node DOWN state");
         const char *localAddress = par("localAddress");
         int localPort = par("localPort");
-        gateToNdp = gate("socketOut"); // MOH for multi sourcing
         socket.setOutputGate(gate("socketOut"));
         socket.bind(
                 localAddress[0] ?
@@ -62,29 +54,31 @@ void NdpSinkApp::initialize(int stage) {
 }
 
 void NdpSinkApp::handleMessage(cMessage *msg) {
-    EV_INFO << "\n\nMESSAGE KIND: " << msg->getKind() << "\n\n";
+    EV_TRACE << "\nNdpSinkApp:handleMessage Message " << msg->getKind() << "\n";
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
+        EV_INFO
+                       << "\nNDP_I_PEER_CLOSED message arrived - end of NDP connection\n";
         tEndAdded = simTime();
         NdpCommand *controlInfo = check_and_cast<NdpCommand*>(
                 msg->getControlInfo());
         numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
         std::string mod = "FatTreeNdp.centralSchedulerNdp";
         cModule *centralMod = getModuleByPath(mod.c_str());
-        if (centralMod && isBackroundFlow == false) {
+        if (centralMod) {
             int numFinishedFlows = centralMod->par("numCompletedShortFlows");
             int newNumFinishedFlows = numFinishedFlows + 1;
             centralMod->par("numCompletedShortFlows").setIntValue(
                     newNumFinishedFlows);
-            EV_INFO
-                           << "\nNdpSinkApp::handleMessage  numCompletedShortFlows "
+            EV_INFO << "\nNdpSinkApp::handleMessage  numCompletedShortFlows "
                            << newNumFinishedFlows << "\n";
         }
         delete msg;
     } else if (msg->getKind() == NDP_I_DATA
             || msg->getKind() == NDP_I_URGENT_DATA) {
-
         Packet *packet = check_and_cast<Packet*>(msg);
         bytesRcvd += packet->getByteLength();
+        EV_INFO << "\nNDP DATA message arrived - bytesRcvd: " << bytesRcvd
+                       << "\n";
         emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
@@ -94,36 +88,29 @@ void NdpSinkApp::handleMessage(cMessage *msg) {
         EV_INFO << "bytesRcvd  " << bytesRcvd << " " << this->getFullPath()
                        << std::endl;
     } else if (msg->getKind() == NDP_I_ESTABLISHED) {
+        EV_INFO << "\nNDP_I_ESTABLISHED message arrived - deleting message\n";
         delete msg;
-    }
-
-    else {
+    } else {
+        EV_WARN << "\nUnknown Message Type Arrived at Sink App\n";
         // must be data or some kind of indication -- can be dropped
         delete msg;
     }
 }
 
 void NdpSinkApp::finish() {
+    EV_TRACE << "NdpSinkApp::finish";
     double throughput = 8 * (double) bytesRcvd
             / (tEndAdded - tStartAdded).dbl();
-    std::cout << "\nTIME: " << (tEndAdded - tStartAdded).dbl();
+    EV_INFO << "\nTime Difference: " << (tEndAdded - tStartAdded).dbl();
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
-    std::cout << " FCT:=    " << FCT << "  \n";
-    std::cout << " isBackroundFlow:=    " << isBackroundFlow << "\n";
-
+    EV_INFO << "\nFlow Completion Time:=    " << FCT << "  \n";
     // don't emit the FCT of the background flows(no need), we just observe the shorter length flows
-    if (isBackroundFlow == false) {
-        emit(fctRecordv3, FCT);
-        emit(goodputSigNdp, throughput);
-        emit(multicastGroupIdSignal, multiCastGroupId);
-        emit(multisourceGroupIdSignal, multiSrcGroupId);
-        std::cout << " numRcvTrimmedHeader   sink  " << numRcvTrimmedHeader
-                << "\n";
-        emit(numRcvTrimmedHeaderSigNdp, numRcvTrimmedHeader);
-        std::cout << "mmmmmmmmmm NdpSinkApp::finish() bytesRcvd ";
-        std::cout << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath()
-                << "\n\n\n";
-    }
+    emit(fctRecordv3, FCT);
+    emit(goodputSigNdp, throughput);
+    emit(numRcvTrimmedHeaderSigNdp, numRcvTrimmedHeader);
+    std::cout << "NdpSinkApp::finish() bytesRcvd ";
+    std::cout << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath()
+            << endl;
 }
 
 void NdpSinkApp::refreshDisplay() const {

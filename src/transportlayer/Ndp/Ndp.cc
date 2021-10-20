@@ -63,7 +63,6 @@ Ndp::~Ndp() {
 
 void Ndp::initialize(int stage) {
     OperationalBase::initialize(stage);
-    //delete getModuleByPath("myexample.client.ndp.conn-10");
     if (stage == INITSTAGE_LOCAL) {
 
         lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
@@ -83,14 +82,13 @@ void Ndp::initialize(int stage) {
 void Ndp::finish() {
     if (requestTimerMsg->isScheduled()) {
         cancelEvent(requestTimerMsg);
-        delete requestTimerMsg;
     }
+    delete requestTimerMsg;
     EV_INFO << getFullPath() << ": finishing with " << ndpConnMap.size()
                    << " connections open.\n";
 }
 
 void Ndp::handleSelfMessage(cMessage *msg) {
-    //throw cRuntimeError("model error: should schedule timers on connection");
     if (msg == requestTimerMsg) {
         process_REQUEST_TIMER();
     } else {
@@ -256,7 +254,7 @@ void Ndp::segmentArrivalWhileClosed(Packet *packet,
 ushort Ndp::getEphemeralPort() {
     // start at the last allocated port number + 1, and search for an unused one
     ushort searchUntil = lastEphemeralPort++;
-    if (lastEphemeralPort == EPHEMERAL_PORTRANGE_END){ // wrap
+    if (lastEphemeralPort == EPHEMERAL_PORTRANGE_END) { // wrap
         lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
     }
     while (usedEphemeralPorts.find(lastEphemeralPort)
@@ -527,18 +525,15 @@ void Ndp::updateConnMap() {
 }
 
 void Ndp::requestTimer() {
-    Enter_Method_Silent
-    ("requestTimer");
+    Enter_Method_Silent("requestTimer");
     cancelRequestTimer();
     simtime_t requestTime = (simTime() + SimTime( PACING_TIME, SIMTIME_US)); // pacing
     scheduleAt(requestTime, requestTimerMsg); // 0.000009
 }
 
 void Ndp::cancelRequestTimer() {
-    if (requestTimerMsg->isScheduled()) {
+    if (requestTimerMsg->isScheduled())
         cancelEvent(requestTimerMsg);
-    }
-    delete requestTimerMsg;
 }
 
 bool Ndp::getNapState() {

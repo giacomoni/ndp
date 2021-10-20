@@ -1,4 +1,3 @@
-
 #ifndef __NDP_RAPTONDPAPPBASE_H
 #define __NDP_RAPTONDPAPPBASE_H
 
@@ -27,24 +26,33 @@ protected:
     long bytesRcvd;
 
 protected:
+    // Initializes the application, binds the socket to the local address and port.
     virtual void initialize(int stage) override;
+
     virtual int numInitStages() const override {
         return NUM_INIT_STAGES;
     }
+
     virtual void handleMessageWhenUp(cMessage *msg) override;
     virtual void finish() override;
 
     /* Utility functions */
+    // Creates a socket connection based on the NED parameters specified.
     virtual void connect();
+    // Closes the socket.
     virtual void close();
     virtual void setStatusString(const char *s);
 
     /* NdpSocket::ICallback callback methods */
     virtual void handleTimer(cMessage *msg) = 0;
 
+    // Called once the socket is established. Currently does nothing but set the status string.
     virtual void socketEstablished(NdpSocket *socket) override;
+
+    //Called once a packet arrives at the application.
     virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent)
             override;
+
     virtual void socketAvailable(NdpSocket *socket,
             NdpAvailableInfo *availableInfo) override {
         socket->accept(availableInfo->getNewSocketId());

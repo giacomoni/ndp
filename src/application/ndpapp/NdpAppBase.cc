@@ -4,10 +4,10 @@
 #include  "../../transportlayer/contract/ndp/NdpSocket.h"
 
 namespace inet {
+
 void NdpAppBase::initialize(int stage) {
-
+    EV_TRACE << "NdpAppBase::initialize stage " << stage;
     ApplicationBase::initialize(stage);
-
     if (stage == INITSTAGE_LOCAL) {
         numSessions = numBroken = packetsSent = packetsRcvd = bytesSent =
                 bytesRcvd = 0;
@@ -27,7 +27,7 @@ void NdpAppBase::initialize(int stage) {
 }
 
 void NdpAppBase::handleMessageWhenUp(cMessage *msg) {
-
+    EV_TRACE << "NdpAppBase::handleMessageWhenUp" << endl;
     if (msg->isSelfMessage()) {
         handleTimer(msg);
     } else
@@ -35,6 +35,7 @@ void NdpAppBase::handleMessageWhenUp(cMessage *msg) {
 }
 
 void NdpAppBase::connect() {
+    EV_TRACE << "NdpAppBase::connect" << endl;
     // we need a new connId if this is not the first connection
     socket.renewSocket();
 
@@ -55,7 +56,7 @@ void NdpAppBase::connect() {
     const char *srcAddress = par("localAddress");
     L3Address localAddress;
     L3AddressResolver().tryResolve(srcAddress, localAddress);
-    EV_INFO << "\n\n\n AAAA localAddress add " << localAddress << "\n\n\n";
+    EV_INFO << "localAddress add " << localAddress << endl;
 
     if (destination.isUnspecified()) {
         EV_ERROR << "Connecting to " << connectAddress << " port="
@@ -67,7 +68,7 @@ void NdpAppBase::connect() {
 
         setStatusString("connecting");
         socket.connect(localAddress, destination, connectPort, isSender,
-                isReceiver, numPacketsToSend, isBackroundFlow, priorityValue);
+                isReceiver, numPacketsToSend, priorityValue);
         EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination
                        << ") port=" << connectPort << endl;
 
@@ -89,7 +90,7 @@ void NdpAppBase::setStatusString(const char *s) {
 void NdpAppBase::socketEstablished(NdpSocket*) {
 
     // *redefine* to perform or schedule first sending
-    EV_INFO << "\n\n\n\n\n\n\n\n connected\n";
+    EV_INFO << "\nconnected\n";
     setStatusString("Established");
 }
 

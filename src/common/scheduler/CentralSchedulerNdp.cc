@@ -1106,8 +1106,8 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
                 80 + newNumNdpSinkAppsDest);
 
         newDestAppModule->par("isBackroundFlow").setBoolValue(false);
-        newDestAppModule->par("multiCastGroupId").setDoubleValue(
-                multicastGrpId);
+        //newDestAppModule->par("multiCastGroupId").setDoubleValue(
+        //        multicastGrpId);
 
         cGate *gateNdpInDest = ndpDestModule->gate("in",
                 newNdpGateOutSizeDest - 1);
@@ -1243,8 +1243,8 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
                 80 + newNumNdpSinkAppsDest);
 
         newDestAppModule->par("isBackroundFlow").setBoolValue(false);
-        newDestAppModule->par("multiCastGroupId").setDoubleValue(
-                multicastGrpId);
+        //newDestAppModule->par("multiCastGroupId").setDoubleValue(
+        //        multicastGrpId);
 
         cGate *gateNdpInDest = ndpDestModule->gate("in");
         cGate *gateNdpOutDest = ndpDestModule->gate("out");

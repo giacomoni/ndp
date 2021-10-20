@@ -31,7 +31,6 @@ void NdpConnection::process_OPEN_ACTIVE(NdpEventCode &event,
         state->numPacketsToSend = openCmd->getNumPacketsToSend();
         state->isSender = openCmd->isSender();  // true
         state->isReceiver = openCmd->isReceiver(); // false
-        state->isLongFlow = openCmd->isLongFlow();
         state->priorityValue = openCmd->getPriorityValue();
         if (remoteAddr.isUnspecified() || remotePort == -1)
             throw cRuntimeError(ndpMain,

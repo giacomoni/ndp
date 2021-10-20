@@ -22,20 +22,22 @@ class INET_API NdpBasicClientApp : public NdpAppBase
 
     simtime_t startTime;
     simtime_t stopTime;
-    unsigned int sendBytes = 0;
-
-    #define NDP_TIMEOUT_REQUEST_REXMIT_MAX    240  // 4 mins (will only be used with request)
-    #define MAX_REQUEST_REXMIT_COUNT         5     // (Added)
-    #define NDP_TIMEOUT_REQUEST_REXMIT        1     // (Added)  request timeout
-    cMessage *requestRexmitTimer = nullptr;        // (Added) for retransmitting request
 
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+
+    // Initializes the client application, calls the initialize method of NdpAppBase
     virtual void initialize(int stage) override;
+
+    // Handles message sent to the application. Most importantly the method handles
+    // a self timer sent on startup to connect to the socket.
     virtual void handleTimer(cMessage *msg) override;
 
     virtual void socketEstablished(NdpSocket *socket) override;
+
+    // No data should arrive in the NDP client application as this is handled by the
+    // NdpConnection. Method must override the ApplicationBase method.
     virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent) override {return;};
     virtual void socketClosed(NdpSocket *socket) override;
     virtual void socketFailure(NdpSocket *socket, int code) override;

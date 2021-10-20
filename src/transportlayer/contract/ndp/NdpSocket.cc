@@ -149,7 +149,7 @@ void NdpSocket::accept(int socketId) {
 
 void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress,
         int remotePort, bool isSender, bool isReceiver,
-        unsigned int numPacketsToSend, bool isLongFlow,
+        unsigned int numPacketsToSend,
         unsigned int priorityValue) {
     if (sockstate != NOT_BOUND && sockstate != BOUND)
         throw cRuntimeError(
@@ -185,7 +185,6 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress,
     openCmd->setPriorityValue(priorityValue);
     openCmd->setIsSender(isSender);
     openCmd->setIsReceiver(isReceiver);
-    openCmd->setIsLongFlow(isLongFlow);
 
     EV_INFO << "\nCONTROL INFO SENT";
     request->setControlInfo(openCmd);

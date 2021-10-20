@@ -239,7 +239,7 @@ public:
      */
     void connect(L3Address localAddress, L3Address remoteAddr, int remotePort,
             bool isSender, bool isReceiver, unsigned int numPacketsToSend,
-            bool isLongFlow, unsigned int priorityValue);
+            unsigned int priorityValue);
 
     /**
      * Sends data packet.

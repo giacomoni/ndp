@@ -58,7 +58,4 @@ simple CentralSchedulerNdp
 
          // incast
         int numIncastSenders = default(1);
-
-//        @signal[multicastGroupID](type=double);
-//        @statistic[multicastGroupID](title="multicast Group ID"; source=multicastGroupID; unit=s; record=last);
 }

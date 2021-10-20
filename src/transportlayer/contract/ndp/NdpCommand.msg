@@ -85,7 +85,6 @@ class NdpOpenCommand extends NdpCommand
     
     unsigned int priorityValue;
     unsigned int numPacketsToSend;
-    bool isLongFlow;
     bool isSender;
     bool isReceiver;
 }

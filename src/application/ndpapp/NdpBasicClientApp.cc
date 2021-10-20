@@ -18,12 +18,12 @@ NdpBasicClientApp::~NdpBasicClientApp() {
 }
 
 void NdpBasicClientApp::initialize(int stage) {
+    EV_TRACE << "NdpBasicClientApp::initialize stage " << stage << endl;
     NdpAppBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
         bytesRcvd = 0;
-        packetsRcvd=0;
+        packetsRcvd = 0;
         WATCH(bytesRcvd);
-        sendBytes = par("sendBytes");   // commented moh
         startTime = par("startTime");
         stopTime = par("stopTime");
         if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
@@ -32,25 +32,27 @@ void NdpBasicClientApp::initialize(int stage) {
     }
 }
 
-void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
-{
+void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation) {
     simtime_t now = simTime();
     simtime_t start = std::max(startTime, now);
-    if (timeoutMsg && ((stopTime < SIMTIME_ZERO) || (start < stopTime) || (start == stopTime && startTime == stopTime))) {
+    if (timeoutMsg
+            && ((stopTime < SIMTIME_ZERO) || (start < stopTime)
+                    || (start == stopTime && startTime == stopTime))) {
         timeoutMsg->setKind(MSGKIND_CONNECT);
         scheduleAt(start, timeoutMsg);
     }
 }
 
-void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
-{
+void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation) {
     cancelEvent(timeoutMsg);
-    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING || socket.getState() == NdpSocket::PEER_CLOSED)
+    if (socket.getState() == NdpSocket::CONNECTED
+            || socket.getState() == NdpSocket::CONNECTING
+            || socket.getState() == NdpSocket::PEER_CLOSED)
         close();
 }
 
-void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
-{
+void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation) {
+    EV_WARN << "NdpBasicClientApp crash operation" << endl;
     cancelEvent(timeoutMsg);
     if (operation->getRootModule() != getContainingNode(this))
         socket.destroy();
@@ -59,14 +61,9 @@ void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
 void NdpBasicClientApp::handleTimer(cMessage *msg) {
     // Added MOH send requests based on a timer
     switch (msg->getKind()) {
-
     case MSGKIND_CONNECT:
         connect();    // active OPEN
         break;
-
-    case MSGKIND_SEND:   // not used now MHO see  NdpBasicClientApp::socketEstablished
-        break;
-
     default:
         throw cRuntimeError("Invalid timer msg: kind=%d", msg->getKind());
     }
@@ -80,18 +77,16 @@ void NdpBasicClientApp::rescheduleOrDeleteTimer(simtime_t d,
         short int msgKind) {
     cancelEvent(timeoutMsg);
 
-    if (stopTime < SIMTIME_ZERO|| d < stopTime) {
+    if (stopTime < SIMTIME_ZERO || d < stopTime) {
         timeoutMsg->setKind(msgKind);
         scheduleAt(d, timeoutMsg);
-    }
-    else {
+    } else {
         delete timeoutMsg;
         timeoutMsg = nullptr;
     }
 }
 
-void NdpBasicClientApp::close()
-{
+void NdpBasicClientApp::close() {
     NdpAppBase::close();
     cancelEvent(timeoutMsg);
 }
@@ -108,6 +103,5 @@ void NdpBasicClientApp::socketFailure(NdpSocket *socket, int code) {
     }
 }
 
-
-}// namespace inet
+}    // namespace inet
 

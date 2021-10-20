@@ -18,7 +18,6 @@ namespace ndp {
 
 class NdpHeader;
 class NdpSendQueue;
-class NdpReceiveQueue;
 class NdpAlgorithm;
 
 enum NdpState {
@@ -52,9 +51,7 @@ enum NdpEventCode {
     NDP_E_ABORT,
     NDP_E_DESTROY,
     NDP_E_STATUS,
-    NDP_E_QUEUE_BYTES_LIMIT,
     NDP_E_READ,
-    NDP_E_SETOPTION,
 
     // TPDU types
     NDP_E_RCV_DATA,
@@ -81,17 +78,7 @@ enum NdpEventCode {
 #define NDP_TIMEOUT_CONN_ESTAB        75  // 75 seconds
 #define NDP_TIMEOUT_FIN_WAIT_2        600  // 10 minutes
 #define NDP_TIMEOUT_2MSL              240  // 2 * 2 minutes
-#define NDP_TIMEOUT_SYN_REXMIT        3  // initially 3 seconds
-
-#define NDP_TIMEOUT_PULL_REXMIT        0.5  // initially 500 msec  MOH
-
-#define NDP_TIMEOUT_SYN_REXMIT_MAX    240  // 4 mins (will only be used with SYN+ACK: with SYN CONN_ESTAB occurs sooner)
 //@}
-
-#define MAX_SYN_REXMIT_COUNT          12  // will only be used with SYN+ACK: with SYN CONN_ESTAB occurs sooner
-#define NDP_MAX_WIN                   65535  // 65535 bytes, largest value (16 bit) for (unscaled) window size
-#define DUPTHRESH                     3  // used for NDPTahoe, NDPReno and SACK (RFC 3517)
-#define PAWS_IDLE_TIME_THRESH         (24 * 24 * 3600)  // 24 days in seconds (RFC 1323)
 
 //typedef std::list<Sack> SackList;
 
@@ -151,7 +138,6 @@ public:
         Packet *msg;
     };
     typedef std::list<PacketsToSend> PacketsList;
-//    PacketsList sentPacketsList;
     PacketsList receivedPacketsList;
 
     // connection identification by apps: socketId
@@ -183,7 +169,6 @@ public:
 
     //NDP options for this connection
     int ttl = -1;
-//    int ClientOrServerSel=10;
 protected:
     Ndp *ndpMain = nullptr;    // NDP module
 
@@ -198,13 +183,8 @@ protected:
     NdpSendQueue* getSendQueue() const {
         return sendQueue;
     }
-    NdpReceiveQueue *receiveQueue = nullptr;
-    NdpReceiveQueue* getReceiveQueue() const {
-        return receiveQueue;
-    }
 
 public:
-    // NDPSACKRexmitQueue *rexmitQueue = nullptr;
     virtual int getNumRcvdPackets();
     virtual bool isConnFinished();
     virtual void setConnFinished();
@@ -383,10 +363,6 @@ public:
     }
     NdpSendQueue* getSendQueue() {
         return sendQueue;
-    }
-    // NDPSACKRexmitQueue *getRexmitQueue() { return rexmitQueue; }
-    NdpReceiveQueue* getReceiveQueue() {
-        return receiveQueue;
     }
     NdpAlgorithm* getNdpAlgorithm() {
         return ndpAlgorithm;

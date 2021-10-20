@@ -18,13 +18,8 @@ class INET_API NdpSinkApp : public cSimpleModule, public ILifecycle
     long bytesRcvd;
     NdpSocket socket;
 
-    double multiCastGroupId;
-    double multiSrcGroupId;
-
-
      //statistics:
     static simsignal_t rcvdPkSignalNDP;
-//    static simsignal_t fctRecordv1;
 
     cMessage *timeoutMsg = nullptr;
     // MOH: added
@@ -32,11 +27,8 @@ class INET_API NdpSinkApp : public cSimpleModule, public ILifecycle
     simtime_t tEndAdded;
     double numRcvTrimmedHeader = 0 ;
 
-
     bool firstDataReceived = true;
-    bool isBackroundFlow;
 
-    cGate *gateToNdp;
     virtual void initialize(int stage) override;
     virtual int numInitStages() const override { return NUM_INIT_STAGES; }
     virtual void handleMessage(cMessage *msg) override;
