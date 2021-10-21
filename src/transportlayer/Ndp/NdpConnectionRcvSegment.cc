@@ -179,7 +179,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
         sendAckNdp(arrivedPktSeqNo);
         unsigned int seqNo = ndpseg->getDataSequenceNumber();
         ++state->numberReceivedPackets;
-        unsigned int numberReceivedPackets = state->numberReceivedPackets;
+        int numberReceivedPackets = state->numberReceivedPackets;
         int initialSentPackets = state->IW;
         int wantedPackets = state->numPacketsToGet;
         // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -236,7 +236,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
                         || state->connFinished == true) {
                     std::list<PacketsToSend>::iterator iter; // received iterator
                     iter = receivedPacketsList.begin();
-                    int index = 0;
                     while (iter != receivedPacketsList.end()) {
                         iter++;
                     }

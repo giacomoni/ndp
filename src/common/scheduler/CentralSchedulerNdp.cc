@@ -184,9 +184,6 @@ void CentralSchedulerNdp::handleMessage(cMessage *msg) {
 void CentralSchedulerNdp::serversLocations() {
     std::cout
             << "\n\n ******************** serversLocations .. ********************  \n";
-    int totalNumberofPods = kValue;
-    int totalNumberofRacks = (kValue / 2) * kValue;
-    int racksPerPod = totalNumberofRacks / totalNumberofPods;
     int serversPerPod = pow(kValue, 2) / 4;
     int serversPerRack = kValue / 2;
 
@@ -1343,7 +1340,6 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
 //      goodput = SINK ? but this gives high goodput as three connections serve the sink
 // ==============================================================================================
 // to use this way take  WAY-I block outside the for loop
-    int test = 0;
     newArrivalTime = expDistribution.operator()(PRNG);
     sumArrivalTimes = sumArrivalTimes + newArrivalTime;
     for (auto iter = senders.begin(); iter != senders.end(); ++iter) {

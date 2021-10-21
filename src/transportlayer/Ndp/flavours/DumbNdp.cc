@@ -1,5 +1,4 @@
 
-
 #include "DumbNdp.h"
 
 #include "../Ndp.h"
@@ -12,8 +11,8 @@ Register_Class(DumbNdp);
 
 #define REXMIT_TIMEOUT    2 // Just a dummy value
 
-DumbNdp::DumbNdp() : NdpAlgorithm(),
-    state((DumbNdpStateVariables *&)NdpAlgorithm::state)
+DumbNdp::DumbNdp() :
+        NdpAlgorithm(), state((DumbNdpStateVariables*&) NdpAlgorithm::state)
 {
     rexmitTimer = nullptr;
 }
@@ -38,7 +37,7 @@ void DumbNdp::connectionClosed()
     conn->getNDPMain()->cancelEvent(rexmitTimer);
 }
 
-void DumbNdp::processTimer(cMessage *timer, NdpEventCode& event)
+void DumbNdp::processTimer(cMessage *timer, NdpEventCode &event)
 {
     if (timer != rexmitTimer)
         throw cRuntimeError(timer, "unrecognized timer");
@@ -47,9 +46,10 @@ void DumbNdp::processTimer(cMessage *timer, NdpEventCode& event)
 
 void DumbNdp::dataSent(uint32 fromseq)
 {
-    if (rexmitTimer->isScheduled())
-     conn->getNDPMain()->cancelEvent(rexmitTimer);
-     conn->scheduleTimeout(rexmitTimer, REXMIT_TIMEOUT);
+    if (rexmitTimer->isScheduled()){
+        conn->getNDPMain()->cancelEvent(rexmitTimer);
+    }
+    conn->scheduleTimeout(rexmitTimer, REXMIT_TIMEOUT);
 }
 
 } // namespace NDP

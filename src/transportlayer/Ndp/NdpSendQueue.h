@@ -75,7 +75,7 @@ public:
      * init() may be called more than once; every call flushes the existing contents
      * of the queue.
      */
-    virtual void init(unsigned int numPacketsToSend, B mss);
+    virtual void init(int numPacketsToSend, B mss);
 
     /**
      * Returns a string with the region stored.

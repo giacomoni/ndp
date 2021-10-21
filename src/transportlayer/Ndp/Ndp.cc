@@ -98,7 +98,7 @@ void Ndp::handleSelfMessage(cMessage *msg)
     }
     else {
         NdpConnection *conn = (NdpConnection*) msg->getContextPointer();
-        bool ret = conn->processTimer(msg);
+        conn->processTimer(msg);
     }
 }
 
@@ -558,7 +558,6 @@ bool Ndp::getNapState()
 void Ndp::process_REQUEST_TIMER()
 {
     bool sendNewRequest = false;
-    auto iter = requestCONNMap.begin();
     bool allEmpty = allPullQueuesEmpty();
     bool allDone = allConnFinished();
 

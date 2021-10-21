@@ -1403,11 +1403,11 @@ void Ipv4NetworkConfiguratorEcmp::addStaticRoutes(TopologyEcmp &topology, cXMLEl
                 // find next hop interface (the last IP interface on the path that is not in the source node)
                 Node *node = destinationNode;
                 Node *nodeTemp = destinationNode;                                       // MOH: Added
-                Node *nodeCore = destinationNode;                                       // MOH: Added
-                bool midWay = false;                                                    // MOH: Added
-                int multiplePathsPoint = 0;                                             // MOH: Added
+                //Node *nodeCore = destinationNode;                                       // MOH: Added
+                //bool midWay = false;                                                    // MOH: Added
+                //int multiplePathsPoint = 0;                                             // MOH: Added
                 int numShortestPaths = node->outPathEcmp.size();                        // MOH: Added
-                int index = 0;                                                          // MOH: Added
+                //int index = 0;                                                          // MOH: Added
 
 //                if (strcmp(sourceNode->getModule()->getFullName(), "Edge1") == 0  && strcmp(destinationNode->getModule()->getFullName(), "server") == 0) {
 //                std::cout  << " \n\\n sourceNode: " << sourceNode->getModule()->getFullName() << "\n";

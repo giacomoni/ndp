@@ -87,7 +87,7 @@ public:
     std::map<int, NdpConnection*> requestCONNMap;
     int connIndex = 0;
 
-    int counter = 0;
+    long unsigned int counter = 0;
     int timeOut = 0;
     int times = 0;
     bool nap = false;

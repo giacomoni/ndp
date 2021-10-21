@@ -112,10 +112,10 @@ public:
     bool isLongFlow;
     bool isHeader;
 
-    uint32 IW;  //initial window size
+    int IW;  //initial window size
     bool connFinished;
-    uint32 numPacketsToGet;
-    uint32 numPacketsToSend;
+    int numPacketsToGet;
+    int numPacketsToSend;
     bool isSender;
     bool isReceiver;
     unsigned int priorityValue;
@@ -123,8 +123,8 @@ public:
     unsigned int numRcvdPkt;
     unsigned int numRcvTrimmedHeader;
 
-    uint32 numberReceivedPackets;
-    uint32 numberSentPackets;
+    int numberReceivedPackets;
+    int numberSentPackets;
 
     int request_rexmit_count; // number of SYN/SYN+ACK retransmissions (=1 after first rexmit)
 

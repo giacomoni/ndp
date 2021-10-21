@@ -17,12 +17,11 @@ NdpSendQueue::~NdpSendQueue()
     sentDataQueue.clear();
 }
 
-void NdpSendQueue::init(unsigned int numPacketsToSend, B mss)
+void NdpSendQueue::init(int numPacketsToSend, B mss)
 {
     // filling the dataToSendQueue queue with (random data) packets based on the numPacketsToSend value that the application passes
     // TODO: I would update this to get  bytes stream from the application then packetise this data at the transport layer
     EV_INFO << "\ngenerateSymbolsList " << "\n";
-    char msgname[16];
     for (int i = 1; i <= numPacketsToSend; i++) {
         const auto &payload = makeShared<GenericAppMsgNdp>();
         std::string packetName = "DATAPKT-" + std::to_string(i);
