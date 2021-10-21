@@ -60,13 +60,11 @@ void NdpConnection::initConnection(Ndp *_mod, int _socketId) {
     requestInternalTimer = new cMessage("requestInternalTimer");
     the2MSLTimer = new cMessage("2MSL");
     connEstabTimer = new cMessage("CONN-ESTAB");
-    finWait2Timer = new cMessage("FIN-WAIT-2");
     synRexmitTimer = new cMessage("SYN-REXMIT");
 
     requestInternalTimer->setContextPointer(this);
     the2MSLTimer->setContextPointer(this);
     connEstabTimer->setContextPointer(this);
-    finWait2Timer->setContextPointer(this);
     synRexmitTimer->setContextPointer(this);
 }
 
@@ -87,8 +85,6 @@ NdpConnection::~NdpConnection() {
         delete cancelEvent(the2MSLTimer);
     if (connEstabTimer)
         delete cancelEvent(connEstabTimer);
-    if (finWait2Timer)
-        delete cancelEvent(finWait2Timer);
     if (synRexmitTimer)
         delete cancelEvent(synRexmitTimer);
     if (requestInternalTimer)
@@ -122,9 +118,6 @@ bool NdpConnection::processTimer(cMessage *msg) {
     } else if (msg == connEstabTimer) {
         event = NDP_E_TIMEOUT_CONN_ESTAB;
         process_TIMEOUT_CONN_ESTAB();
-    } else if (msg == finWait2Timer) {
-        event = NDP_E_TIMEOUT_FIN_WAIT_2;
-        process_TIMEOUT_FIN_WAIT_2();
     } else if (msg == synRexmitTimer) {
         event = NDP_E_IGNORE;
 //        process_TIMEOUT_SYN_REXMIT(event);
@@ -576,8 +569,6 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
             cancelEvent(the2MSLTimer);
         if (connEstabTimer)
             cancelEvent(connEstabTimer);
-        if (finWait2Timer)
-            cancelEvent(finWait2Timer);
         if (synRexmitTimer)
             cancelEvent(synRexmitTimer);
         ndpAlgorithm->connectionClosed();

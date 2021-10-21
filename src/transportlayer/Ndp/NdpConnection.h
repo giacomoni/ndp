@@ -208,7 +208,6 @@ protected:
 
     cMessage *the2MSLTimer = nullptr;
     cMessage *connEstabTimer = nullptr;
-    cMessage *finWait2Timer = nullptr;
     cMessage *synRexmitTimer = nullptr;    // for retransmitting SYN and SYN+ACK
 
     // statistics

@@ -19,8 +19,6 @@ enum NdpCommandCode
     NDP_C_SEND = 4;          // send data (set on data packet)
     NDP_C_CLOSE = 5;         // "I have no more data to send"
     NDP_C_ABORT = 6;         // abort connection
-    NDP_C_QUEUE_BYTES_LIMIT = 8; // set send queue limit (in bytes)
-    NDP_C_READ = 9;       // send request to NDP to deliver data
 }
 
 //
