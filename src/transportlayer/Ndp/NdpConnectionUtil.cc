@@ -76,23 +76,17 @@ const char* NdpConnection::indicationName(int code)
 
 void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg)
 {
-    EV_INFO << "\n\n\n\n\nLOCAL PORT" << localPort;
+    EV_TRACE << "NdpConnection::sendToIP" << endl;
+    EV_INFO << "LOCAL PORT" << localPort;
     EV_INFO << "\nIS PULL PACKET?: " << ndpseg->isPullPacket();
     ndpseg->setSrcPort(localPort);
     ndpseg->setDestPort(remotePort);
-    //state->sentBytes = packet->getByteLength();    // resetting sentBytes to 0 if sending a segment without data (e.g. ACK)
-
     EV_INFO << "Sending: ";
     printSegmentBrief(packet, ndpseg);
-
-    // TBD reuse next function for sending
-
     IL3AddressType *addressType = remoteAddr.getAddressType();
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
 
-    if (ttl != -1 && packet->findTag<HopLimitReq>() == nullptr)
-        packet->addTag<HopLimitReq>()->setHopLimit(ttl);
-    EV_INFO << "\n\n\nDISPATCH PROTOCOL: " << addressType->getNetworkProtocol()->str() << "\n\n\n\n\n";
+    EV_INFO << "Dispatch Protocol: " << addressType->getNetworkProtocol()->str() << endl;
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(localAddr);
     addresses->setDestAddress(remoteAddr);
@@ -110,9 +104,6 @@ void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg, L3Add
     IL3AddressType *addressType = dest.getAddressType();
     //setByteLength() Replacement^
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
-
-    if (ttl != -1 && packet->findTag<HopLimitReq>() == nullptr)
-        packet->addTag<HopLimitReq>()->setHopLimit(ttl);
 
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(src);

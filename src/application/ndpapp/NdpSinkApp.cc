@@ -93,7 +93,7 @@ void NdpSinkApp::finish()
 {
     EV_TRACE << "NdpSinkApp::finish" << endl;
     double throughput = 8 * (double) bytesRcvd / (tEndAdded - tStartAdded).dbl();
-    EV_INFO << "\nTime Difference: " << (tEndAdded - tStartAdded).dbl();
+    EV_INFO << "Time Difference: " << (tEndAdded - tStartAdded).dbl() << endl;
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
     EV_INFO << "Flow Completion Time:=    " << FCT << endl;
     // don't emit the FCT of the background flows(no need), we just observe the shorter length flows

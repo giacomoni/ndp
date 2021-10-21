@@ -173,9 +173,6 @@ public:
     }
     int localPort = -1;
     int remotePort = -1;
-
-    //NDP options for this connection
-    int ttl = -1;
 protected:
     Ndp *ndpMain = nullptr;    // NDP module
 
