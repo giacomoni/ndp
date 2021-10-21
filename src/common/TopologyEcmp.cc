@@ -46,8 +46,6 @@ TopologyEcmp::LinkOut* TopologyEcmp::Node::getLinkOut(int i)
     return (TopologyEcmp::LinkOut*) outLinks[i];
 }
 
-//----
-
 TopologyEcmp::TopologyEcmp(const char *name) :
         cOwnedObject(name)
 {

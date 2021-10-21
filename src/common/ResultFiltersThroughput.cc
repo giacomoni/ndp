@@ -35,7 +35,7 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t, cOb
     if (auto packet = dynamic_cast<cPacket*>(object)) {
         const simtime_t now = simTime();
         packets++;
-        if (packets >= 1) { // MOH modified
+        if (packets >= 1) {
             bytes += packet->getByteLength();
             double throughput = 8 * bytes / (now - lastSignal).dbl();
             fire(this, now, throughput, details);
@@ -51,7 +51,6 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t, cOb
             packets = 0;
             if (emitIntermediateZeros) {
                 while (now - lastSignal >= interval) {
-                    // fire(this, lastSignal + interval, 0.0, details); // MOH commented
                     lastSignal = lastSignal + interval;
                 }
             }

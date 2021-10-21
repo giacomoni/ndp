@@ -33,10 +33,6 @@ const char* NdpSocket::stateName(NdpSocket::State state)
             CASE(LISTENING);
             CASE(CONNECTING);
             CASE(CONNECTED);
-            CASE(PEER_CLOSED);
-            CASE(LOCALLY_CLOSED);
-            CASE(CLOSED);
-            CASE(SOCKERROR);
         }
     return s;
 #undef CASE
@@ -72,9 +68,7 @@ void NdpSocket::listen(bool fork)
         throw cRuntimeError(sockstate == NOT_BOUND ? "NdpSocket: must call bind() before listen()" : "NdpSocket::listen(): connect() or listen() already called");
 
     auto request = new Request("PassiveOPEN", NDP_C_OPEN_PASSIVE);
-
     NdpOpenCommand *openCmd = new NdpOpenCommand();
-
     openCmd->setLocalAddr(localAddr);
     openCmd->setLocalPort(localPrt);
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
@@ -109,7 +103,6 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int rem
     openCmd->setRemotePort(remotePrt);
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
     openCmd->setNumPacketsToSend(numPacketsToSend);
-
     request->setControlInfo(openCmd);
     sendToNDP(request);
     sockstate = CONNECTING;
@@ -190,30 +183,8 @@ void NdpSocket::processMessage(cMessage *msg)
                 cb->socketEstablished(this);
             delete msg;
             break;
-
-        case NDP_I_PEER_CLOSED:
-            sockstate = PEER_CLOSED;
-            if (cb)
-                cb->socketPeerClosed(this);
-            delete msg;
-            break;
-
-        case NDP_I_CLOSED:
-            sockstate = CLOSED;
-            if (cb) {
-                cb->socketClosed(this);
-            }
-            delete msg;
-            break;
-
         case NDP_I_CONNECTION_REFUSED:
         case NDP_I_CONNECTION_RESET:
-        case NDP_I_TIMED_OUT:
-            sockstate = SOCKERROR;
-            if (cb)
-                cb->socketFailure(this, msg->getKind());
-            delete msg;
-            break;
 
         case NDP_I_STATUS:
             status = check_and_cast<NdpStatusInfo*>(msg->removeControlInfo());

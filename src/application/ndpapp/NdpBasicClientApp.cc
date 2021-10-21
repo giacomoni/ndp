@@ -29,6 +29,7 @@ void NdpBasicClientApp::initialize(int stage)
             throw cRuntimeError("Invalid startTime/stopTime parameters");
         timeoutMsg = new cMessage("timer");
     }
+    // TODO update timer to make it more up to date
 }
 
 void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
@@ -44,7 +45,7 @@ void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
 void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
 {
     cancelEvent(timeoutMsg);
-    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING || socket.getState() == NdpSocket::PEER_CLOSED)
+    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING)
         close();
 }
 

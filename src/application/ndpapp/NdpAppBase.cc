@@ -99,12 +99,7 @@ void NdpAppBase::socketDataArrived(NdpSocket*, Packet *msg, bool)
 
 void NdpAppBase::socketPeerClosed(NdpSocket *socket_)
 {
-    ASSERT(socket_ == &socket);
-    // close the connection (if not already closed)
-    if (socket.getState() == NdpSocket::PEER_CLOSED) {
-        EV_INFO << "remote NDP closed, closing here as well\n";
-        close();
-    }
+    throw cRuntimeError("NdpAppBase::socketPeerClosed(): never called");
 }
 
 void NdpAppBase::socketClosed(NdpSocket*)

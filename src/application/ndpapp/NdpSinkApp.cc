@@ -69,7 +69,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
     else if (msg->getKind() == NDP_I_DATA || msg->getKind() == NDP_I_URGENT_DATA) {
         Packet *packet = check_and_cast<Packet*>(msg);
         bytesRcvd += packet->getByteLength();
-        EV_INFO << "\nNDP DATA message arrived - bytesRcvd: " << bytesRcvd << "\n";
+        EV_INFO << "NDP DATA message arrived - bytesRcvd: " << bytesRcvd << endl;
         emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
@@ -79,11 +79,11 @@ void NdpSinkApp::handleMessage(cMessage *msg)
         EV_INFO << "bytesRcvd  " << bytesRcvd << " " << this->getFullPath() << std::endl;
     }
     else if (msg->getKind() == NDP_I_ESTABLISHED) {
-        EV_INFO << "\nNDP_I_ESTABLISHED message arrived - deleting message\n";
+        EV_INFO << "NDP_I_ESTABLISHED message arrived - deleting message" << endl;
         delete msg;
     }
     else {
-        EV_WARN << "\nUnknown Message Type Arrived at Sink App\n";
+        EV_WARN << "Unknown Message Type Arrived at Sink App" << endl;
         // must be data or some kind of indication -- can be dropped
         delete msg;
     }

@@ -45,7 +45,7 @@ public:
 
     enum State
     {
-        NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED, PEER_CLOSED, LOCALLY_CLOSED, CLOSED, SOCKERROR
+        NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED
     };
 
 protected:
@@ -191,6 +191,7 @@ public:
     }
 
     /**
+     * NOT USED
      * Not used due as an NDP server does not need to accept an attempt to create a new connection unlike TCP.
      * The connection instead is immediately made in the simulation of NDP.
      *
@@ -207,6 +208,7 @@ public:
     void connect(L3Address localAddress, L3Address remoteAddr, int remotePort, unsigned int numPacketsToSend);
 
     /**
+     * NOT USED
      * Not implemented. The client never sends any packets to the ndp connection as this is done
      * within the connection itself. To improve the client should send the packets from the application
      * itself using this method.
@@ -214,12 +216,14 @@ public:
     void send(Packet *msg);
 
     /**
+     * NOT USED
      * This method is never called as NDP never sends a CLOSE operation
      * to the socket.
      */
     void close() override;
 
     /**
+     * NOT USED
      * This is never called as a ABORT command is never sent to the socket
      * as there is no retransmission limit which can be exceeded in the NDP
      * implementation unlike TCP.
@@ -227,12 +231,14 @@ public:
     void abort();
 
     /**
+     * * NOT USED
      * The handleCrashOperation method is never handled by the NDP socket,
      * therefore the socket is never destroyed.
      */
     virtual void destroy() override;
 
     /**
+     * NOT USED
      * This is not needed as the socket will never be closed unless the simulation
      * is completed. TODO Allow the possibility of re-connecting with an already
      * established NdpSocket object. The renewSocket is used to ensure that the socket has not been
