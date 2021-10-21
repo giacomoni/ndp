@@ -313,36 +313,6 @@ NdpEventCode NdpConnection::processSegmentInListen(Packet *packet, const Ptr<con
     return NDP_E_IGNORE;
 }
 
-void NdpConnection::process_TIMEOUT_2MSL()
-{
-    //"
-    // If the time-wait timeout expires on a connection delete the TCB,
-    // enter the CLOSED state and return.
-    //"
-    switch (fsm.getState()) {
-        case NDP_S_TIME_WAIT:
-            break;
-
-        default:
-// We should not receive this timeout in this state.
-            throw cRuntimeError(ndpMain, "Internal error: received time-wait (2MSL) timeout in state %s", stateName(fsm.getState()));
-    }
-}
-
-void NdpConnection::process_TIMEOUT_FIN_WAIT_2()
-{
-    switch (fsm.getState()) {
-        case NDP_S_FIN_WAIT_2:
-// Nothing to do here. The TIMEOUT_FIN_WAIT_2 event will automatically take
-// the connection to CLOSED.
-            break;
-
-        default:
-// We should not receive this timeout in this state.
-            throw cRuntimeError(ndpMain, "Internal error: received FIN_WAIT_2 timeout in state %s", stateName(fsm.getState()));
-    }
-}
-
 void NdpConnection::segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr)
 {
     EV_TRACE << "NdpConnection::segmentArrivalWhileClosed" << endl;

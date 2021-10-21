@@ -56,16 +56,6 @@ void NdpConnection::initConnection(Ndp *_mod, int _socketId) {
     fsm.setState(NDP_S_INIT);
 
     // queues and algorithm will be created on active or passive open
-
-    requestInternalTimer = new cMessage("requestInternalTimer");
-    the2MSLTimer = new cMessage("2MSL");
-    connEstabTimer = new cMessage("CONN-ESTAB");
-    synRexmitTimer = new cMessage("SYN-REXMIT");
-
-    requestInternalTimer->setContextPointer(this);
-    the2MSLTimer->setContextPointer(this);
-    connEstabTimer->setContextPointer(this);
-    synRexmitTimer->setContextPointer(this);
 }
 
 NdpConnection::~NdpConnection() {
@@ -80,15 +70,6 @@ NdpConnection::~NdpConnection() {
     delete sendQueue;
     delete ndpAlgorithm;
     delete state;
-
-    if (the2MSLTimer)
-        delete cancelEvent(the2MSLTimer);
-    if (connEstabTimer)
-        delete cancelEvent(connEstabTimer);
-    if (synRexmitTimer)
-        delete cancelEvent(synRexmitTimer);
-    if (requestInternalTimer)
-        delete cancelEvent(requestInternalTimer);
 }
 
 void NdpConnection::handleMessage(cMessage *msg) {
@@ -106,25 +87,8 @@ bool NdpConnection::processTimer(cMessage *msg) {
 
     // first do actions
     NdpEventCode event;
-
-    if (msg == requestInternalTimer) {
-        event = NDP_E_IGNORE;
-    // based on my congestion control, I send requests after receiving  a packet not based on a timer
-    }
-
-    else if (msg == the2MSLTimer) {
-        event = NDP_E_TIMEOUT_2MSL;
-        process_TIMEOUT_2MSL();
-    } else if (msg == connEstabTimer) {
-        event = NDP_E_TIMEOUT_CONN_ESTAB;
-        process_TIMEOUT_CONN_ESTAB();
-    } else if (msg == synRexmitTimer) {
-        event = NDP_E_IGNORE;
-//        process_TIMEOUT_SYN_REXMIT(event);
-    } else {
-        event = NDP_E_IGNORE;
-        ndpAlgorithm->processTimer(msg, event); // seeeee processTimer method in NDPBaseAlg.cc
-    }
+    event = NDP_E_IGNORE;
+    ndpAlgorithm->processTimer(msg, event); // seeeee processTimer method in NDPBaseAlg.cc
     // then state transitions
     return performStateTransition(event);
 }
@@ -260,10 +224,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
             FSM_Goto(fsm, NDP_S_CLOSED);
             break;
 
-        case NDP_E_TIMEOUT_CONN_ESTAB:
-            FSM_Goto(fsm, state->active ? NDP_S_CLOSED : NDP_S_LISTEN);
-            break;
-
         case NDP_E_RCV_RST:
             FSM_Goto(fsm, state->active ? NDP_S_CLOSED : NDP_S_LISTEN);
             break;
@@ -292,10 +252,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
             break;
 
         case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_TIMEOUT_CONN_ESTAB:
             FSM_Goto(fsm, NDP_S_CLOSED);
             break;
 
@@ -430,10 +386,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
             FSM_Goto(fsm, NDP_S_TIME_WAIT);
             break;
 
-        case NDP_E_TIMEOUT_FIN_WAIT_2:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
         case NDP_E_RCV_RST:
             FSM_Goto(fsm, NDP_S_CLOSED);
             break;
@@ -473,10 +425,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
     case NDP_S_TIME_WAIT:
         switch (event) {
         case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_TIMEOUT_2MSL:
             FSM_Goto(fsm, NDP_S_CLOSED);
             break;
 
@@ -525,9 +473,6 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
 
     case NDP_S_LISTEN:
         // we may get back to LISTEN from SYN_RCVD
-        ASSERT(connEstabTimer && synRexmitTimer);
-        cancelEvent(connEstabTimer);
-        cancelEvent(synRexmitTimer);
         break;
 
     case NDP_S_SYN_RCVD:
@@ -536,9 +481,6 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
 
     case NDP_S_ESTABLISHED:
         // we're in ESTABLISHED, these timers are no longer needed
-        delete cancelEvent(connEstabTimer);
-        delete cancelEvent(synRexmitTimer);
-        connEstabTimer = synRexmitTimer = nullptr;
         // NDP_I_ESTAB notification moved inside event processing
         break;
 
@@ -551,10 +493,6 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
             sendIndicationToApp (NDP_I_PEER_CLOSED);
         // whether connection setup succeeded (ESTABLISHED) or not (others),
         // cancel these timers
-        if (connEstabTimer)
-            cancelEvent(connEstabTimer);
-        if (synRexmitTimer)
-            cancelEvent(synRexmitTimer);
         break;
 
     case NDP_S_TIME_WAIT:
@@ -565,12 +503,6 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
         if (oldState != NDP_S_TIME_WAIT && event != NDP_E_ABORT)
             sendIndicationToApp(NDP_I_CLOSED);
         // all timers need to be cancelled
-        if (the2MSLTimer)
-            cancelEvent(the2MSLTimer);
-        if (connEstabTimer)
-            cancelEvent(connEstabTimer);
-        if (synRexmitTimer)
-            cancelEvent(synRexmitTimer);
         ndpAlgorithm->connectionClosed();
         break;
     }

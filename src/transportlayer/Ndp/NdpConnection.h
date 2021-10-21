@@ -66,23 +66,9 @@ enum NdpEventCode
 
     NDP_E_RCV_UNEXP_SYN,    // unexpected SYN
 
-    // timers
-    NDP_E_TIMEOUT_2MSL,    // RFC 793, a.k.a. TIME-WAIT timer
-    NDP_E_TIMEOUT_CONN_ESTAB,
-    NDP_E_TIMEOUT_FIN_WAIT_2,
-
 // All other timers (REXMT, PERSIST, DELAYED-ACK, KEEP-ALIVE, etc.),
 // are handled in NdpAlgorithm.
 };
-
-/** @name Timeout values */
-//@{
-#define NDP_TIMEOUT_CONN_ESTAB        75  // 75 seconds
-#define NDP_TIMEOUT_FIN_WAIT_2        600  // 10 minutes
-#define NDP_TIMEOUT_2MSL              240  // 2 * 2 minutes
-//@}
-
-//typedef std::list<Sack> SackList;
 
 /**
  * Contains state variables ("TCB") for NDP.
@@ -203,14 +189,6 @@ protected:
     {
         return ndpAlgorithm;
     }
-    // timers
-    cMessage *requestInternalTimer = nullptr;
-
-    cMessage *the2MSLTimer = nullptr;
-    cMessage *connEstabTimer = nullptr;
-    cMessage *synRexmitTimer = nullptr;    // for retransmitting SYN and SYN+ACK
-
-    // statistics
 
 protected:
     /** @name FSM transitions: analysing events and executing state transitions */
@@ -238,14 +216,6 @@ protected:
     virtual NdpEventCode processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader> &ndpseg);
 
     //@}
-
-    /** @name Processing timeouts. Invoked from processTimer(). */
-    //@{
-    virtual void process_TIMEOUT_2MSL();
-    virtual void process_TIMEOUT_CONN_ESTAB();
-    virtual void process_TIMEOUT_FIN_WAIT_2();
-    //@}
-
     /** Utility: clone a listening connection. Used for forking. */
     //virtual NdpConnection *cloneListeningConnection();
     //virtual void initClonedConnection(NdpConnection *listenerConn);
@@ -277,8 +247,6 @@ public:
     virtual void sendRequestFromPullsQueue();
 
     virtual int getPullsQueueLength();
-    /** Utility: signal to user that connection timed out */
-    virtual void signalConnectionTimeout();
 
     /** Utility: start a timer */
     void scheduleTimeout(cMessage *msg, simtime_t timeout)
