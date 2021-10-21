@@ -313,25 +313,6 @@ NdpEventCode NdpConnection::processSegmentInListen(Packet *packet, const Ptr<con
     return NDP_E_IGNORE;
 }
 
-void NdpConnection::process_TIMEOUT_CONN_ESTAB()
-{
-    switch (fsm.getState()) {
-        case NDP_S_SYN_RCVD:
-        case NDP_S_SYN_SENT:
-// Nothing to do here. TIMEOUT_CONN_ESTAB event will automatically
-// take the connection to LISTEN or CLOSED, and cancel SYN-REXMIT timer.
-            if (state->active) {
-                // notify user if we're on the active side
-                sendIndicationToApp(NDP_I_TIMED_OUT);
-            }
-            break;
-
-        default:
-// We should not receive this timeout in this state.
-            throw cRuntimeError(ndpMain, "Internal error: received CONN_ESTAB timeout in state %s", stateName(fsm.getState()));
-    }
-}
-
 void NdpConnection::process_TIMEOUT_2MSL()
 {
     //"

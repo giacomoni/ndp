@@ -289,9 +289,9 @@ public:
      * you gave in the setCallbackObject() call.
      *
      * The method deletes the message, unless (1) there is a callback object
-     * installed AND (2) the message is payload (message kind NDP_I_DATA or
-     * NDP_I_URGENT_DATA) when the responsibility of destruction is on the
-     * socketDataArrived() callback method.
+     * installed AND (2) the message is payload (message kind NDP_I_DATA) when
+     *  the responsibility of destruction is on the socketDataArrived() callback
+     *  method.
      *
      * IMPORTANT: for performance reasons, this method doesn't check that
      * the message belongs to this socket, i.e. belongsToSocket(msg) would

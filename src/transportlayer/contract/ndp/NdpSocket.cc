@@ -154,8 +154,6 @@ void NdpSocket::setCallback(ICallback *callback)
 void NdpSocket::processMessage(cMessage *msg)
 {
     ASSERT(belongsToSocket(msg));
-
-    NdpStatusInfo *status;
     NdpConnectInfo *connectInfo;
 
     switch (msg->getKind()) {
@@ -183,16 +181,6 @@ void NdpSocket::processMessage(cMessage *msg)
                 cb->socketEstablished(this);
             delete msg;
             break;
-        case NDP_I_CONNECTION_REFUSED:
-        case NDP_I_CONNECTION_RESET:
-
-        case NDP_I_STATUS:
-            status = check_and_cast<NdpStatusInfo*>(msg->removeControlInfo());
-            if (cb)
-                cb->socketStatusArrived(this, status);
-            delete msg;
-            break;
-
         default:
             throw cRuntimeError("NdpSocket: invalid msg kind %d, one of the NDP_I_xxx constants expected", msg->getKind());
     }

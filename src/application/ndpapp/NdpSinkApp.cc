@@ -65,7 +65,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
         }
         delete msg;
     }
-    else if (msg->getKind() == NDP_I_DATA || msg->getKind() == NDP_I_URGENT_DATA) {
+    else if (msg->getKind() == NDP_I_DATA) {
         Packet *packet = check_and_cast<Packet*>(msg);
         bytesRcvd += packet->getByteLength();
         EV_INFO << "NDP DATA message arrived - bytesRcvd: " << bytesRcvd << endl;

@@ -66,9 +66,7 @@ const char* NdpConnection::indicationName(int code)
     const char *s = "unknown";
     switch (code) {
         CASE(NDP_I_DATA)
-;            CASE(NDP_I_URGENT_DATA);
-            CASE(NDP_I_ESTABLISHED);
-            //CASE(NDP_I_PEER_CLOSED);
+;            CASE(NDP_I_ESTABLISHED);
         }
     return s;
 #undef CASE
@@ -77,22 +75,18 @@ const char* NdpConnection::indicationName(int code)
 void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg)
 {
     EV_TRACE << "NdpConnection::sendToIP" << endl;
-    EV_INFO << "LOCAL PORT" << localPort;
-    EV_INFO << "\nIS PULL PACKET?: " << ndpseg->isPullPacket();
+    EV_INFO << "sendToIP Local Port" << localPort << endl;
     ndpseg->setSrcPort(localPort);
     ndpseg->setDestPort(remotePort);
-    EV_INFO << "Sending: ";
+    EV_INFO << "Sending: " << endl;
     printSegmentBrief(packet, ndpseg);
     IL3AddressType *addressType = remoteAddr.getAddressType();
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
-
     EV_INFO << "Dispatch Protocol: " << addressType->getNetworkProtocol()->str() << endl;
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(localAddr);
     addresses->setDestAddress(remoteAddr);
-
     insertTransportProtocolHeader(packet, Protocol::ndp, ndpseg);
-
     ndpMain->sendFromConn(packet, "ipOut");
 }
 
@@ -100,28 +94,19 @@ void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg, L3Add
 {
     EV_INFO << "Sending: ";
     printSegmentBrief(packet, ndpseg);
-
     IL3AddressType *addressType = dest.getAddressType();
-    //setByteLength() Replacement^
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
-
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(src);
     addresses->setDestAddress(dest);
-    //ndpseg->setByteLength(ndpseg->getHeaderLength() + ndpseg->getPayloadLength());
 
     insertTransportProtocolHeader(packet, Protocol::ndp, ndpseg);
     ndpMain->sendFromConn(packet, "ipOut");
 }
 
-void NdpConnection::signalConnectionTimeout()
-{
-    sendIndicationToApp(NDP_I_TIMED_OUT);
-}
-
 void NdpConnection::sendIndicationToApp(int code, const int id)
 {
-    EV_INFO << "Notifying app: " << indicationName(code) << "\n";
+    EV_INFO << "Notifying app: " << indicationName(code) << endl;
     auto indication = new Indication(indicationName(code), code);
     NdpCommand *ind = new NdpCommand();
     ind->setNumRcvTrimmedHeader(state->numRcvTrimmedHeader);
@@ -133,7 +118,7 @@ void NdpConnection::sendIndicationToApp(int code, const int id)
 
 void NdpConnection::sendEstabIndicationToApp()
 {
-    EV_INFO << "Notifying app: " << indicationName(NDP_I_ESTABLISHED) << "\n";
+    EV_INFO << "Notifying app: " << indicationName(NDP_I_ESTABLISHED) << endl;
     auto indication = new Indication(indicationName(NDP_I_ESTABLISHED), NDP_I_ESTABLISHED);
     NdpConnectInfo *ind = new NdpConnectInfo();
     ind->setLocalAddr(localAddr);
@@ -210,7 +195,7 @@ void NdpConnection::sendAckNdp(unsigned int AckNum)
 
 void NdpConnection::printConnBrief() const
 {
-    EV_DETAIL << "Connection " << localAddr << ":" << localPort << " to " << remoteAddr << ":" << remotePort << "  on socketId=" << socketId << "  in " << stateName(fsm.getState()) << "\n";
+    EV_DETAIL << "Connection " << localAddr << ":" << localPort << " to " << remoteAddr << ":" << remotePort << "  on socketId=" << socketId << "  in " << stateName(fsm.getState()) << endl;
 }
 
 void NdpConnection::printSegmentBrief(Packet *packet, const Ptr<const NdpHeader> &ndpseg)
@@ -226,7 +211,7 @@ void NdpConnection::printSegmentBrief(Packet *packet, const Ptr<const NdpHeader>
         EV_INFO << (ndpseg->getAckBit() ? "RST+ACK " : "RST ");
     if (ndpseg->getAckBit())
         EV_INFO << "ack " << ndpseg->getAckNo() << " ";
-    EV_INFO << "\n";
+    EV_INFO << endl;
 }
 
 void NdpConnection::sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort, int destPort)
