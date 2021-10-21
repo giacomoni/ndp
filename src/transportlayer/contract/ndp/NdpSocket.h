@@ -64,7 +64,7 @@ protected:
 protected:
     void sendToNDP(cMessage *msg, int c = -1);
 
-    // internal: implementation behind listen() and listenOnce()
+    // TODO: in the future to support apps with multiple incoming connections
     void listen(bool fork);
 
 public:
@@ -141,8 +141,7 @@ public:
     }
 
     /**
-     * Bind the socket to a local port number and IP address (useful with
-     * multi-homing).
+     * TODO: add an NDP specific comment here
      */
     void bind(L3Address localAddr, int localPort);
 
@@ -192,75 +191,44 @@ public:
     }
 
     /**
-     * Accepts a new incoming connection reported as available.
+     * TODO: not used, add comment explaining why
+     * TODO: maybe create in the future applications that can accept multiple incoming NDP connections
      */
     void accept(int socketId);
+
     /**
-     * Active OPEN to the given remote socket.
+     * TODO: eliminate unnecessary stuff and explain what's done here
      */
     void connect(L3Address localAddress, L3Address remoteAddr, int remotePort, bool isSender, bool isReceiver, unsigned int numPacketsToSend, unsigned int priorityValue);
 
     /**
-     * Sends data packet.
+     * TODO: not implemented - explain
      */
     void send(Packet *msg);
 
     /**
-     * Sends command.
-     */
-    void sendCommand(Request *msg);
-
-    /**
-     * Closes the local end of the connection. With NDP, a CLOSE operation
-     * means "I have no more data to send", and thus results in a one-way
-     * connection until the remote NDP closes too (or the FIN_WAIT_1 timeout
-     * expires)
+     * TODO: NDP sender does it - explain
      */
     void close() override;
 
     /**
-     * Aborts the connection.
+     * TODO: not implemented - explain
      */
     void abort();
 
     /**
-     * Destroy the connection.
+     * TODO: not implemented - explain
      */
     virtual void destroy() override;
 
     /**
-     * Causes NDP to reply with a fresh NDPStatusInfo, attached to a dummy
-     * message as getControlInfo(). The reply message can be recognized by its
-     * message kind NDP_I_STATUS, or (if a callback object is used)
-     * the socketStatusArrived() method of the callback object will be
-     * called.
-     */
-    void requestStatus();
-
-    /**
-     * Required to re-connect with a "used" NdpSocket object.
-     * By default, a NdpSocket object is tied to a single NDP connection,
-     * via the connectionId. When the connection gets closed or aborted,
-     * you cannot use the socket to connect again (by connect() or listen())
-     * unless you obtain a new connectionId by calling this method.
-     *
-     * BEWARE if you use NdpSocketMap! NdpSocketMap uses connectionId
-     * to find NdpSockets, so after calling this method you have to remove
-     * the socket from your NdpSocketMap, and re-add it. Otherwise NdpSocketMap
-     * will get confused.
-     *
-     * The reason why one must obtain a new connectionId is that NDP still
-     * has to maintain the connection data structure (identified by the old
-     * connectionId) internally for a while (2 maximum segment lifetimes = 240s)
-     * after it reported "connection closed" to us.
+     * TODO: figure out why it is needed - look but not copy TCP code
      */
     void renewSocket();
 
+    // TODO: not called - add comment
     virtual bool isOpen() const override;
-    //@}
 
-    /** @name Handling of messages arriving from NDP */
-    //@{
     /**
      * Returns true if the message belongs to this socket instance (message
      * has a NDPCommand as getControlInfo(), and the connId in it matches

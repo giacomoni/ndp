@@ -47,6 +47,8 @@ protected:
 
     virtual void handleStartOperation(LifecycleOperation *operation) override;
     virtual void handleStopOperation(LifecycleOperation *operation) override;
+
+    // TODO - not implemented
     virtual void handleCrashOperation(LifecycleOperation *operation) override;
 
     virtual void close() override;

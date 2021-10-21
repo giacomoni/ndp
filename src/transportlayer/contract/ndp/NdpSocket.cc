@@ -68,7 +68,6 @@ void NdpSocket::bind(L3Address lAddr, int lPort)
 
 void NdpSocket::listen(bool fork)
 {
-
     if (sockstate != BOUND)
         throw cRuntimeError(sockstate == NOT_BOUND ? "NdpSocket: must call bind() before listen()" : "NdpSocket::listen(): connect() or listen() already called");
 
@@ -87,16 +86,8 @@ void NdpSocket::listen(bool fork)
 }
 void NdpSocket::accept(int socketId)
 {
-    auto request = new Request("ACCEPT", NDP_C_ACCEPT);
-    NdpAcceptCommand *acceptCmd = new NdpAcceptCommand();
-    request->setControlInfo(acceptCmd);
-    sendToNDP(request, socketId);
+    throw cRuntimeError("NdpSocket::accept(): never called");
 }
-
-// note: moh i added localAddress here, so instead of waiting for the syn/ack to be received to know my loaca add
-// this is now should be known from the par("localAddress"); --> so this par should be specified correctly now
-// note that the local port will be assigend by the transport layer (ndpmain based on the available number) see
-// ushort Ndp::getEphemeralPort() (its -1 now)
 
 void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int remotePort, bool isSender, bool isReceiver, unsigned int numPacketsToSend, unsigned int priorityValue)
 {
@@ -132,17 +123,9 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int rem
 
 void NdpSocket::send(Packet *msg)
 {
-    if (sockstate != CONNECTED && sockstate != CONNECTING && sockstate != PEER_CLOSED)
-        throw cRuntimeError("NdpSocket::send(): socket not connected or connecting, state is %s", stateName(sockstate));
-
-    msg->setKind(NDP_C_SEND);
-    sendToNDP(msg);
+    throw cRuntimeError("NdpSocket::send(): never called by application - hack where NDP handles all data");
 }
 
-void NdpSocket::sendCommand(Request *msg)
-{
-    sendToNDP(msg);
-}
 
 void NdpSocket::close()
 {
@@ -159,30 +142,12 @@ void NdpSocket::close()
 
 void NdpSocket::abort()
 {
-    if (sockstate != NOT_BOUND && sockstate != BOUND && sockstate != CLOSED && sockstate != SOCKERROR) {
-        auto request = new Request("ABORT", NDP_C_ABORT);
-        NdpCommand *cmd = new NdpCommand();
-        request->setControlInfo(cmd);
-        sendToNDP(request);
-    }
-    sockstate = CLOSED;
+    throw cRuntimeError("NdpSocket::abort(): never called by application - hack where NDP handles all data");
 }
 
 void NdpSocket::destroy()
 {
-    auto request = new Request("DESTROY", NDP_C_DESTROY);
-    NdpCommand *cmd = new NdpCommand();
-    request->setControlInfo(cmd);
-    sendToNDP(request);
-    sockstate = CLOSED;
-}
-
-void NdpSocket::requestStatus()
-{
-    auto request = new Request("STATUS", NDP_C_STATUS);
-    NdpCommand *cmd = new NdpCommand();
-    request->setControlInfo(cmd);
-    sendToNDP(request);
+    throw cRuntimeError("NdpSocket::destroy(): never called by application - hack where NDP handles all data");
 }
 
 void NdpSocket::renewSocket()
@@ -195,21 +160,7 @@ void NdpSocket::renewSocket()
 
 bool NdpSocket::isOpen() const
 {
-    switch (sockstate) {
-        case BOUND:
-        case LISTENING:
-        case CONNECTING:
-        case CONNECTED:
-        case PEER_CLOSED:
-        case LOCALLY_CLOSED:
-        case SOCKERROR: //TODO check SOCKERROR is opened or is closed socket
-            return true;
-        case NOT_BOUND:
-        case CLOSED:
-            return false;
-        default:
-            throw cRuntimeError("invalid NdpSocket state: %d", sockstate);
-    }
+    throw cRuntimeError("NdpSocket::isOpen(): never called");
 }
 
 bool NdpSocket::belongsToSocket(cMessage *msg) const
@@ -226,8 +177,8 @@ void NdpSocket::setCallback(ICallback *callback)
 
 void NdpSocket::processMessage(cMessage *msg)
 {
-
     ASSERT(belongsToSocket(msg));
+
     NdpStatusInfo *status;
     NdpConnectInfo *connectInfo;
 

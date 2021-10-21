@@ -30,8 +30,9 @@ void NdpAppBase::handleMessageWhenUp(cMessage *msg)
     if (msg->isSelfMessage()) {
         handleTimer(msg);
     }
-    else
+    else {
         socket.processMessage(msg);
+    }
 }
 
 void NdpAppBase::connect()

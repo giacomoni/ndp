@@ -50,10 +50,7 @@ void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
 
 void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)
 {
-    EV_WARN << "NdpBasicClientApp crash operation" << endl;
-    cancelEvent(timeoutMsg);
-    if (operation->getRootModule() != getContainingNode(this))
-        socket.destroy();
+    throw cRuntimeError("NdpBasicClientApp::handleCrashOperation - not implemented");
 }
 
 void NdpBasicClientApp::handleTimer(cMessage *msg)
