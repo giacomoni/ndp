@@ -256,7 +256,7 @@ void NdpConnection::addRequestToPullsQueue()
     ndpseg->setPullSequenceNumber(state->request_id);
     ndppack->insertAtFront(ndpseg);
     pullQueue.insert(ndppack);
-    EV << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength() << "\n\n\n\n";
+    EV_INFO << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength() << "\n\n\n\n";
     bool napState = getNDPMain()->getNapState();
     if (napState == true) {
         EV_INFO << "Requesting Pull Timer (12 microseconds)" << endl;
@@ -293,8 +293,6 @@ int NdpConnection::getNumRcvdPackets()
 
 void NdpConnection::setConnFinished()
 {
-    MY_COUT << "allReceivedCloseAllMultiSourcingConnsmmmm \n\n\n\n";
-
     state->connFinished = true;
 }
 

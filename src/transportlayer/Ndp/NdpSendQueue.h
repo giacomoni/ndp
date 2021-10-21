@@ -68,12 +68,8 @@ public:
     }
 
     /**
-     * Initialize the object. The startSeq parameter tells what sequence number the first
-     * byte of app data should get. This is usually ISS + 1 because SYN consumes
-     * one byte in the sequence number space.
-     *
-     * init() may be called more than once; every call flushes the existing contents
-     * of the queue.
+     * Initialize the object. The dataToSendQueue will be filled with data packets given the numPacketsToSend
+     * value. This should only be called once for each flow.
      */
     virtual void init(int numPacketsToSend, B mss);
 
@@ -81,16 +77,6 @@ public:
      * Returns a string with the region stored.
      */
     virtual std::string str() const override;
-
-    /**
-     * Called on SEND app command, it inserts in the queue the data the user
-     * wants to send. Implementations of this abstract class will decide
-     * what this means: copying actual bytes, just increasing the
-     * "last byte queued" variable, or storing cMessage object(s).
-     * The msg object should not be referenced after this point (sendQueue may
-     * delete it.)
-     */
-    virtual void enqueueAppData(Packet *msg);
 
     /**
      * Returns the sequence number of the first byte stored in the buffer.
@@ -105,7 +91,14 @@ public:
 
     virtual const std::tuple<Ptr<NdpHeader>, Packet*> getNdpHeader();
 
+    /**
+     * Called when an ACK has arrived at the sender. Frees the sentDataQueue buffer.
+     */
     virtual void ackArrived(unsigned int ackNum);
+
+    /**
+     * Called when a NACK has arrived at the sender. Pushes the NACKed packet to the front of the dataToSendQueue.
+     */
     virtual void nackArrived(unsigned int nackNum);
 
     /**
