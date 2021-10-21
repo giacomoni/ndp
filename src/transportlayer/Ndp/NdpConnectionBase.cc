@@ -19,10 +19,7 @@ NdpStateVariables::NdpStateVariables() {
 
     numPacketsToGet = 0;
     numPacketsToSend = 0;
-    priorityValue = 0;
     isLongFlow = false;
-    isSender = false;
-    isReceiver = false;
 
     numRcvTrimmedHeader = 0;
     numberReceivedPackets = 0;

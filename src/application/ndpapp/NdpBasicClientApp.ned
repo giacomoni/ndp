@@ -17,10 +17,6 @@ simple NdpBasicClientApp like IApp
 
         volatile int sendBytes @unit(B) = default(1MiB);
         int numPacketsToSend;  // if this is a sender
-        bool isBackroundFlow = default(false);  // 
-        int priorityValue = default(0);
-        bool isSender = default(true);
-        bool isReceiver = default(false);
 
         volatile double reconnectInterval @unit(s) = default(30s);  // if connection breaks, waits this much before trying to reconnect
 

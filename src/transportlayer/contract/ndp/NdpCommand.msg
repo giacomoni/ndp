@@ -83,10 +83,7 @@ class NdpOpenCommand extends NdpCommand
 	bool fork = false;
     string ndpAlgorithmClass; 
     
-    unsigned int priorityValue;
     unsigned int numPacketsToSend;
-    bool isSender;
-    bool isReceiver;
 }
 
 class NdpAcceptCommand extends NdpCommand

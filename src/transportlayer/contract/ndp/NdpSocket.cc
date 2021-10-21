@@ -78,8 +78,6 @@ void NdpSocket::listen(bool fork)
     openCmd->setLocalAddr(localAddr);
     openCmd->setLocalPort(localPrt);
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
-    openCmd->setIsSender(false);
-    openCmd->setIsReceiver(true);
     request->setControlInfo(openCmd);
     sendToNDP(request);
     sockstate = LISTENING;
@@ -89,7 +87,7 @@ void NdpSocket::accept(int socketId)
     throw cRuntimeError("NdpSocket::accept(): never called");
 }
 
-void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int remotePort, bool isSender, bool isReceiver, unsigned int numPacketsToSend, unsigned int priorityValue)
+void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int remotePort, unsigned int numPacketsToSend)
 {
     if (sockstate != NOT_BOUND && sockstate != BOUND)
         throw cRuntimeError("NdpSocket::connect(): connect() or listen() already called (need renewSocket()?)");
@@ -111,9 +109,6 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int rem
     openCmd->setRemotePort(remotePrt);
     openCmd->setNdpAlgorithmClass(ndpAlgorithmClass.c_str());
     openCmd->setNumPacketsToSend(numPacketsToSend);
-    openCmd->setPriorityValue(priorityValue);
-    openCmd->setIsSender(isSender);
-    openCmd->setIsReceiver(isReceiver);
 
     request->setControlInfo(openCmd);
     sendToNDP(request);
@@ -126,18 +121,9 @@ void NdpSocket::send(Packet *msg)
     throw cRuntimeError("NdpSocket::send(): never called by application - hack where NDP handles all data");
 }
 
-
 void NdpSocket::close()
 {
-    std::cout << "NdpSocket::close() " << std::endl;
-    if (sockstate != CONNECTED && sockstate != PEER_CLOSED && sockstate != CONNECTING && sockstate != LISTENING)
-        throw cRuntimeError("NdpSocket::close(): not connected or close() already called (sockstate=%s)", stateName(sockstate));
-
-    auto request = new Request("CLOSE", NDP_C_CLOSE);
-    NdpCommand *cmd = new NdpCommand();
-    request->setControlInfo(cmd);
-    sendToNDP(request);
-    sockstate = (sockstate == CONNECTED) ? LOCALLY_CLOSED : CLOSED;
+    throw cRuntimeError("NdpSocket::close(): never called by application");
 }
 
 void NdpSocket::abort()
@@ -152,10 +138,7 @@ void NdpSocket::destroy()
 
 void NdpSocket::renewSocket()
 {
-    connId = getEnvir()->getUniqueNumber();
-    remoteAddr = localAddr = L3Address();
-    remotePrt = localPrt = -1;
-    sockstate = NOT_BOUND;
+    throw cRuntimeError("NdpSocket::renewSocket(): not needed as the socket should never be closed to begin with");
 }
 
 bool NdpSocket::isOpen() const
@@ -216,7 +199,6 @@ void NdpSocket::processMessage(cMessage *msg)
             break;
 
         case NDP_I_CLOSED:
-            std::cout << " socket closed \n";
             sockstate = CLOSED;
             if (cb) {
                 cb->socketClosed(this);

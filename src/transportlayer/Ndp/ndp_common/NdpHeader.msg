@@ -35,7 +35,6 @@ class NdpHeader extends TransportHeaderBase
 	bool isHeader;
 	bool isPullPacket; //2 Bytes
 	bool isDataPacket;
-	unsigned int priorityValue;
 	unsigned int numPacketsToSend;
 	unsigned int pullSequenceNumber;
 	unsigned int dataSequenceNumber; //2 Bytes

@@ -32,10 +32,6 @@ struct NdpStateVariables
     bool connFinished;
     uint32 numPacketsToGet;
     uint32 numPacketsToSend;
-    bool isSender;
-    bool isReceiver;
-    unsigned int  priorityValue;
-
 
     unsigned int numRcvdPkt;
     unsigned int numRcvTrimmedHeader;

@@ -401,7 +401,6 @@ void CentralSchedulerNdp::scheduleLongFlows() {
                 nameNdpAppDest.c_str(), destModule);
         newDestAppModule->par("localPort").setIntValue(
                 80 + newNumNdpSinkAppsDest);
-        newDestAppModule->par("isBackroundFlow").setBoolValue(true);
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------
@@ -420,7 +419,6 @@ void CentralSchedulerNdp::scheduleLongFlows() {
         newDestAppModule->par("localAddress").setStringValue(dest.c_str());
         newDestAppModule->par("localPort").setIntValue(
                 80 + newNumNdpSinkAppsDest);
-        newDestAppModule->par("isBackroundFlow").setBoolValue(true);
 
         // Sender  app
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
@@ -443,9 +441,6 @@ void CentralSchedulerNdp::scheduleLongFlows() {
         newSrcAppModule->par("startTime").setDoubleValue(simTime().dbl());
         // >>>>>>
         newSrcAppModule->par("numPacketsToSend").setIntValue(longFlowSize); // should be longFlowSize
-        int priority = 0; // TODO
-        newSrcAppModule->par("priorityValue").setIntValue(priority);
-        newSrcAppModule->par("isBackroundFlow").setBoolValue(true);
         //   --------<ndpIn         appOut[]<----------
         //     ndpApp                          ndp
         //   -------->ndpOut        appIn[] >----------
@@ -489,7 +484,6 @@ void CentralSchedulerNdp::scheduleIncast(int numSenders) {
             destModule);
     newDestAppModule->par("localPort").setIntValue(80 + newNumNdpSinkAppsDest);
 
-    newDestAppModule->par("isBackroundFlow").setBoolValue(false);
     cGate *gateNdpInDest = ndpDestModule->gate("in", newNdpGateOutSizeDest - 1);
     cGate *gateNdpOutDest = ndpDestModule->gate("out",
             newNdpGateOutSizeDest - 1);
@@ -584,7 +578,6 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
             destModule);
     newDestAppModule->par("localAddress").setStringValue(newDest);
     newDestAppModule->par("localPort").setIntValue(80 + newNumNdpSinkAppsDest);
-    newDestAppModule->par("isBackroundFlow").setBoolValue(false);
 
     //   --------<ndpIn         ndpOut[]<----------
     //     ndpApp                          ndp
@@ -632,13 +625,9 @@ void CentralSchedulerNdp::scheduleNewShortFlow(std::string itsSrc,
     // >>>>>>
     if (isWebSearchWorkLoad == false) {
         newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
-        int priority = getPriorityValue(flowSize);
-        newSrcAppModule->par("priorityValue").setIntValue(priority);
     } else if (isWebSearchWorkLoad == true) {
         int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
         newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
-        int priority = getPriorityValue(newFlowSize);
-        newSrcAppModule->par("priorityValue").setIntValue(priority);
     }
     // <<<<<<<<
 
@@ -851,33 +840,6 @@ int CentralSchedulerNdp::getNewFlowSizeFromWebSearchWorkLoad() {
 // 10KB  --> 100KB   P=2
 // 100KB --> 1MB     P=3
 // 1MB   --> 10MB    P=4
-// otherwise (longflows)         P=0 (RaptorQBasicClientApp.ned --> int priorityValue = default(0);)
-int CentralSchedulerNdp::getPriorityValue(int flowSize) {
-//    std::cout << "CentralSchedulerNdp::getPriorityValue \n\n ";
-    int priorityValue;
-    if (flowSize >= 1 && flowSize <= 7) {
-        priorityValue = 1;
-        return priorityValue;
-    }
-
-    if (flowSize >= 8 && flowSize <= 67) {
-        priorityValue = 2;
-        return priorityValue;
-    }
-
-    if (flowSize >= 68 && flowSize <= 667) {
-        priorityValue = 3;
-        return priorityValue;
-    }
-
-    if (flowSize >= 668 && flowSize <= 6667) {
-        priorityValue = 4;
-        return priorityValue;
-    }
-
-    return 0;
-}
-
 // ;;;;;;;;;;;;;;;;;;
 
 // random TM for multicasting (multicast 3 replicas)
@@ -1102,7 +1064,6 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
         newDestAppModule->par("localPort").setIntValue(
                 80 + newNumNdpSinkAppsDest);
 
-        newDestAppModule->par("isBackroundFlow").setBoolValue(false);
         //newDestAppModule->par("multiCastGroupId").setDoubleValue(
         //        multicastGrpId);
 
@@ -1149,18 +1110,11 @@ void CentralSchedulerNdp::scheduleNewDaisyChainSession(std::string itsSrc,
         if (isWebSearchWorkLoad == false) {
             newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //
             // aha .....
-            int priority = getPriorityValue(flowSize);
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
             int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
-
-            int priority = getPriorityValue(newFlowSize);
-
-            std::cout << " getPriorityValueppp = " << priority << "\n\n";
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
         /// >>>>>>>>>>>
 
@@ -1239,7 +1193,6 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
         newDestAppModule->par("localPort").setIntValue(
                 80 + newNumNdpSinkAppsDest);
 
-        newDestAppModule->par("isBackroundFlow").setBoolValue(false);
         //newDestAppModule->par("multiCastGroupId").setDoubleValue(
         //        multicastGrpId);
 
@@ -1283,19 +1236,11 @@ void CentralSchedulerNdp::scheduleNewMultiCastSession(std::string itsSrc,
         /// >>>>>>>>>>>>
         if (isWebSearchWorkLoad == false) {
             newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
-            // aha .....
-            int priority = getPriorityValue(flowSize);
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
             int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
-
-            int priority = getPriorityValue(newFlowSize);
-
-            std::cout << " getPriorityValueppp = " << priority << "\n\n";
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
         /// >>>>>>>>>>>
 
@@ -1384,7 +1329,6 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
         newDestAppModule->par("localPort").setIntValue(
                 80 + newNumNdpSinkAppsDest);
 
-        newDestAppModule->par("isBackroundFlow").setBoolValue(false);
         newDestAppModule->par("multiSrcGroupId").setDoubleValue(
                 multiSrcGroupId); // added new
 
@@ -1434,16 +1378,11 @@ void CentralSchedulerNdp::scheduleNewMultiSourcingSession(std::string dest,
 //               flowSize = flowSize/3; ??????????????????
             newSrcAppModule->par("numPacketsToSend").setIntValue(flowSize); //
             // aha .....
-            int priority = getPriorityValue(flowSize);
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
 
         if (isWebSearchWorkLoad == true) {
             int newFlowSize = getNewFlowSizeFromWebSearchWorkLoad();
             newSrcAppModule->par("numPacketsToSend").setIntValue(newFlowSize); //
-
-            int priority = getPriorityValue(newFlowSize);
-            newSrcAppModule->par("priorityValue").setIntValue(priority); //RaptorQBasicClientApp
         }
         /// >>>>>>>>>>>>
 //        newSrcAppModule->par("numPacketsToSend").setDoubleValue(flowSize); //

@@ -141,7 +141,7 @@ public:
     }
 
     /**
-     * TODO: add an NDP specific comment here
+     * Binds the provided local address and port to the NdpSocket.
      */
     void bind(L3Address localAddr, int localPort);
 
@@ -191,42 +191,58 @@ public:
     }
 
     /**
-     * TODO: not used, add comment explaining why
+     * Not used due as an NDP server does not need to accept an attempt to create a new connection unlike TCP.
+     * The connection instead is immediately made in the simulation of NDP.
+     *
      * TODO: maybe create in the future applications that can accept multiple incoming NDP connections
      */
     void accept(int socketId);
 
     /**
-     * TODO: eliminate unnecessary stuff and explain what's done here
+     * Connect to the a remote socket given its remote address and port. The localAddress is also
+     * used to immediately know the local socket address without the need of waiting for a syn/ack
+     * as with the TCP implementation. The local port is assigned by the transport layer see Ndp::getEphemeralPort()
+     * numPacketsToSend needed to fill sendQueue with number of packets to send to the receiver.
      */
-    void connect(L3Address localAddress, L3Address remoteAddr, int remotePort, bool isSender, bool isReceiver, unsigned int numPacketsToSend, unsigned int priorityValue);
+    void connect(L3Address localAddress, L3Address remoteAddr, int remotePort, unsigned int numPacketsToSend);
 
     /**
-     * TODO: not implemented - explain
+     * Not implemented. The client never sends any packets to the ndp connection as this is done
+     * within the connection itself. To improve the client should send the packets from the application
+     * itself using this method.
      */
     void send(Packet *msg);
 
     /**
-     * TODO: NDP sender does it - explain
+     * This method is never called as NDP never sends a CLOSE operation
+     * to the socket.
      */
     void close() override;
 
     /**
-     * TODO: not implemented - explain
+     * This is never called as a ABORT command is never sent to the socket
+     * as there is no retransmission limit which can be exceeded in the NDP
+     * implementation unlike TCP.
      */
     void abort();
 
     /**
-     * TODO: not implemented - explain
+     * The handleCrashOperation method is never handled by the NDP socket,
+     * therefore the socket is never destroyed.
      */
     virtual void destroy() override;
 
     /**
-     * TODO: figure out why it is needed - look but not copy TCP code
+     * This is not needed as the socket will never be closed unless the simulation
+     * is completed. TODO Allow the possibility of re-connecting with an already
+     * established NdpSocket object. The renewSocket is used to ensure that the socket has not been
+     * closed or aborted. If this is the case, the socket will be renewed rather
+     * than creating an entirely new connectionId (see NdpAppBase::connect).
      */
     void renewSocket();
 
-    // TODO: not called - add comment
+    // Not used as this is used to verify that the socket is not open when trying to
+    // close, but the socket does not close within this NDP implementation.
     virtual bool isOpen() const override;
 
     /**

@@ -44,7 +44,6 @@ void NdpConnection::sendInitialWindow() {
             ndpseg->setAckBit(false);
             ndpseg->setNackBit(false);
             ndpseg->setNumPacketsToSend(state->numPacketsToSend);
-            ndpseg->setPriorityValue(state->priorityValue);
             sendToIP(fp, ndpseg);
         }
     }
@@ -90,7 +89,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     ASSERT(fsm.getState() == NDP_S_ESTABLISHED);
     EV_INFO << "Connection confirmed established!" << endl;
-    if (state->isSender == true && ndpseg->getNackBit() == true) {
+    if (ndpseg->getNackBit() == true) {
         EV_INFO << "Nack arrived at the sender - move data packet to front"
                        << endl;
         sendQueue->nackArrived(ndpseg->getNackNo());
@@ -100,7 +99,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // ££££££££££££££££££££££££ ACK Arrived at the sender £££££££££££££££££££ Tx
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    if (state->isSender == true && ndpseg->getAckBit() == true) {
+    if (ndpseg->getAckBit() == true) {
         EV_INFO << "Ack arrived at the sender - free ack buffer" << endl;
         sendQueue->ackArrived(ndpseg->getAckNo());
     }
@@ -109,7 +108,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
 // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
 // ££££££££££££££££££££££££ REQUEST Arrived at the sender £££££££££££££££
 // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    if (state->isSender == true && ndpseg->isPullPacket() == true) {
+    if (ndpseg->isPullPacket() == true) {
         int requestsGap = ndpseg->getPullSequenceNumber()
                 - state->internal_request_id;
         EV_INFO << "Pull packet arrived at the sender - request gap "
@@ -134,7 +133,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
                     ndpseg->setNackBit(false);
                     ndpseg->setSynBit(false);
                     ndpseg->setNumPacketsToSend(state->numPacketsToSend);
-                    ndpseg->setPriorityValue(state->priorityValue);
                     sendToIP(fp, ndpseg);
                 } else {
                     EV_WARN << "No Ndp header within the send queue!" << endl;
@@ -172,7 +170,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
 // $$$$$$$$$$$$$$$$$$$$$$  data pkt arrived at the receiver  $$$$$$$$$$$$$$$$
 // $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$
 
-    if (state->isReceiver == true && ndpseg->isDataPacket() == true
+    if (ndpseg->isDataPacket() == true
             && ndpseg->isHeader() == false) {
         EV_INFO << "Data packet arrived at the receiver - seq num " << ndpseg->getDataSequenceNumber() << endl;
         unsigned int arrivedPktSeqNo = ndpseg->getDataSequenceNumber();
@@ -268,7 +266,6 @@ void NdpConnection::addRequestToPullsQueue() {
     ndpseg->setSynBit(false);
     ndpseg->setAckBit(false);
     ndpseg->setNackBit(false);
-    ndpseg->setPriorityValue(state->priorityValue);
     ndpseg->setPullSequenceNumber(state->request_id);
     ndppack->insertAtFront(ndpseg);
     pullQueue.insert(ndppack);

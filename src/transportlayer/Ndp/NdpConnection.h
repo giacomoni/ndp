@@ -116,9 +116,6 @@ public:
     bool connFinished;
     int numPacketsToGet;
     int numPacketsToSend;
-    bool isSender;
-    bool isReceiver;
-    unsigned int priorityValue;
 
     unsigned int numRcvdPkt;
     unsigned int numRcvTrimmedHeader;

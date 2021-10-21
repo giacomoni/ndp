@@ -173,8 +173,6 @@ protected:
     void scheduleIncast(int numSenders);
     void getWebSearchWorkLoad();
     int getNewFlowSizeFromWebSearchWorkLoad();
-    int getPriorityValue(int flowSize);
-
 
 };
 

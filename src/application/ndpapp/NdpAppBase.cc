@@ -38,13 +38,8 @@ void NdpAppBase::handleMessageWhenUp(cMessage *msg)
 void NdpAppBase::connect()
 {
     EV_TRACE << "NdpAppBase::connect" << endl;
-    // we need a new connId if this is not the first connection
-    socket.renewSocket();
 
     int numPacketsToSend = par("numPacketsToSend").intValue();
-    int priorityValue = par("priorityValue").intValue();
-    bool isSender = par("isSender").boolValue();
-    bool isReceiver = par("isReceiver").boolValue();
 
     // connect
     const char *connectAddress = par("connectAddress");
@@ -66,7 +61,7 @@ void NdpAppBase::connect()
         EV_INFO << "Connecting to " << connectAddress << "(" << destination << ") port=" << connectPort << endl;
 
         setStatusString("connecting");
-        socket.connect(localAddress, destination, connectPort, isSender, isReceiver, numPacketsToSend, priorityValue);
+        socket.connect(localAddress, destination, connectPort, numPacketsToSend);
         EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination << ") port=" << connectPort << endl;
 
         numSessions++;

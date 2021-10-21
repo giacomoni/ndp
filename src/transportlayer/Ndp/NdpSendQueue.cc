@@ -133,7 +133,7 @@ void NdpSendQueue::nackArrived(unsigned int nackNum)
             break;
         }
     }
-    assert(found == false);
+    ASSERT(found == true);
 }
 
 }            // namespace ndp
