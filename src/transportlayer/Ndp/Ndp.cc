@@ -53,7 +53,8 @@ Define_Module(Ndp);
 
 simsignal_t Ndp::numRequestsRTOs = registerSignal("numRequestsRTOs");
 
-Ndp::~Ndp() {
+Ndp::~Ndp()
+{
     while (!ndpAppConnMap.empty()) {
         auto i = ndpAppConnMap.begin();
         i->second->deleteModule();
@@ -61,7 +62,8 @@ Ndp::~Ndp() {
     }
 }
 
-void Ndp::initialize(int stage) {
+void Ndp::initialize(int stage)
+{
     OperationalBase::initialize(stage);
     if (stage == INITSTAGE_LOCAL) {
 
@@ -70,7 +72,8 @@ void Ndp::initialize(int stage) {
         WATCH(lastEphemeralPort);
         WATCH_PTRMAP(ndpConnMap);
         WATCH_PTRMAP(ndpAppConnMap);
-    } else if (stage == INITSTAGE_TRANSPORT_LAYER) {
+    }
+    else if (stage == INITSTAGE_TRANSPORT_LAYER) {
         requestTimerMsg = new cMessage("requestTimerMsg");
         requestTimerMsg->setContextPointer(this);
 
@@ -79,25 +82,28 @@ void Ndp::initialize(int stage) {
     }
 }
 
-void Ndp::finish() {
+void Ndp::finish()
+{
     if (requestTimerMsg->isScheduled()) {
         cancelEvent(requestTimerMsg);
     }
     delete requestTimerMsg;
-    EV_INFO << getFullPath() << ": finishing with " << ndpConnMap.size()
-                   << " connections open.\n";
+    EV_INFO << getFullPath() << ": finishing with " << ndpConnMap.size() << " connections open.\n";
 }
 
-void Ndp::handleSelfMessage(cMessage *msg) {
+void Ndp::handleSelfMessage(cMessage *msg)
+{
     if (msg == requestTimerMsg) {
         process_REQUEST_TIMER();
-    } else {
+    }
+    else {
         NdpConnection *conn = (NdpConnection*) msg->getContextPointer();
         bool ret = conn->processTimer(msg);
     }
 }
 
-void Ndp::handleUpperCommand(cMessage *msg) {
+void Ndp::handleUpperCommand(cMessage *msg)
+{
     int socketId = getTags(msg).getTag<SocketReq>()->getSocketId();
     NdpConnection *conn = findConnForApp(socketId);
 
@@ -115,23 +121,28 @@ void Ndp::handleUpperCommand(cMessage *msg) {
         removeConnection(conn);
 }
 
-void Ndp::sendFromConn(cMessage *msg, const char *gatename, int gateindex) {
+void Ndp::sendFromConn(cMessage *msg, const char *gatename, int gateindex)
+{
     Enter_Method_Silent
     ();
     take(msg);
     send(msg, gatename, gateindex);
 }
 
-void Ndp::handleUpperPacket(Packet *packet) {
+void Ndp::handleUpperPacket(Packet *packet)
+{
     handleUpperCommand(packet);
 }
-NdpConnection* Ndp::findConnForApp(int socketId) {
+NdpConnection* Ndp::findConnForApp(int socketId)
+{
     auto i = ndpAppConnMap.find(socketId);
     return i == ndpAppConnMap.end() ? nullptr : i->second;
 }
 
-void Ndp::handleLowerPacket(Packet *packet) {
-    EV_INFO << "\n\n\n\nLOWER PACKET DETAILS: " << packet->str() << std::endl;
+void Ndp::handleLowerPacket(Packet *packet)
+{
+    EV_TRACE << "Ndp::handleLowerPacket";
+    EV_INFO << "Lower Packet Handled: " << packet->str() << std::endl;
     // must be a NdpHeader
     auto protocol = packet->getTag<PacketProtocolTag>()->getProtocol();
     if (protocol == &Protocol::ndp) {
@@ -148,32 +159,34 @@ void Ndp::handleLowerPacket(Packet *packet) {
         NdpConnection *conn = nullptr;
         conn = findConnForSegment(ndpHeader, srcAddr, destAddr);
         if (conn) {
-            bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr,
-                    destAddr);
+            bool ret = conn->processNDPSegment(packet, ndpHeader, srcAddr, destAddr);
             if (!ret)
                 removeConnection(conn);
-        } else {
+        }
+        else {
             segmentArrivalWhileClosed(packet, ndpHeader, srcAddr, destAddr);
         }
-    } else if (protocol == &Protocol::icmpv4 || protocol == &Protocol::icmpv6) {
+    }
+    else if (protocol == &Protocol::icmpv4 || protocol == &Protocol::icmpv6) {
         EV_DETAIL << "ICMP error received -- discarding\n"; // FIXME can ICMP packets really make it up to Tcp???
         delete packet;
-    } else
-        throw cRuntimeError("Unknown protocol: '%s'",
-                (protocol != nullptr ? protocol->getName() : "<nullptr>"));
+    }
+    else
+        throw cRuntimeError("Unknown protocol: '%s'", (protocol != nullptr ? protocol->getName() : "<nullptr>"));
 }
 
-NdpConnection* Ndp::createConnection(int socketId) {
+NdpConnection* Ndp::createConnection(int socketId)
+{
     auto moduleType = cModuleType::get("ndp.transportlayer.Ndp.NdpConnection");
     char submoduleName[24];
     sprintf(submoduleName, "conn-%d", socketId);
-    auto module = check_and_cast<NdpConnection*>(
-            moduleType->createScheduleInit(submoduleName, this));
+    auto module = check_and_cast<NdpConnection*>(moduleType->createScheduleInit(submoduleName, this));
     module->initConnection(this, socketId);
     return module;
 }
 
-void Ndp::removeConnection(NdpConnection *conn) {
+void Ndp::removeConnection(NdpConnection *conn)
+{
     EV_INFO << "Deleting Ndp connection\n";
 
     ndpAppConnMap.erase(conn->socketId);
@@ -196,8 +209,8 @@ void Ndp::removeConnection(NdpConnection *conn) {
     conn->deleteModule();
 }
 
-NdpConnection* Ndp::findConnForSegment(const Ptr<const NdpHeader> &ndpseg,
-        L3Address srcAddr, L3Address destAddr) {
+NdpConnection* Ndp::findConnForSegment(const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr)
+{
     SockPair key;
     key.localAddr = destAddr;
     key.remoteAddr = srcAddr;
@@ -238,31 +251,27 @@ NdpConnection* Ndp::findConnForSegment(const Ptr<const NdpHeader> &ndpseg,
     return nullptr;
 }
 
-void Ndp::segmentArrivalWhileClosed(Packet *packet,
-        const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr,
-        L3Address destAddr) {
+void Ndp::segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr)
+{
     auto moduleType = cModuleType::get("ndp.transportlayer.Ndp.NdpConnection");
     const char *submoduleName = "conn-temp";
-    auto module = check_and_cast<NdpConnection*>(
-            moduleType->createScheduleInit(submoduleName, this));
+    auto module = check_and_cast<NdpConnection*>(moduleType->createScheduleInit(submoduleName, this));
     module->initConnection(this, -1);
     module->segmentArrivalWhileClosed(packet, ndpseg, srcAddr, destAddr);
     module->deleteModule();
     delete packet;
 }
 
-ushort Ndp::getEphemeralPort() {
+ushort Ndp::getEphemeralPort()
+{
     // start at the last allocated port number + 1, and search for an unused one
     ushort searchUntil = lastEphemeralPort++;
     if (lastEphemeralPort == EPHEMERAL_PORTRANGE_END) { // wrap
         lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
     }
-    while (usedEphemeralPorts.find(lastEphemeralPort)
-            != usedEphemeralPorts.end()) {
+    while (usedEphemeralPorts.find(lastEphemeralPort) != usedEphemeralPorts.end()) {
         if (lastEphemeralPort == searchUntil) // got back to starting point?
-            throw cRuntimeError(
-                    "Ephemeral port range %d..%d exhausted, all ports occupied",
-                    EPHEMERAL_PORTRANGE_START, EPHEMERAL_PORTRANGE_END);
+            throw cRuntimeError("Ephemeral port range %d..%d exhausted, all ports occupied", EPHEMERAL_PORTRANGE_START, EPHEMERAL_PORTRANGE_END);
         lastEphemeralPort++;
         if (lastEphemeralPort == EPHEMERAL_PORTRANGE_END) // wrap
             lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
@@ -272,8 +281,8 @@ ushort Ndp::getEphemeralPort() {
     return lastEphemeralPort;
 }
 
-void Ndp::addSockPair(NdpConnection *conn, L3Address localAddr,
-        L3Address remoteAddr, int localPort, int remotePort) {
+void Ndp::addSockPair(NdpConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort)
+{
     // update addresses/ports in TcpConnection
     SockPair key;
     key.localAddr = conn->localAddr = localAddr;
@@ -291,27 +300,21 @@ void Ndp::addSockPair(NdpConnection *conn, L3Address localAddr,
     if (it != ndpConnMap.end()) {
         // throw "address already in use" error
         if (remoteAddr.isUnspecified() && remotePort == -1)
-            throw cRuntimeError(
-                    "Address already in use: there is already a connection listening on %s:%d",
-                    localAddr.str().c_str(), localPort);
+            throw cRuntimeError("Address already in use: there is already a connection listening on %s:%d", localAddr.str().c_str(), localPort);
         else
-            throw cRuntimeError(
-                    "Address already in use: there is already a connection %s:%d to %s:%d",
-                    localAddr.str().c_str(), localPort,
-                    remoteAddr.str().c_str(), remotePort);
+            throw cRuntimeError("Address already in use: there is already a connection %s:%d to %s:%d", localAddr.str().c_str(), localPort, remoteAddr.str().c_str(), remotePort);
     }
 
     // then insert it into ncpConnMap
     ndpConnMap[key] = conn;
 
     // mark port as used
-    if (localPort >= EPHEMERAL_PORTRANGE_START
-            && localPort < EPHEMERAL_PORTRANGE_END)
+    if (localPort >= EPHEMERAL_PORTRANGE_START && localPort < EPHEMERAL_PORTRANGE_END)
         usedEphemeralPorts.insert(localPort);
 }
 
-void Ndp::updateSockPair(NdpConnection *conn, L3Address localAddr,
-        L3Address remoteAddr, int localPort, int remotePort) {
+void Ndp::updateSockPair(NdpConnection *conn, L3Address localAddr, L3Address remoteAddr, int localPort, int remotePort)
+{
     // find with existing address/port pair...
     SockPair key;
     key.localAddr = conn->localAddr;
@@ -340,26 +343,31 @@ void Ndp::updateSockPair(NdpConnection *conn, L3Address localAddr,
     // localPort doesn't change (see ASSERT above), so there's no need to update usedEphemeralPorts[].
 }
 
-NdpSendQueue* Ndp::createSendQueue() {
+NdpSendQueue* Ndp::createSendQueue()
+{
     return new NdpSendQueue();
 }
 
-void Ndp::handleStartOperation(LifecycleOperation *operation) {
+void Ndp::handleStartOperation(LifecycleOperation *operation)
+{
     //FIXME implementation
 }
 
-void Ndp::handleStopOperation(LifecycleOperation *operation) {
+void Ndp::handleStopOperation(LifecycleOperation *operation)
+{
     //FIXME close connections??? yes, because the applications may not close them!!!
     reset();
     delayActiveOperationFinish(par("stopOperationTimeout"));
     startActiveOperationExtraTimeOrFinish(par("stopOperationExtraTime"));
 }
 
-void Ndp::handleCrashOperation(LifecycleOperation *operation) {
+void Ndp::handleCrashOperation(LifecycleOperation *operation)
+{
     reset();
 }
 
-void Ndp::reset() {
+void Ndp::reset()
+{
     for (auto &elem : ndpAppConnMap)
         elem.second->deleteModule();
     ndpAppConnMap.clear();
@@ -368,7 +376,8 @@ void Ndp::reset() {
     lastEphemeralPort = EPHEMERAL_PORTRANGE_START;
 }
 
-void Ndp::refreshDisplay() const {
+void Ndp::refreshDisplay() const
+{
     OperationalBase::refreshDisplay();
     if (getEnvir()->isExpressMode()) {
         // in express mode, we don't bother to update the display
@@ -376,58 +385,55 @@ void Ndp::refreshDisplay() const {
         getDisplayString().setTagArg("t", 0, "");
         return;
     }
-    int numINIT = 0, numCLOSED = 0, numLISTEN = 0, numSYN_SENT = 0,
-            numSYN_RCVD = 0, numESTABLISHED = 0, numCLOSE_WAIT = 0,
-            numLAST_ACK = 0, numFIN_WAIT_1 = 0, numFIN_WAIT_2 = 0, numCLOSING =
-                    0, numTIME_WAIT = 0;
+    int numINIT = 0, numCLOSED = 0, numLISTEN = 0, numSYN_SENT = 0, numSYN_RCVD = 0, numESTABLISHED = 0, numCLOSE_WAIT = 0, numLAST_ACK = 0, numFIN_WAIT_1 = 0, numFIN_WAIT_2 = 0, numCLOSING = 0, numTIME_WAIT = 0;
 
     for (auto &elem : ndpAppConnMap) {
         int state = (elem).second->getFsmState();
 
         switch (state) {
-        case NDP_S_INIT:
-            numINIT++;
-            break;
+            case NDP_S_INIT:
+                numINIT++;
+                break;
 
-        case NDP_S_CLOSED:
-            numCLOSED++;
-            break;
+            case NDP_S_CLOSED:
+                numCLOSED++;
+                break;
 
-        case NDP_S_LISTEN:
-            numLISTEN++;
-            break;
+            case NDP_S_LISTEN:
+                numLISTEN++;
+                break;
 
-        case NDP_S_SYN_SENT:
-            numSYN_SENT++;
-            break;
+            case NDP_S_SYN_SENT:
+                numSYN_SENT++;
+                break;
 
-        case NDP_S_SYN_RCVD:
-            numSYN_RCVD++;
-            break;
+            case NDP_S_SYN_RCVD:
+                numSYN_RCVD++;
+                break;
 
-        case NDP_S_ESTABLISHED:
-            numESTABLISHED++;
-            break;
+            case NDP_S_ESTABLISHED:
+                numESTABLISHED++;
+                break;
 
-        case NDP_S_CLOSE_WAIT:
-            numCLOSE_WAIT++;
-            break;
+            case NDP_S_CLOSE_WAIT:
+                numCLOSE_WAIT++;
+                break;
 
-        case NDP_S_FIN_WAIT_1:
-            numFIN_WAIT_1++;
-            break;
+            case NDP_S_FIN_WAIT_1:
+                numFIN_WAIT_1++;
+                break;
 
-        case NDP_S_FIN_WAIT_2:
-            numFIN_WAIT_2++;
-            break;
+            case NDP_S_FIN_WAIT_2:
+                numFIN_WAIT_2++;
+                break;
 
-        case NDP_S_CLOSING:
-            numCLOSING++;
-            break;
+            case NDP_S_CLOSING:
+                numCLOSING++;
+                break;
 
-        case NDP_S_TIME_WAIT:
-            numTIME_WAIT++;
-            break;
+            case NDP_S_TIME_WAIT:
+                numTIME_WAIT++;
+                break;
         }
     }
 
@@ -462,7 +468,8 @@ void Ndp::refreshDisplay() const {
     getDisplayString().setTagArg("t", 0, buf2);
 }
 
-void Ndp::printConnRequestMap() {
+void Ndp::printConnRequestMap()
+{
     auto iterrr = requestCONNMap.begin();
     int index = 0;
     while (iterrr != requestCONNMap.end()) {
@@ -472,14 +479,16 @@ void Ndp::printConnRequestMap() {
 
 }
 
-void Ndp::sendFirstRequest() {
+void Ndp::sendFirstRequest()
+{
     bool allEmpty = allPullQueuesEmpty();
     if (allEmpty == false) {
         requestTimer();
     }
 }
 
-bool Ndp::allPullQueuesEmpty() {
+bool Ndp::allPullQueuesEmpty()
+{
     int pullsQueueLength = 0;
     auto iter = requestCONNMap.begin();
     while (iter != requestCONNMap.end()) {
@@ -491,7 +500,8 @@ bool Ndp::allPullQueuesEmpty() {
     return true;
 }
 
-bool Ndp::allConnFinished() {
+bool Ndp::allConnFinished()
+{
 //     std::cout << "  allConnFinished ?   "     << "\n";
     bool connDone;
 
@@ -509,7 +519,8 @@ bool Ndp::allConnFinished() {
     return true;
 }
 
-void Ndp::updateConnMap() {
+void Ndp::updateConnMap()
+{
     std::cout << "  updateConnMap updateConnMap   " << "\n";
     a: bool connDone;
     auto iter = requestCONNMap.begin();
@@ -524,23 +535,28 @@ void Ndp::updateConnMap() {
     }
 }
 
-void Ndp::requestTimer() {
-    Enter_Method_Silent("requestTimer");
+void Ndp::requestTimer()
+{
+    Enter_Method_Silent
+    ("requestTimer");
     cancelRequestTimer();
     simtime_t requestTime = (simTime() + SimTime( PACING_TIME, SIMTIME_US)); // pacing
     scheduleAt(requestTime, requestTimerMsg); // 0.000009
 }
 
-void Ndp::cancelRequestTimer() {
+void Ndp::cancelRequestTimer()
+{
     if (requestTimerMsg->isScheduled())
         cancelEvent(requestTimerMsg);
 }
 
-bool Ndp::getNapState() {
+bool Ndp::getNapState()
+{
     return nap;
 }
 
-void Ndp::process_REQUEST_TIMER() {
+void Ndp::process_REQUEST_TIMER()
+{
     bool sendNewRequest = false;
     auto iter = requestCONNMap.begin();
     bool allEmpty = allPullQueuesEmpty();
@@ -548,10 +564,12 @@ void Ndp::process_REQUEST_TIMER() {
 
     if (allDone == true) {
         cancelRequestTimer();
-    } else if (allDone == false && allEmpty == true) {
+    }
+    else if (allDone == false && allEmpty == true) {
         ++times;
         nap = true;
-    } else if (allDone == false && allEmpty == false) {
+    }
+    else if (allDone == false && allEmpty == false) {
         times = 0;
         nap = false;
         while (sendNewRequest != true) {
@@ -570,13 +588,14 @@ void Ndp::process_REQUEST_TIMER() {
     }
 }
 
-std::ostream& operator<<(std::ostream &os, const Ndp::SockPair &sp) {
-    os << "locSocket=" << sp.localAddr << ":" << sp.localPort << " "
-            << "remSocket=" << sp.remoteAddr << ":" << sp.remotePort;
+std::ostream& operator<<(std::ostream &os, const Ndp::SockPair &sp)
+{
+    os << "locSocket=" << sp.localAddr << ":" << sp.localPort << " " << "remSocket=" << sp.remoteAddr << ":" << sp.remotePort;
     return os;
 }
 
-std::ostream& operator<<(std::ostream &os, const NdpConnection &conn) {
+std::ostream& operator<<(std::ostream &os, const NdpConnection &conn)
+{
     os << "socketId=" << conn.socketId << " ";
     os << "fsmState=" << NdpConnection::stateName(conn.getFsmState()) << " ";
     return os;

@@ -30,8 +30,8 @@ namespace filters {
 
 Register_ResultFilter("throughputA", ThroughputFilterA);
 
-void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
-        cObject *object, cObject *details) {
+void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details)
+{
     if (auto packet = dynamic_cast<cPacket*>(object)) {
         const simtime_t now = simTime();
         packets++;
@@ -42,7 +42,8 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
             lastSignal = now;
             bytes = 0;
             packets = 0;
-        } else if (now - lastSignal >= interval) { // interval = 0.1
+        }
+        else if (now - lastSignal >= interval) { // interval = 0.1
             double throughput = 8 * bytes / interval.dbl();
             fire(this, lastSignal + interval, throughput, details);
             lastSignal = lastSignal + interval;
@@ -53,7 +54,8 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                     // fire(this, lastSignal + interval, 0.0, details); // MOH commented
                     lastSignal = lastSignal + interval;
                 }
-            } else {
+            }
+            else {
                 if (now - lastSignal >= interval) { // no packets arrived for a long period
                     // zero should have been signaled at the beginning of this packet (approximation)
                     fire(this, now - interval, 0.0, details);
@@ -61,7 +63,8 @@ void ThroughputFilterA::receiveSignal(cResultFilter *prev, simtime_t_cref t,
                 }
             }
             bytes += packet->getByteLength();
-        } else
+        }
+        else
             bytes += packet->getByteLength();
     }
 }

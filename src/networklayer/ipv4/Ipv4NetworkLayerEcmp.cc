@@ -27,14 +27,14 @@ void Ipv4NetworkLayerEcmp::refreshDisplay() const
 
 void Ipv4NetworkLayerEcmp::updateDisplayString() const
 {
-    auto text = StringFormat::formatString(par("displayStringTextFormat"), [&] (char directive) {
+    auto text = StringFormat::formatString(par("displayStringTextFormat"), [&](char directive) {
         static std::string result;
         switch (directive) {
             case 'i':
-                result = getSubmodule("ip")->getDisplayString().getTagArg("t", 0);
-                break;
+            result = getSubmodule("ip")->getDisplayString().getTagArg("t", 0);
+            break;
             default:
-                throw cRuntimeError("Unknown directive: %c", directive);
+            throw cRuntimeError("Unknown directive: %c", directive);
         }
         return result.c_str();
     });
@@ -42,6 +42,4 @@ void Ipv4NetworkLayerEcmp::updateDisplayString() const
 }
 
 } // namespace inet
-
-
 

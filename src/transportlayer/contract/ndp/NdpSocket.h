@@ -13,7 +13,8 @@ namespace inet {
 
 class NdpStatusInfo;
 
-class INET_API NdpSocket: public ISocket {
+class INET_API NdpSocket : public ISocket
+{
 public:
     /**
      * Abstract base class for your callback objects. See setCallbackObject()
@@ -23,48 +24,28 @@ public:
      * classes may have both this class and cSimpleModule as base class,
      * and cSimpleModule is already a cObject.
      */
-    class INET_API ICallback {
+    class INET_API ICallback
+    {
     public:
-        virtual ~ICallback() {
+        virtual ~ICallback()
+        {
         }
         /**
          * Notifies about data arrival, packet ownership is transferred to the callee.
          */
-        virtual void socketDataArrived(NdpSocket *socket, Packet *packet,
-                bool urgent) = 0;
-        virtual void socketAvailable(NdpSocket *socket,
-                NdpAvailableInfo *availableInfo) = 0;
+        virtual void socketDataArrived(NdpSocket *socket, Packet *packet, bool urgent) = 0;
+        virtual void socketAvailable(NdpSocket *socket, NdpAvailableInfo *availableInfo) = 0;
         virtual void socketEstablished(NdpSocket *socket) = 0;
         virtual void socketPeerClosed(NdpSocket *socket) = 0;
         virtual void socketClosed(NdpSocket *socket) = 0;
         virtual void socketFailure(NdpSocket *socket, int code) = 0;
-        virtual void socketStatusArrived(NdpSocket *socket,
-                NdpStatusInfo *status) = 0;
+        virtual void socketStatusArrived(NdpSocket *socket, NdpStatusInfo *status) = 0;
         virtual void socketDeleted(NdpSocket *socket) = 0;
     };
 
-    class INET_API ReceiveQueueBasedCallback: public ICallback {
-    public:
-        virtual void socketDataArrived(NdpSocket *socket) = 0;
-
-        virtual void socketDataArrived(NdpSocket *socket, Packet *packet,
-                bool urgent) override {
-            socket->getReceiveQueue()->push(packet->peekData());
-            delete packet;
-            socketDataArrived(socket);
-        }
-    };
-
-    enum State {
-        NOT_BOUND,
-        BOUND,
-        LISTENING,
-        CONNECTING,
-        CONNECTED,
-        PEER_CLOSED,
-        LOCALLY_CLOSED,
-        CLOSED,
-        SOCKERROR
+    enum State
+    {
+        NOT_BOUND, BOUND, LISTENING, CONNECTING, CONNECTED, PEER_CLOSED, LOCALLY_CLOSED, CLOSED, SOCKERROR
     };
 
 protected:
@@ -77,11 +58,9 @@ protected:
     int remotePrt = -1;
 
     ICallback *cb = nullptr;
-    void *userData = nullptr;
     cGate *gateToNdp = nullptr;
     std::string ndpAlgorithmClass;
 
-    ChunkQueue *receiveQueue = nullptr;
 protected:
     void sendToNDP(cMessage *msg, int c = -1);
 
@@ -96,18 +75,6 @@ public:
     NdpSocket();
 
     /**
-     * Constructor, to be used with forked sockets (see listen()).
-     * The new connId will be picked up from the message: it should have
-     * arrived from NDP and contain NDPCommmand control info.
-     */
-    NdpSocket(cMessage *msg);
-
-    /**
-     * Constructor, to be used with forked sockets (see listen()).
-     */
-    NdpSocket(NdpAvailableInfo *availableInfo);
-
-    /**
      * Destructor
      */
     ~NdpSocket();
@@ -117,28 +84,17 @@ public:
      * to identify the connection when it receives a command from the application
      * (or NdpSocket).
      */
-    int getSocketId() const override {
+    int getSocketId() const override
+    {
         return connId;
-    }
-
-    ChunkQueue* getReceiveQueue() {
-        if (receiveQueue == nullptr)
-            receiveQueue = new ChunkQueue();
-        return receiveQueue;
-    }
-
-    void* getUserData() const {
-        return userData;
-    }
-    void setUserData(void *userData) {
-        this->userData = userData;
     }
     /**
      * Returns the socket state, one of NOT_BOUND, CLOSED, LISTENING, CONNECTING,
      * CONNECTED, etc. Messages received from NDP must be routed through
      * processMessage() in order to keep socket state up-to-date.
      */
-    NdpSocket::State getState() {
+    NdpSocket::State getState()
+    {
         return sockstate;
     }
 
@@ -147,23 +103,28 @@ public:
      */
     static const char* stateName(NdpSocket::State state);
 
-    void setState(NdpSocket::State state) {
+    void setState(NdpSocket::State state)
+    {
         sockstate = state;
     }
     ;
 
     /** @name Getter functions */
     //@{
-    L3Address getLocalAddress() {
+    L3Address getLocalAddress()
+    {
         return localAddr;
     }
-    int getLocalPort() {
+    int getLocalPort()
+    {
         return localPrt;
     }
-    L3Address getRemoteAddress() {
+    L3Address getRemoteAddress()
+    {
         return remoteAddr;
     }
-    int getRemotePort() {
+    int getRemotePort()
+    {
         return remotePrt;
     }
     //@}
@@ -174,14 +135,10 @@ public:
      * Sets the gate on which to send to NDP. Must be invoked before socket
      * can be used. Example: <tt>socket.setOutputGate(gate("raptondpOut"));</tt>
      */
-    void setOutputGate(cGate *toNdp) {
+    void setOutputGate(cGate *toNdp)
+    {
         gateToNdp = toNdp;
     }
-
-    /**
-     * Bind the socket to a local port number.
-     */
-    void bind(int localPort);
 
     /**
      * Bind the socket to a local port number and IP address (useful with
@@ -192,14 +149,16 @@ public:
     /**
      * Returns the current ndpAlgorithmClass parameter.
      */
-    const char* getNdpAlgorithmClass() const {
+    const char* getNdpAlgorithmClass() const
+    {
         return ndpAlgorithmClass.c_str();
     }
 
     /**
      * Sets the ndpAlgorithmClass parameter of the next connect() or listen() call.
      */
-    void setNdpAlgorithmClass(const char *ndpAlgorithmClass) {
+    void setNdpAlgorithmClass(const char *ndpAlgorithmClass)
+    {
         this->ndpAlgorithmClass = ndpAlgorithmClass;
     }
 
@@ -215,7 +174,8 @@ public:
      * class can also be useful, and NDPSrvHostApp shows how to put it all
      * together. See also NDPOpenCommand documentation (neddoc) for more info.
      */
-    void listen() {
+    void listen()
+    {
         listen(true);
     }
 
@@ -226,7 +186,8 @@ public:
      *
      * See NDPOpenCommand documentation (neddoc) for more info.
      */
-    void listenOnce() {
+    void listenOnce()
+    {
         listen(false);
     }
 
@@ -237,9 +198,7 @@ public:
     /**
      * Active OPEN to the given remote socket.
      */
-    void connect(L3Address localAddress, L3Address remoteAddr, int remotePort,
-            bool isSender, bool isReceiver, unsigned int numPacketsToSend,
-            unsigned int priorityValue);
+    void connect(L3Address localAddress, L3Address remoteAddr, int remotePort, bool isSender, bool isReceiver, unsigned int numPacketsToSend, unsigned int priorityValue);
 
     /**
      * Sends data packet.

@@ -242,7 +242,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet,
                     }
 
                     EV_INFO << " numRcvTrimmedHeader:    "
-                            << state->numRcvTrimmedHeader << "endln";
+                            << state->numRcvTrimmedHeader << endl;
                     EV_INFO << "CONNECTION FINISHED!" << endl;
                     sendIndicationToApp(NDP_I_PEER_CLOSED); // this is ok if the sinkApp is used by one conn
                     state->isfinalReceivedPrintedOut = true;

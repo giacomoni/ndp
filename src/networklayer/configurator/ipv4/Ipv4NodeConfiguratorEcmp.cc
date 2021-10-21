@@ -42,7 +42,7 @@ void Ipv4NodeConfiguratorEcmp::initialize(int stage)
     if (stage == INITSTAGE_LOCAL) {
         cModule *node = getContainingNode(this);
         const char *networkConfiguratorPath = par("networkConfiguratorModule");
-        nodeStatus = dynamic_cast<NodeStatus *>(node->getSubmodule("status"));
+        nodeStatus = dynamic_cast<NodeStatus*>(node->getSubmodule("status"));
         interfaceTable = getModuleFromPar<IInterfaceTable>(par("interfaceTableModule"), this);
         routingTable = getModuleFromPar<IIpv4RoutingTable>(par("routingTableModule"), this);
 
@@ -52,7 +52,7 @@ void Ipv4NodeConfiguratorEcmp::initialize(int stage)
             cModule *module = getModuleByPath(networkConfiguratorPath);
             if (!module)
                 throw cRuntimeError("Configurator module '%s' not found (check the 'networkConfiguratorModule' parameter)", networkConfiguratorPath);
-            networkConfigurator = check_and_cast<Ipv4NetworkConfiguratorEcmp *>(module);
+            networkConfigurator = check_and_cast<Ipv4NetworkConfiguratorEcmp*>(module);
         }
     }
     else if (stage == INITSTAGE_NETWORK_CONFIGURATION) {
@@ -77,9 +77,10 @@ void Ipv4NodeConfiguratorEcmp::initialize(int stage)
 
 bool Ipv4NodeConfiguratorEcmp::handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback)
 {
-    Enter_Method_Silent();
+    Enter_Method_Silent
+    ();
     int stage = operation->getCurrentStage();
-    if (dynamic_cast<ModuleStartOperation *>(operation)) {
+    if (dynamic_cast<ModuleStartOperation*>(operation)) {
         if (static_cast<ModuleStartOperation::Stage>(stage) == ModuleStartOperation::STAGE_LINK_LAYER)
             prepareAllInterfaces();
         else if (static_cast<ModuleStartOperation::Stage>(stage) == ModuleStartOperation::STAGE_NETWORK_LAYER) {
@@ -93,7 +94,7 @@ bool Ipv4NodeConfiguratorEcmp::handleOperationStage(LifecycleOperation *operatio
             node->subscribe(interfaceStateChangedSignal, this);
         }
     }
-    else if (dynamic_cast<ModuleStopOperation *>(operation)) {
+    else if (dynamic_cast<ModuleStopOperation*>(operation)) {
         if (static_cast<ModuleStopOperation::Stage>(stage) == ModuleStopOperation::STAGE_LOCAL) {
             cModule *node = getContainingNode(this);
             node->unsubscribe(interfaceCreatedSignal, this);
@@ -101,7 +102,7 @@ bool Ipv4NodeConfiguratorEcmp::handleOperationStage(LifecycleOperation *operatio
             node->unsubscribe(interfaceStateChangedSignal, this);
         }
     }
-    else if (dynamic_cast<ModuleCrashOperation *>(operation)) {
+    else if (dynamic_cast<ModuleCrashOperation*>(operation)) {
         cModule *node = getContainingNode(this);
         node->unsubscribe(interfaceCreatedSignal, this);
         node->unsubscribe(interfaceDeletedSignal, this);
@@ -135,7 +136,7 @@ void Ipv4NodeConfiguratorEcmp::prepareInterface(InterfaceEntry *interfaceEntry)
             interfaceData->setMetric(1);
         else
             // metric: some hints: OSPF cost (2e9/bps value), MS KB article Q299540, ...
-            interfaceData->setMetric((int)ceil(2e9 / datarate));    // use OSPF cost as default
+            interfaceData->setMetric((int) ceil(2e9 / datarate));    // use OSPF cost as default
         if (interfaceEntry->isMulticast()) {
             interfaceData->joinMulticastGroup(Ipv4Address::ALL_HOSTS_MCAST);
             if (routingTable->isForwardingEnabled())
@@ -156,7 +157,7 @@ void Ipv4NodeConfiguratorEcmp::configureRoutingTable()
     ASSERT(networkConfigurator);
     if (par("configureRoutingTable"))
         networkConfigurator->configureRoutingTable(routingTable);
-        //TODO
+    //TODO
 }
 
 void Ipv4NodeConfiguratorEcmp::receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details)
@@ -164,11 +165,12 @@ void Ipv4NodeConfiguratorEcmp::receiveSignal(cComponent *source, simsignal_t sig
     if (getSimulation()->getContextType() == CTX_INITIALIZE)
         return; // ignore notifications during initialize
 
-    Enter_Method_Silent();
+    Enter_Method_Silent
+    ();
     printSignalBanner(signalID, obj, details);
 
     if (signalID == interfaceCreatedSignal) {
-        auto *entry = check_and_cast<InterfaceEntry *>(obj);
+        auto *entry = check_and_cast<InterfaceEntry*>(obj);
         prepareInterface(entry);
         // TODO
     }
@@ -176,7 +178,7 @@ void Ipv4NodeConfiguratorEcmp::receiveSignal(cComponent *source, simsignal_t sig
         // The RoutingTable deletes routing entries of interface
     }
     else if (signalID == interfaceStateChangedSignal) {
-        const auto *ieChangeDetails = check_and_cast<const InterfaceEntryChangeDetails *>(obj);
+        const auto *ieChangeDetails = check_and_cast<const InterfaceEntryChangeDetails*>(obj);
         auto fieldId = ieChangeDetails->getFieldId();
         if (fieldId == InterfaceEntry::F_STATE || fieldId == InterfaceEntry::F_CARRIER) {
             auto *entry = ieChangeDetails->getInterfaceEntry();

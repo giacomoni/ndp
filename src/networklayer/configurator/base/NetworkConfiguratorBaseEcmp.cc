@@ -68,20 +68,20 @@ void NetworkConfiguratorBaseEcmp::initialize(int stage)
     }
 }
 
-void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
+void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp &topology)
 {
     // extract topology
     topology.extractByProperty("networkNode");
     EV_DEBUG << "Topology found " << topology.getNumNodes() << " nodes\n";
 
     // print isolated networks information
-    std::map<int, std::vector<Node *>> isolatedNetworks;
+    std::map<int, std::vector<Node*>> isolatedNetworks;
     for (int i = 0; i < topology.getNumNodes(); i++) {
-        Node *node = (Node *)topology.getNode(i);
+        Node *node = (Node*) topology.getNode(i);
         int networkId = node->getNetworkId();
         auto networkNodes = isolatedNetworks.find(networkId);
         if (networkNodes == isolatedNetworks.end()) {
-            std::vector<Node *> collection = {node};
+            std::vector<Node*> collection = { node };
             isolatedNetworks[networkId] = collection;
         }
         else
@@ -94,7 +94,7 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
 
     // extract nodes, fill in interfaceTable and routingTable members in node
     for (int i = 0; i < topology.getNumNodes(); i++) {
-        Node *node = (Node *)topology.getNode(i);
+        Node *node = (Node*) topology.getNode(i);
         cModule *module = node->getModule();
         node->module = module;
         node->interfaceTable = findInterfaceTable(node);
@@ -102,9 +102,9 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
     }
 
     // extract links and interfaces
-    std::map<int, InterfaceEntry *> interfacesSeen;
+    std::map<int, InterfaceEntry*> interfacesSeen;
     for (int i = 0; i < topology.getNumNodes(); i++) {
-        Node *node = (Node *)topology.getNode(i);
+        Node *node = (Node*) topology.getNode(i);
         IInterfaceTable *interfaceTable = node->interfaceTable;
         if (interfaceTable) {
             for (int j = 0; j < interfaceTable->getNumInterfaces(); j++) {
@@ -123,14 +123,14 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
                         linkInfo->interfaceInfos.push_back(interfaceInfo);
                         // visit neighbors (and potentially the whole LAN, recursively)
                         if (isWirelessInterface(interfaceEntry)) {
-                            std::vector<Node *> empty;
+                            std::vector<Node*> empty;
                             auto wirelessId = getWirelessId(interfaceEntry);
                             extractWirelessNeighbors(topology, wirelessId.c_str(), linkInfo, interfacesSeen, empty);
                         }
                         else {
                             TopologyEcmp::LinkOut *linkOut = findLinkOut(node, interfaceEntry->getNodeOutputGateId());
                             if (linkOut) {
-                                std::vector<Node *> empty;
+                                std::vector<Node*> empty;
                                 extractWiredNeighbors(topology, linkOut, linkInfo, interfacesSeen, empty);
                             }
                         }
@@ -142,22 +142,22 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
 
     // annotate links with interfaces
     for (int i = 0; i < topology.getNumNodes(); i++) {
-        Node *node = (Node *)topology.getNode(i);
+        Node *node = (Node*) topology.getNode(i);
         for (int j = 0; j < node->getNumOutLinks(); j++) {
             TopologyEcmp::LinkOut *linkOut = node->getLinkOut(j);
-            Link *link = (Link *)linkOut;
-            Node *localNode = (Node *)linkOut->getLocalNode();
+            Link *link = (Link*) linkOut;
+            Node *localNode = (Node*) linkOut->getLocalNode();
             if (localNode->interfaceTable)
                 link->sourceInterfaceInfo = findInterfaceInfo(localNode, localNode->interfaceTable->findInterfaceByNodeOutputGateId(linkOut->getLocalGateId()));
-            Node *remoteNode = (Node *)linkOut->getRemoteNode();
+            Node *remoteNode = (Node*) linkOut->getRemoteNode();
             if (remoteNode->interfaceTable)
                 link->destinationInterfaceInfo = findInterfaceInfo(remoteNode, remoteNode->interfaceTable->findInterfaceByNodeInputGateId(linkOut->getRemoteGateId()));
         }
     }
 
     // collect wireless LAN interface infos into a map
-    std::map<std::string, std::vector<InterfaceInfo *> > wirelessIdToInterfaceInfosMap;
-    for (auto & entry : topology.interfaceInfos) {
+    std::map<std::string, std::vector<InterfaceInfo*> > wirelessIdToInterfaceInfosMap;
+    for (auto &entry : topology.interfaceInfos) {
         InterfaceInfo *interfaceInfo = entry.second;
         InterfaceEntry *interfaceEntry = interfaceInfo->interfaceEntry;
         if (!interfaceEntry->isLoopback() && isWirelessInterface(interfaceEntry)) {
@@ -167,8 +167,8 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
     }
 
     // add extra links between all pairs of wireless interfaces within a LAN (full graph)
-    for (auto & entry : wirelessIdToInterfaceInfosMap) {
-        std::vector<InterfaceInfo *>& interfaceInfos = entry.second;
+    for (auto &entry : wirelessIdToInterfaceInfosMap) {
+        std::vector<InterfaceInfo*> &interfaceInfos = entry.second;
         for (size_t i = 0; i < interfaceInfos.size(); i++) {
             InterfaceInfo *interfaceInfoI = interfaceInfos.at(i);
             for (size_t j = i + 1; j < interfaceInfos.size(); j++) {
@@ -187,13 +187,13 @@ void NetworkConfiguratorBaseEcmp::extractTopology(TopologyEcmp& topology)
     }
 
     // determine gatewayInterfaceInfo for all linkInfos
-    for (auto & linkInfo : topology.linkInfos)
+    for (auto &linkInfo : topology.linkInfos)
         linkInfo->gatewayInterfaceInfo = determineGatewayForLink(linkInfo);
 }
 
-void NetworkConfiguratorBaseEcmp::extractWiredNeighbors(TopologyEcmp& topology, TopologyEcmp::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited)
+void NetworkConfiguratorBaseEcmp::extractWiredNeighbors(TopologyEcmp &topology, TopologyEcmp::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &deviceNodesVisited)
 {
-    Node *node = (Node *)linkOut->getRemoteNode();
+    Node *node = (Node*) linkOut->getRemoteNode();
     int inputGateId = linkOut->getRemoteGateId();
     IInterfaceTable *interfaceTable = node->interfaceTable;
     if (!isBridgeNode(node)) {
@@ -213,10 +213,10 @@ void NetworkConfiguratorBaseEcmp::extractWiredNeighbors(TopologyEcmp& topology, 
     }
 }
 
-void NetworkConfiguratorBaseEcmp::extractWirelessNeighbors(TopologyEcmp& topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited)
+void NetworkConfiguratorBaseEcmp::extractWirelessNeighbors(TopologyEcmp &topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &deviceNodesVisited)
 {
     for (int nodeIndex = 0; nodeIndex < topology.getNumNodes(); nodeIndex++) {
-        Node *node = (Node *)topology.getNode(nodeIndex);
+        Node *node = (Node*) topology.getNode(nodeIndex);
         IInterfaceTable *interfaceTable = node->interfaceTable;
         if (interfaceTable) {
             for (int j = 0; j < interfaceTable->getNumInterfaces(); j++) {
@@ -239,7 +239,7 @@ void NetworkConfiguratorBaseEcmp::extractWirelessNeighbors(TopologyEcmp& topolog
     }
 }
 
-void NetworkConfiguratorBaseEcmp::extractDeviceNeighbors(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited)
+void NetworkConfiguratorBaseEcmp::extractDeviceNeighbors(TopologyEcmp &topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &deviceNodesVisited)
 {
     deviceNodesVisited.push_back(node);
     IInterfaceTable *interfaceTable = node->interfaceTable;
@@ -279,7 +279,7 @@ bool NetworkConfiguratorBaseEcmp::isWirelessInterface(InterfaceEntry *interfaceE
     return !strncmp(interfaceEntry->getInterfaceName(), "wlan", 4);
 }
 
-TopologyEcmp::LinkOut *NetworkConfiguratorBaseEcmp::findLinkOut(Node *node, int gateId)
+TopologyEcmp::LinkOut* NetworkConfiguratorBaseEcmp::findLinkOut(Node *node, int gateId)
 {
     for (int i = 0; i < node->getNumOutLinks(); i++)
         if (node->getLinkOut(i)->getLocalGateId() == gateId)
@@ -288,11 +288,11 @@ TopologyEcmp::LinkOut *NetworkConfiguratorBaseEcmp::findLinkOut(Node *node, int 
     return nullptr;
 }
 
-NetworkConfiguratorBaseEcmp::InterfaceInfo *NetworkConfiguratorBaseEcmp::findInterfaceInfo(Node *node, InterfaceEntry *interfaceEntry)
+NetworkConfiguratorBaseEcmp::InterfaceInfo* NetworkConfiguratorBaseEcmp::findInterfaceInfo(Node *node, InterfaceEntry *interfaceEntry)
 {
     if (interfaceEntry == nullptr)
         return nullptr;
-    for (auto & interfaceInfo : node->interfaceInfos)
+    for (auto &interfaceInfo : node->interfaceInfos)
         if (interfaceInfo->interfaceEntry == interfaceEntry)
             return interfaceInfo;
 
@@ -326,8 +326,7 @@ double NetworkConfiguratorBaseEcmp::computeNodeWeight(Node *node, const char *me
 
 double NetworkConfiguratorBaseEcmp::computeLinkWeight(Link *link, const char *metric, cXMLElement *parameters)
 {
-    if ((link->sourceInterfaceInfo && isWirelessInterface(link->sourceInterfaceInfo->interfaceEntry)) ||
-        (link->destinationInterfaceInfo && isWirelessInterface(link->destinationInterfaceInfo->interfaceEntry)))
+    if ((link->sourceInterfaceInfo && isWirelessInterface(link->sourceInterfaceInfo->interfaceEntry)) || (link->destinationInterfaceInfo && isWirelessInterface(link->destinationInterfaceInfo->interfaceEntry)))
         return computeWirelessLinkWeight(link, metric, parameters);
     else
         return computeWiredLinkWeight(link, metric, parameters);
@@ -339,11 +338,11 @@ double NetworkConfiguratorBaseEcmp::computeWiredLinkWeight(Link *link, const cha
     if (costAttribute != nullptr)
         return parseCostAttribute(costAttribute);
     else {
-        TopologyEcmp::LinkOut *linkOut = static_cast<TopologyEcmp::LinkOut *>(static_cast<TopologyEcmp::Link *>(link));
+        TopologyEcmp::LinkOut *linkOut = static_cast<TopologyEcmp::LinkOut*>(static_cast<TopologyEcmp::Link*>(link));
         if (!strcmp(metric, "hopCount"))
             return 1;
         else if (!strcmp(metric, "delay")) {
-            cDatarateChannel *transmissionChannel = dynamic_cast<cDatarateChannel *>(linkOut->getLocalGate()->findTransmissionChannel());
+            cDatarateChannel *transmissionChannel = dynamic_cast<cDatarateChannel*>(linkOut->getLocalGate()->findTransmissionChannel());
             if (transmissionChannel != nullptr)
                 return transmissionChannel->getDelay().dbl();
             else
@@ -359,7 +358,7 @@ double NetworkConfiguratorBaseEcmp::computeWiredLinkWeight(Link *link, const cha
                 return minLinkWeight;
         }
         else if (!strcmp(metric, "errorRate")) {
-            cDatarateChannel *transmissionChannel = dynamic_cast<cDatarateChannel *>(linkOut->getLocalGate()->findTransmissionChannel());
+            cDatarateChannel *transmissionChannel = dynamic_cast<cDatarateChannel*>(linkOut->getLocalGate()->findTransmissionChannel());
             if (transmissionChannel != nullptr) {
                 InterfaceInfo *sourceInterfaceInfo = link->sourceInterfaceInfo;
                 double bitErrorRate = transmissionChannel->getBitErrorRate();
@@ -388,8 +387,8 @@ double NetworkConfiguratorBaseEcmp::computeWirelessLinkWeight(Link *link, const 
             const InterfaceInfo *receiverInterfaceInfo = link->destinationInterfaceInfo;
             cModule *transmitterInterfaceModule = transmitterInterfaceInfo->interfaceEntry;
             cModule *receiverInterfaceModule = receiverInterfaceInfo->interfaceEntry;
-            const IRadio *transmitterRadio = check_and_cast<IRadio *>(transmitterInterfaceModule->getSubmodule("radio"));
-            const IRadio *receiverRadio = check_and_cast<IRadio *>(receiverInterfaceModule->getSubmodule("radio"));
+            const IRadio *transmitterRadio = check_and_cast<IRadio*>(transmitterInterfaceModule->getSubmodule("radio"));
+            const IRadio *receiverRadio = check_and_cast<IRadio*>(receiverInterfaceModule->getSubmodule("radio"));
             const Packet *macFrame = new Packet();
             const IRadioMedium *radioMedium = receiverRadio->getMedium();
             const ITransmission *transmission = transmitterRadio->getTransmitter()->createTransmission(transmitterRadio, macFrame, simTime());
@@ -398,8 +397,8 @@ double NetworkConfiguratorBaseEcmp::computeWirelessLinkWeight(Link *link, const 
         }
         else if (!strcmp(metric, "dataRate")) {
             cModule *transmitterInterfaceModule = link->sourceInterfaceInfo->interfaceEntry;
-            IRadio *transmitterRadio = check_and_cast<IRadio *>(transmitterInterfaceModule->getSubmodule("radio"));
-            const FlatTransmitterBase *transmitter = dynamic_cast<const FlatTransmitterBase *>(transmitterRadio->getTransmitter());
+            IRadio *transmitterRadio = check_and_cast<IRadio*>(transmitterInterfaceModule->getSubmodule("radio"));
+            const FlatTransmitterBase *transmitter = dynamic_cast<const FlatTransmitterBase*>(transmitterRadio->getTransmitter());
             double dataRate = transmitter ? transmitter->getBitrate().get() : 0;
             return dataRate != 0 ? 1 / dataRate : minLinkWeight;
         }
@@ -409,8 +408,8 @@ double NetworkConfiguratorBaseEcmp::computeWirelessLinkWeight(Link *link, const 
             const InterfaceInfo *receiverInterfaceInfo = link->destinationInterfaceInfo;
             cModule *transmitterInterfaceModule = transmitterInterfaceInfo->interfaceEntry;
             cModule *receiverInterfaceModule = receiverInterfaceInfo->interfaceEntry;
-            const IRadio *transmitterRadio = check_and_cast<IRadio *>(transmitterInterfaceModule->getSubmodule("radio"));
-            const IRadio *receiverRadio = check_and_cast<IRadio *>(receiverInterfaceModule->getSubmodule("radio"));
+            const IRadio *transmitterRadio = check_and_cast<IRadio*>(transmitterInterfaceModule->getSubmodule("radio"));
+            const IRadio *receiverRadio = check_and_cast<IRadio*>(receiverInterfaceModule->getSubmodule("radio"));
             const IRadioMedium *medium = receiverRadio->getMedium();
             Packet *transmittedFrame = new Packet();
             auto byteCountChunk = makeShared<ByteCountChunk>(B(transmitterInterfaceInfo->interfaceEntry->getMtu()));
@@ -418,14 +417,14 @@ double NetworkConfiguratorBaseEcmp::computeWirelessLinkWeight(Link *link, const 
 
             // KLUDGE:
             transmittedFrame->addTag<PacketProtocolTag>()->setProtocol(nullptr);
-            check_and_cast<const Radio *>(transmitterRadio)->encapsulate(transmittedFrame);
+            check_and_cast<const Radio*>(transmitterRadio)->encapsulate(transmittedFrame);
 
             const ITransmission *transmission = transmitterRadio->getTransmitter()->createTransmission(transmitterRadio, transmittedFrame, simTime());
             const IArrival *arrival = medium->getPropagation()->computeArrival(transmission, receiverRadio->getAntenna()->getMobility());
             const IListening *listening = receiverRadio->getReceiver()->createListening(receiverRadio, arrival->getStartTime(), arrival->getEndTime(), arrival->getStartPosition(), arrival->getEndPosition());
             const INoise *noise = medium->getBackgroundNoise() != nullptr ? medium->getBackgroundNoise()->computeNoise(listening) : nullptr;
             const IReception *reception = medium->getAnalogModel()->computeReception(receiverRadio, transmission, arrival);
-            const IInterference *interference = new Interference(noise, new std::vector<const IReception *>());
+            const IInterference *interference = new Interference(noise, new std::vector<const IReception*>());
             const ISnir *snir = medium->getAnalogModel()->computeSNIR(reception, noise);
             const IReceiver *receiver = receiverRadio->getReceiver();
             bool isReceptionPossible = receiver->computeIsReceptionPossible(listening, reception, IRadioSignal::SIGNAL_PART_WHOLE);
@@ -434,9 +433,9 @@ double NetworkConfiguratorBaseEcmp::computeWirelessLinkWeight(Link *link, const 
                 packetErrorRate = 1;
             else {
                 const IReceptionDecision *receptionDecision = new ReceptionDecision(reception, IRadioSignal::SIGNAL_PART_WHOLE, isReceptionPossible, true, true);
-                const std::vector<const IReceptionDecision *> *receptionDecisions = new std::vector<const IReceptionDecision *> {receptionDecision};
+                const std::vector<const IReceptionDecision*> *receptionDecisions = new std::vector<const IReceptionDecision*> { receptionDecision };
                 const IReceptionResult *receptionResult = receiver->computeReceptionResult(listening, reception, interference, snir, receptionDecisions);
-                Packet *receivedFrame = const_cast<Packet *>(receptionResult->getPacket());
+                Packet *receivedFrame = const_cast<Packet*>(receptionResult->getPacket());
                 packetErrorRate = receivedFrame->getTag<ErrorRateInd>()->getPacketErrorRate();
                 delete receptionResult;
                 delete receptionDecision;
@@ -469,7 +468,7 @@ std::string NetworkConfiguratorBaseEcmp::getWirelessId(InterfaceEntry *interface
     std::string hostFullPath = hostModule->getFullPath();
     std::string hostShortenedFullPath = hostFullPath.substr(hostFullPath.find('.') + 1);
     cXMLElementList wirelessElements = configuration->getChildrenByTagName("wireless");
-    for (auto & wirelessElement : wirelessElements) {
+    for (auto &wirelessElement : wirelessElements) {
         const char *hostAttr = wirelessElement->getAttribute("hosts");    // "host* router[0..3]"
         const char *interfaceAttr = wirelessElement->getAttribute("interfaces");    // i.e. interface names, like "eth* ppp0"
         try {
@@ -478,19 +477,18 @@ std::string NetworkConfiguratorBaseEcmp::getWirelessId(InterfaceEntry *interface
             Matcher interfaceMatcher(interfaceAttr);
 
             // Note: "hosts", "interfaces" must ALL match on the interface for the rule to apply
-            if ((hostMatcher.matchesAny() || hostMatcher.matches(hostShortenedFullPath.c_str()) || hostMatcher.matches(hostFullPath.c_str())) &&
-                (interfaceMatcher.matchesAny() || interfaceMatcher.matches(interfaceEntry->getInterfaceName())))
-            {
+            if ((hostMatcher.matchesAny() || hostMatcher.matches(hostShortenedFullPath.c_str()) || hostMatcher.matches(hostFullPath.c_str()))
+                    && (interfaceMatcher.matchesAny() || interfaceMatcher.matches(interfaceEntry->getInterfaceName()))) {
                 const char *idAttr = wirelessElement->getAttribute("id");    // identifier of wireless connection
                 return idAttr ? idAttr : wirelessElement->getSourceLocation();
             }
         }
-        catch (std::exception& e) {
+        catch (std::exception &e) {
             throw cRuntimeError("Error in XML <wireless> element at %s: %s", wirelessElement->getSourceLocation(), e.what());
         }
     }
     cModule *interfaceModule = interfaceEntry;
-    if (auto mibModule = dynamic_cast<ieee80211::Ieee80211Mib *>(interfaceModule->getSubmodule("mib"))) {
+    if (auto mibModule = dynamic_cast<ieee80211::Ieee80211Mib*>(interfaceModule->getSubmodule("mib"))) {
         auto ssid = mibModule->bssData.ssid;
         if (ssid.length() != 0)
             return ssid;
@@ -508,9 +506,9 @@ std::string NetworkConfiguratorBaseEcmp::getWirelessId(InterfaceEntry *interface
             return value;
     }
     cModule *radioModule = interfaceModule->getSubmodule("radio");
-    const IRadio *radio = dynamic_cast<const IRadio *>(radioModule);
+    const IRadio *radio = dynamic_cast<const IRadio*>(radioModule);
     if (radio != nullptr) {
-        const cModule *mediumModule = dynamic_cast<const cModule *>(radio->getMedium());
+        const cModule *mediumModule = dynamic_cast<const cModule*>(radio->getMedium());
         if (mediumModule != nullptr)
             return mediumModule->getFullName();
     }
@@ -523,10 +521,10 @@ std::string NetworkConfiguratorBaseEcmp::getWirelessId(InterfaceEntry *interface
  * If this link has exactly one node that connects to other links as well, we can assume
  * it is a "gateway" and return that (we'll use it in routing); otherwise return nullptr.
  */
-NetworkConfiguratorBaseEcmp::InterfaceInfo *NetworkConfiguratorBaseEcmp::determineGatewayForLink(LinkInfo *linkInfo)
+NetworkConfiguratorBaseEcmp::InterfaceInfo* NetworkConfiguratorBaseEcmp::determineGatewayForLink(LinkInfo *linkInfo)
 {
     InterfaceInfo *gatewayInterfaceInfo = nullptr;
-    for (auto & interfaceInfo : linkInfo->interfaceInfos) {
+    for (auto &interfaceInfo : linkInfo->interfaceInfos) {
         IInterfaceTable *interfaceTable = interfaceInfo->node->interfaceTable;
         IRoutingTable *routingTable = interfaceInfo->node->routingTable;
 
@@ -535,7 +533,6 @@ NetworkConfiguratorBaseEcmp::InterfaceInfo *NetworkConfiguratorBaseEcmp::determi
         for (int i = 0; i < interfaceTable->getNumInterfaces(); i++)
             if (!interfaceTable->getInterface(i)->isLoopback())
                 numInterfaces++;
-
 
         if (numInterfaces > 1 && routingTable && routingTable->isForwardingEnabled()) {
             // node has at least one more interface, supposedly connecting to another link
@@ -548,17 +545,17 @@ NetworkConfiguratorBaseEcmp::InterfaceInfo *NetworkConfiguratorBaseEcmp::determi
     return gatewayInterfaceInfo;
 }
 
-IInterfaceTable *NetworkConfiguratorBaseEcmp::findInterfaceTable(Node *node)
+IInterfaceTable* NetworkConfiguratorBaseEcmp::findInterfaceTable(Node *node)
 {
     return L3AddressResolver::findInterfaceTableOf(node->module);
 }
 
-IRoutingTable *NetworkConfiguratorBaseEcmp::findRoutingTable(Node *node)
+IRoutingTable* NetworkConfiguratorBaseEcmp::findRoutingTable(Node *node)
 {
     return nullptr;
 }
 
-NetworkConfiguratorBaseEcmp::InterfaceInfo *NetworkConfiguratorBaseEcmp::createInterfaceInfo(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *ie)
+NetworkConfiguratorBaseEcmp::InterfaceInfo* NetworkConfiguratorBaseEcmp::createInterfaceInfo(TopologyEcmp &topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *ie)
 {
     InterfaceInfo *interfaceInfo = new InterfaceInfo(node, linkInfo, ie);
     node->interfaceInfos.push_back(interfaceInfo);
@@ -578,7 +575,7 @@ NetworkConfiguratorBaseEcmp::Matcher::Matcher(const char *pattern)
 
 NetworkConfiguratorBaseEcmp::Matcher::~Matcher()
 {
-    for (auto & matcher : matchers)
+    for (auto &matcher : matchers)
         delete matcher;
 }
 
@@ -586,7 +583,7 @@ bool NetworkConfiguratorBaseEcmp::Matcher::matches(const char *s)
 {
     if (matchesany)
         return true;
-    for (auto & matcher : matchers)
+    for (auto &matcher : matchers)
         if (matcher->matches(s))
             return true;
 
@@ -610,9 +607,9 @@ NetworkConfiguratorBaseEcmp::InterfaceMatcher::InterfaceMatcher(const char *patt
 
 NetworkConfiguratorBaseEcmp::InterfaceMatcher::~InterfaceMatcher()
 {
-    for (auto & nameMatcher : nameMatchers)
+    for (auto &nameMatcher : nameMatchers)
         delete nameMatcher;
-    for (auto & towardsMatcher : towardsMatchers)
+    for (auto &towardsMatcher : towardsMatchers)
         delete towardsMatcher;
 }
 
@@ -622,42 +619,41 @@ bool NetworkConfiguratorBaseEcmp::InterfaceMatcher::matches(InterfaceInfo *inter
         return true;
 
     const char *interfaceName = interfaceInfo->interfaceEntry->getInterfaceName();
-    for (auto & nameMatcher : nameMatchers)
+    for (auto &nameMatcher : nameMatchers)
         if (nameMatcher->matches(interfaceName))
             return true;
 
     LinkInfo *linkInfo = interfaceInfo->linkInfo;
     cModule *ownerModule = interfaceInfo->interfaceEntry->getInterfaceTable()->getHostModule();
-    for (auto & candidateInfo : linkInfo->interfaceInfos) {
+    for (auto &candidateInfo : linkInfo->interfaceInfos) {
         cModule *candidateModule = candidateInfo->interfaceEntry->getInterfaceTable()->getHostModule();
         if (candidateModule == ownerModule)
             continue;
         std::string candidateFullPath = candidateModule->getFullPath();
         std::string candidateShortenedFullPath = candidateFullPath.substr(candidateFullPath.find('.') + 1);
-        for (auto & towardsMatcher : towardsMatchers)
-            if (towardsMatcher->matches(candidateShortenedFullPath.c_str()) ||
-                towardsMatcher->matches(candidateFullPath.c_str()))
+        for (auto &towardsMatcher : towardsMatchers)
+            if (towardsMatcher->matches(candidateShortenedFullPath.c_str()) || towardsMatcher->matches(candidateFullPath.c_str()))
                 return true;
 
     }
     return false;
 }
 
-void NetworkConfiguratorBaseEcmp::dumpTopology(TopologyEcmp& topology)
+void NetworkConfiguratorBaseEcmp::dumpTopology(TopologyEcmp &topology)
 {
     for (int i = 0; i < topology.getNumNodes(); i++) {
-        Node *node = (Node *)topology.getNode(i);
+        Node *node = (Node*) topology.getNode(i);
         EV_INFO << "Node " << node->module->getFullPath() << endl;
         for (int j = 0; j < node->getNumOutLinks(); j++) {
             TopologyEcmp::LinkOut *linkOut = node->getLinkOut(j);
             ASSERT(linkOut->getLocalNode() == node);
-            Node *remoteNode = (Node *)linkOut->getRemoteNode();
+            Node *remoteNode = (Node*) linkOut->getRemoteNode();
             EV_INFO << "     -> " << remoteNode->module->getFullPath() << endl;
         }
         for (int j = 0; j < node->getNumInLinks(); j++) {
             TopologyEcmp::LinkIn *linkIn = node->getLinkIn(j);
             ASSERT(linkIn->getLocalNode() == node);
-            Node *remoteNode = (Node *)linkIn->getRemoteNode();
+            Node *remoteNode = (Node*) linkIn->getRemoteNode();
             EV_INFO << "     <- " << remoteNode->module->getFullPath() << endl;
         }
     }

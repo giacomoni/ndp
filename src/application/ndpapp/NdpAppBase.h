@@ -13,7 +13,8 @@ namespace inet {
  *
  * It needs the following NED parameters: localAddress, localPort, connectAddress, connectPort.
  */
-class INET_API NdpAppBase: public ApplicationBase, public NdpSocket::ICallback {
+class INET_API NdpAppBase : public ApplicationBase, public NdpSocket::ICallback
+{
 protected:
     NdpSocket socket;
 
@@ -29,7 +30,8 @@ protected:
     // Initializes the application, binds the socket to the local address and port.
     virtual void initialize(int stage) override;
 
-    virtual int numInitStages() const override {
+    virtual int numInitStages() const override
+    {
         return NUM_INIT_STAGES;
     }
 
@@ -50,21 +52,22 @@ protected:
     virtual void socketEstablished(NdpSocket *socket) override;
 
     //Called once a packet arrives at the application.
-    virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent)
-            override;
+    virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent) override;
 
-    virtual void socketAvailable(NdpSocket *socket,
-            NdpAvailableInfo *availableInfo) override {
+    virtual void socketAvailable(NdpSocket *socket, NdpAvailableInfo *availableInfo) override
+    {
         socket->accept(availableInfo->getNewSocketId());
     }
     virtual void socketPeerClosed(NdpSocket *socket) override;
     virtual void socketClosed(NdpSocket *socket) override;
     virtual void socketFailure(NdpSocket *socket, int code) override;
     virtual void socketStatusArrived(NdpSocket *socket, NdpStatusInfo *status)
-            override {
+    override
+    {
         delete status;
     }
-    virtual void socketDeleted(NdpSocket *socket) override {
+    virtual void socketDeleted(NdpSocket *socket) override
+    {
     }
 };
 

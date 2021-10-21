@@ -15,7 +15,8 @@
 
 package ndp.transportlayer.Ndp;
 
-simple NdpConnection {
+simple NdpConnection
+{
     parameters:
         @class("NdpConnection");
         @signal[state];    // FSM state
@@ -26,7 +27,7 @@ simple NdpConnection {
         @signal[rttvar];    // will record RTT variance (rttvar)
 
         @statistic[state](record=vector; interpolationmode=sample-hold);
-    
+
         @statistic[rtt](record=vector; interpolationmode=sample-hold);    // will record measured RTT
         @statistic[srtt](record=vector; interpolationmode=sample-hold);    // will record smoothed RTT
         @statistic[rttvar](record=vector; interpolationmode=sample-hold);    // will record RTT variance (rttvar)

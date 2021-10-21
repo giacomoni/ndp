@@ -37,10 +37,7 @@ const int MAX_ENTRY_STRING_SIZE = 500;
 //
 // Tokens that mark the route file.
 //
-const char *IFCONFIG_START_TOKEN = "ifconfig:",
-*IFCONFIG_END_TOKEN = "ifconfigend.",
-*ROUTE_START_TOKEN = "route:",
-*ROUTE_END_TOKEN = "routeend.";
+const char *IFCONFIG_START_TOKEN = "ifconfig:", *IFCONFIG_END_TOKEN = "ifconfigend.", *ROUTE_START_TOKEN = "route:", *ROUTE_END_TOKEN = "routeend.";
 
 int RoutingTableParserEcmp::streq(const char *str1, const char *str2)
 {
@@ -56,9 +53,9 @@ int RoutingTableParserEcmp::strcpyword(char *dest, const char *src)
     return i;
 }
 
-void RoutingTableParserEcmp::skipBlanks(char *str, int& charptr)
+void RoutingTableParserEcmp::skipBlanks(char *str, int &charptr)
 {
-    for ( ; isspace(str[charptr]); charptr++)
+    for (; isspace(str[charptr]); charptr++)
         ;
 }
 
@@ -78,31 +75,24 @@ int RoutingTableParserEcmp::readRoutingTableFromFile(const char *filename)
     for (charpointer = 0; (c = getc(fp)) != EOF; charpointer++)
         file[charpointer] = c;
 
-    for ( ; charpointer < MAX_FILESIZE; charpointer++)
+    for (; charpointer < MAX_FILESIZE; charpointer++)
         file[charpointer] = '\0';
 
     fclose(fp);
 
     // copy file into specialized, filtered char arrays
-    for (charpointer = 0;
-         (charpointer < MAX_FILESIZE) && (file[charpointer] != '\0');
-         charpointer++)
-    {
+    for (charpointer = 0; (charpointer < MAX_FILESIZE) && (file[charpointer] != '\0'); charpointer++) {
         // check for tokens at beginning of file or line
         if (charpointer == 0 || file[charpointer - 1] == '\n') {
             // copy into ifconfig filtered chararray
             if (streq(file + charpointer, IFCONFIG_START_TOKEN)) {
-                ifconfigFile = createFilteredFile(file,
-                            charpointer,
-                            IFCONFIG_END_TOKEN);
+                ifconfigFile = createFilteredFile(file, charpointer, IFCONFIG_END_TOKEN);
                 //PRINTF("Filtered File 1 created:\n%s\n", ifconfigFile);
             }
 
             // copy into route filtered chararray
             if (streq(file + charpointer, ROUTE_START_TOKEN)) {
-                routeFile = createFilteredFile(file,
-                            charpointer,
-                            ROUTE_END_TOKEN);
+                routeFile = createFilteredFile(file, charpointer, ROUTE_END_TOKEN);
                 //PRINTF("Filtered File 2 created:\n%s\n", routeFile);
             }
         }
@@ -122,7 +112,7 @@ int RoutingTableParserEcmp::readRoutingTableFromFile(const char *filename)
     return 0;
 }
 
-char *RoutingTableParserEcmp::createFilteredFile(char *file, int& charpointer, const char *endtoken)
+char* RoutingTableParserEcmp::createFilteredFile(char *file, int &charpointer, const char *endtoken)
 {
     int i = 0;
     char *filterFile = new char[MAX_FILESIZE];
@@ -273,8 +263,7 @@ void RoutingTableParserEcmp::parseInterfaces(char *ifconfigFile)
     }
 }
 
-char *RoutingTableParserEcmp::parseEntry(char *ifconfigFile, const char *tokenStr,
-        int& charpointer, char *destStr)
+char* RoutingTableParserEcmp::parseEntry(char *ifconfigFile, const char *tokenStr, int &charpointer, char *destStr)
 {
     int temp = 0;
 
@@ -377,7 +366,7 @@ void RoutingTableParserEcmp::parseRouting(char *routeFile)
         // add entry
         rt->addRoute(e);
     }
-    delete [] str;
+    delete[] str;
 }
 
 } // namespace inet

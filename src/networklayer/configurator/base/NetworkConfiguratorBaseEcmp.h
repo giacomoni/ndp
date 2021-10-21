@@ -29,12 +29,18 @@
 namespace inet {
 
 // TODO: move to some utility file
-inline bool isEmptyEcmp(const char *s) { return !s || !s[0]; }
-inline bool isNotEmptyEcmp(const char *s) { return s && s[0]; }
+inline bool isEmptyEcmp(const char *s)
+{
+    return !s || !s[0];
+}
+inline bool isNotEmptyEcmp(const char *s)
+{
+    return s && s[0];
+}
 
 class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3AddressResolver
 {
-  public:
+public:
     class LinkInfo;
     class InterfaceInfo;
 
@@ -43,15 +49,22 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      */
     class Node : public inet::TopologyEcmp::Node
     {
-      public:
+    public:
         cModule *module = nullptr;
         IInterfaceTable *interfaceTable = nullptr;
         IRoutingTable *routingTable = nullptr;
-        std::vector<InterfaceInfo *> interfaceInfos;
+        std::vector<InterfaceInfo*> interfaceInfos;
 
-      public:
-        Node(cModule *module) : inet::TopologyEcmp::Node(module->getId()), module(module) { }
-        virtual ~Node() { for (auto & interfaceInfo : interfaceInfos) delete interfaceInfo; }
+    public:
+        Node(cModule *module) :
+                inet::TopologyEcmp::Node(module->getId()), module(module)
+        {
+        }
+        virtual ~Node()
+        {
+            for (auto &interfaceInfo : interfaceInfos)
+                delete interfaceInfo;
+        }
     };
 
     /**
@@ -59,12 +72,14 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      */
     class Link : public inet::TopologyEcmp::Link
     {
-      public:
+    public:
         InterfaceInfo *sourceInterfaceInfo = nullptr;
         InterfaceInfo *destinationInterfaceInfo = nullptr;
 
-      public:
-        Link() { }
+    public:
+        Link()
+        {
+        }
     };
 
     /**
@@ -72,7 +87,7 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      */
     class InterfaceInfo : public cObject
     {
-      public:
+    public:
         Node *node = nullptr;
         LinkInfo *linkInfo = nullptr;
         InterfaceEntry *interfaceEntry = nullptr;
@@ -83,10 +98,13 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
         bool addDefaultRoute = false;    // add-default-route attribute
         bool addSubnetRoute = false;    // add-subnet-route attribute
 
-      public:
+    public:
         InterfaceInfo(Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry);
 
-        virtual std::string getFullPath() const override { return interfaceEntry->getInterfaceFullPath(); }
+        virtual std::string getFullPath() const override
+        {
+            return interfaceEntry->getInterfaceFullPath();
+        }
     };
 
     /**
@@ -95,13 +113,15 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      */
     class LinkInfo : public cObject
     {
-      public:
-        std::vector<InterfaceInfo *> interfaceInfos;    // interfaces on that LAN or point-to-point link
+    public:
+        std::vector<InterfaceInfo*> interfaceInfos;    // interfaces on that LAN or point-to-point link
         InterfaceInfo *gatewayInterfaceInfo = nullptr;    // non-NULL if all hosts have 1 non-loopback interface except one host that has two of them (this will be the gateway)
         int networkId = 0;
 
-      public:
-        LinkInfo() { }
+    public:
+        LinkInfo()
+        {
+        }
     };
 
     /**
@@ -109,70 +129,92 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
      */
     class TopologyEcmp : public inet::TopologyEcmp
     {
-      public:
-        std::vector<LinkInfo *> linkInfos;    // all links in the network
-        std::map<int, InterfaceInfo *> interfaceInfos;    // all interfaces in the network
+    public:
+        std::vector<LinkInfo*> linkInfos;    // all links in the network
+        std::map<int, InterfaceInfo*> interfaceInfos;    // all interfaces in the network
 
-      public:
-        virtual ~TopologyEcmp() { for (auto & linkInfo : linkInfos) delete linkInfo; }
+    public:
+        virtual ~TopologyEcmp()
+        {
+            for (auto &linkInfo : linkInfos)
+                delete linkInfo;
+        }
 
-      protected:
-        virtual Node *createNode(cModule *module) override { return new NetworkConfiguratorBaseEcmp::Node(module); }
-        virtual Link *createLink() override { return new NetworkConfiguratorBaseEcmp::Link(); }
+    protected:
+        virtual Node* createNode(cModule *module) override
+        {
+            return new NetworkConfiguratorBaseEcmp::Node(module);
+        }
+        virtual Link* createLink() override
+        {
+            return new NetworkConfiguratorBaseEcmp::Link();
+        }
     };
 
     class Matcher
     {
-      protected:
+    protected:
         bool matchesany = false;
-        std::vector<inet::PatternMatcher *> matchers;    // TODO replace with a MatchExpression once it becomes available in OMNeT++
+        std::vector<inet::PatternMatcher*> matchers;    // TODO replace with a MatchExpression once it becomes available in OMNeT++
 
-      public:
+    public:
         Matcher(const char *pattern);
         ~Matcher();
 
         bool matches(const char *s);
-        bool matchesAny() { return matchesany; }
+        bool matchesAny()
+        {
+            return matchesany;
+        }
     };
 
     class InterfaceMatcher
     {
-      protected:
+    protected:
         bool matchesany = false;
-        std::vector<inet::PatternMatcher *> nameMatchers;
-        std::vector<inet::PatternMatcher *> towardsMatchers;
+        std::vector<inet::PatternMatcher*> nameMatchers;
+        std::vector<inet::PatternMatcher*> towardsMatchers;
 
-      public:
+    public:
         InterfaceMatcher(const char *pattern);
         ~InterfaceMatcher();
 
         bool matches(InterfaceInfo *interfaceInfo);
-        bool matchesAny() { return matchesany; }
+        bool matchesAny()
+        {
+            return matchesany;
+        }
     };
 
-  protected:
+protected:
     // parameters
     double minLinkWeight = NaN;
     bool configureIsolatedNetworksSeparatly = false;
     cXMLElement *configuration = nullptr;
 
-  protected:
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+protected:
+    virtual int numInitStages() const override
+    {
+        return NUM_INIT_STAGES;
+    }
     virtual void initialize(int stage) override;
-    virtual void handleMessage(cMessage *msg) override { throw cRuntimeError("this module doesn't handle messages, it runs only in initialize()"); }
+    virtual void handleMessage(cMessage *msg) override
+    {
+        throw cRuntimeError("this module doesn't handle messages, it runs only in initialize()");
+    }
 
     /**
      * Extracts network topology by walking through the module hierarchy.
      * Creates vertices from modules having @networkNode property.
      * Creates edges from connections (wired and wireless) between network interfaces.
      */
-    virtual void extractTopology(TopologyEcmp& topology);
+    virtual void extractTopology(TopologyEcmp &topology);
 
     // helper functions
-    virtual void extractWiredNeighbors(TopologyEcmp& topology, TopologyEcmp::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
-    virtual void extractWirelessNeighbors(TopologyEcmp& topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& nodesVisited);
-    virtual void extractDeviceNeighbors(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry *>& interfacesSeen, std::vector<Node *>& deviceNodesVisited);
-    virtual InterfaceInfo *determineGatewayForLink(LinkInfo *linkInfo);
+    virtual void extractWiredNeighbors(TopologyEcmp &topology, TopologyEcmp::LinkOut *linkOut, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &nodesVisited);
+    virtual void extractWirelessNeighbors(TopologyEcmp &topology, const char *wirelessId, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &nodesVisited);
+    virtual void extractDeviceNeighbors(TopologyEcmp &topology, Node *node, LinkInfo *linkInfo, std::map<int, InterfaceEntry*> &interfacesSeen, std::vector<Node*> &deviceNodesVisited);
+    virtual InterfaceInfo* determineGatewayForLink(LinkInfo *linkInfo);
     virtual double computeNodeWeight(Node *node, const char *metric, cXMLElement *parameters);
     virtual double computeLinkWeight(Link *link, const char *metric, cXMLElement *parameters);
     virtual double computeWiredLinkWeight(Link *link, const char *metric, cXMLElement *parameters);
@@ -180,23 +222,22 @@ class INET_API NetworkConfiguratorBaseEcmp : public cSimpleModule, public L3Addr
     virtual bool isBridgeNode(Node *node);
     virtual bool isWirelessInterface(InterfaceEntry *interfaceEntry);
     virtual std::string getWirelessId(InterfaceEntry *interfaceEntry);
-    virtual InterfaceInfo *createInterfaceInfo(TopologyEcmp& topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry);
-    virtual TopologyEcmp::LinkOut *findLinkOut(Node *node, int gateId);
-    virtual InterfaceInfo *findInterfaceInfo(Node *node, InterfaceEntry *interfaceEntry);
-    virtual IInterfaceTable *findInterfaceTable(Node *node);
-    virtual IRoutingTable *findRoutingTable(Node *node);
+    virtual InterfaceInfo* createInterfaceInfo(TopologyEcmp &topology, Node *node, LinkInfo *linkInfo, InterfaceEntry *interfaceEntry);
+    virtual TopologyEcmp::LinkOut* findLinkOut(Node *node, int gateId);
+    virtual InterfaceInfo* findInterfaceInfo(Node *node, InterfaceEntry *interfaceEntry);
+    virtual IInterfaceTable* findInterfaceTable(Node *node);
+    virtual IRoutingTable* findRoutingTable(Node *node);
 
     // generic helper functions
-    virtual void dumpTopology(TopologyEcmp& topology);
+    virtual void dumpTopology(TopologyEcmp &topology);
 };
 
-inline std::ostream& operator<<(std::ostream& stream, const NetworkConfiguratorBaseEcmp::Link& link)
+inline std::ostream& operator<<(std::ostream &stream, const NetworkConfiguratorBaseEcmp::Link &link)
 {
-    return stream << (link.sourceInterfaceInfo != nullptr ? link.sourceInterfaceInfo->getFullPath() : "") << " -> "
-                  << (link.destinationInterfaceInfo != nullptr ? link.destinationInterfaceInfo->getFullPath() : "");
+    return stream << (link.sourceInterfaceInfo != nullptr ? link.sourceInterfaceInfo->getFullPath() : "") << " -> " << (link.destinationInterfaceInfo != nullptr ? link.destinationInterfaceInfo->getFullPath() : "");
 }
 
-inline std::ostream& operator<<(std::ostream& stream, const NetworkConfiguratorBaseEcmp::Link *link)
+inline std::ostream& operator<<(std::ostream &stream, const NetworkConfiguratorBaseEcmp::Link *link)
 {
     return stream << *link;
 }

@@ -36,7 +36,7 @@ namespace ndp {
  */
 class INET_API NdpAlgorithm : public cObject
 {
-  protected:
+protected:
     NdpConnection *conn;    // we belong to this connection
     NdpStateVariables *state;    // our state variables
 
@@ -46,29 +46,38 @@ class INET_API NdpAlgorithm : public cObject
      * subclassed from NDPStateVariables. This factory method should
      * create and return a "blank" state block of the appropriate type.
      */
-    virtual NdpStateVariables *createStateVariables() = 0;
+    virtual NdpStateVariables* createStateVariables() = 0;
 
-  public:
+public:
     /**
      * Ctor.
      */
-    NdpAlgorithm() { state = nullptr; conn = nullptr; }
+    NdpAlgorithm()
+    {
+        state = nullptr;
+        conn = nullptr;
+    }
 
     /**
      * Virtual dtor.
      */
-    virtual ~NdpAlgorithm() {}
+    virtual ~NdpAlgorithm()
+    {
+    }
 
     /**
      * Assign this object to a NdpConnection. Its sendQueue and receiveQueue
      * must be set already at this time, because we cache their pointers here.
      */
-    void setConnection(NdpConnection *_conn) { conn = _conn; }
+    void setConnection(NdpConnection *_conn)
+    {
+        conn = _conn;
+    }
 
     /**
      * Creates and returns the NDP state variables.
      */
-    NdpStateVariables *getStateVariables()
+    NdpStateVariables* getStateVariables()
     {
         if (!state)
             state = createStateVariables();
@@ -81,7 +90,9 @@ class INET_API NdpAlgorithm : public cObject
      * This method is necessary because the NdpConnection ptr is not
      * available in the constructor yet.
      */
-    virtual void initialize() {}
+    virtual void initialize()
+    {
+    }
 
     /**
      * Called when the connection closes, it should cancel all running timers.
@@ -97,7 +108,7 @@ class INET_API NdpAlgorithm : public cObject
      * Method may also change the event code (by default set to NDP_E_IGNORE)
      * to cause the state transition of NDP FSM.
      */
-    virtual void processTimer(cMessage *timer, NdpEventCode& event) = 0;
+    virtual void processTimer(cMessage *timer, NdpEventCode &event) = 0;
 
     /**
      * Called after we sent data. This hook can be used to schedule the

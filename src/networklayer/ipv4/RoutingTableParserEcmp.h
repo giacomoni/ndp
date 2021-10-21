@@ -26,34 +26,38 @@ namespace inet {
  */
 class INET_API RoutingTableParserEcmp
 {
-  protected:
+protected:
     IInterfaceTable *ift;
     IIpv4RoutingTable *rt;
 
-  public:
+public:
     /**
      * Constructor
      */
-    RoutingTableParserEcmp(IInterfaceTable *ift, IIpv4RoutingTable *rt) : ift(ift), rt(rt) {}
+    RoutingTableParserEcmp(IInterfaceTable *ift, IIpv4RoutingTable *rt) :
+            ift(ift), rt(rt)
+    {
+    }
 
     /**
      * Destructor
      */
-    virtual ~RoutingTableParserEcmp() {};
+    virtual ~RoutingTableParserEcmp()
+    {
+    }
+    ;
 
     /**
      * Read Routing Table file; return 0 on success, -1 on error
      */
     virtual int readRoutingTableFromFile(const char *filename);
 
-  protected:
+protected:
     // Parsing functions
 
     // Used to create specific "files" char arrays without comments or blanks
     // from original file.
-    virtual char *createFilteredFile(char *file,
-            int& charpointer,
-            const char *endtoken);
+    virtual char* createFilteredFile(char *file, int &charpointer, const char *endtoken);
 
     // Go through the ifconfigFile char array, parse all entries and
     // write them into the interface table.
@@ -64,20 +68,17 @@ class INET_API RoutingTableParserEcmp
     // write them into the routing table.
     virtual void parseRouting(char *routeFile);
 
-    virtual char *parseEntry(char *ifconfigFile,
-            const char *tokenStr,
-            int& charpointer,
-            char *destStr);
+    virtual char* parseEntry(char *ifconfigFile, const char *tokenStr, int &charpointer, char *destStr);
 
     // Convert string separated by ':' into dynamic string array.
-    virtual void parseMulticastGroups(char *groupStr, InterfaceEntry *);
+    virtual void parseMulticastGroups(char *groupStr, InterfaceEntry*);
 
     // Return 1 if beginning of str1 and str2 is equal up to str2-len,
     // otherwise 0.
     static int streq(const char *str1, const char *str2);
 
     // Skip blanks in string
-    static void skipBlanks(char *str, int& charptr);
+    static void skipBlanks(char *str, int &charptr);
 
     // Copies the first word of src up to a space-char into dest
     // and appends \0, returns position of next space-char in src

@@ -1,4 +1,3 @@
-
 #ifndef __INET_NdpSinkApp_H
 #define __INET_NdpSinkApp_H
 
@@ -14,29 +13,35 @@ namespace inet {
  */
 class INET_API NdpSinkApp : public cSimpleModule, public ILifecycle
 {
-  protected:
+protected:
     long bytesRcvd;
     NdpSocket socket;
-
-     //statistics:
+    //statistics:
     static simsignal_t rcvdPkSignalNDP;
 
     cMessage *timeoutMsg = nullptr;
     // MOH: added
     simtime_t tStartAdded;
     simtime_t tEndAdded;
-    double numRcvTrimmedHeader = 0 ;
-
+    double numRcvTrimmedHeader = 0;
     bool firstDataReceived = true;
 
     virtual void initialize(int stage) override;
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+    virtual int numInitStages() const override
+    {
+        return NUM_INIT_STAGES;
+    }
     virtual void handleMessage(cMessage *msg) override;
     virtual void finish() override;
     virtual void refreshDisplay() const override;
 
     virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override
-    { Enter_Method_Silent(); throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName()); return true; }
+    {
+        Enter_Method_Silent
+        ();
+        throw cRuntimeError("Unsupported lifecycle operation '%s'", operation->getClassName());
+        return true;
+    }
 };
 
 } // namespace inet

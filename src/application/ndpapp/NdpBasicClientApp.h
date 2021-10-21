@@ -1,4 +1,3 @@
-
 #ifndef __INET_NdpBasicClientApp_H
 #define __INET_NdpBasicClientApp_H
 
@@ -14,18 +13,18 @@ namespace inet {
  */
 class INET_API NdpBasicClientApp : public NdpAppBase
 {
-  protected:
+protected:
     cMessage *timeoutMsg = nullptr;
-    NodeStatus *nodeStatus = nullptr;
-
-    static simsignal_t packetReceivedSignal; // moh
 
     simtime_t startTime;
     simtime_t stopTime;
 
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+    virtual int numInitStages() const override
+    {
+        return NUM_INIT_STAGES;
+    }
 
     // Initializes the client application, calls the initialize method of NdpAppBase
     virtual void initialize(int stage) override;
@@ -38,7 +37,11 @@ class INET_API NdpBasicClientApp : public NdpAppBase
 
     // No data should arrive in the NDP client application as this is handled by the
     // NdpConnection. Method must override the ApplicationBase method.
-    virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent) override {return;};
+    virtual void socketDataArrived(NdpSocket *socket, Packet *msg, bool urgent) override
+    {
+        return;
+    }
+    ;
     virtual void socketClosed(NdpSocket *socket) override;
     virtual void socketFailure(NdpSocket *socket, int code) override;
 
@@ -48,8 +51,10 @@ class INET_API NdpBasicClientApp : public NdpAppBase
 
     virtual void close() override;
 
-  public:
-    NdpBasicClientApp() {}
+public:
+    NdpBasicClientApp()
+    {
+    }
     virtual ~NdpBasicClientApp();
 };
 

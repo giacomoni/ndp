@@ -45,14 +45,12 @@ std::string NdpHeader::str() const
     if (separ == flagSepar)
         stream << flagEnd;
 
-    stream << " Seq=" << getDataSequenceNumber()
-           << ", length = " << getChunkLength();
+    stream << " Seq=" << getDataSequenceNumber() << ", length = " << getChunkLength();
 
     //TODO show NDP Options
 
     return stream.str();
 }
-
 
 } // namespace tcp
 

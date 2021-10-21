@@ -37,18 +37,24 @@ namespace inet {
  */
 class INET_API Ipv4NodeConfiguratorEcmp : public cSimpleModule, public ILifecycle, protected cListener
 {
-  protected:
+protected:
     NodeStatus *nodeStatus;
     IInterfaceTable *interfaceTable;
     IIpv4RoutingTable *routingTable;
     Ipv4NetworkConfiguratorEcmp *networkConfigurator;
 
-  public:
+public:
     Ipv4NodeConfiguratorEcmp();
 
-  protected:
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
-    virtual void handleMessage(cMessage *msg) override { throw cRuntimeError("this module doesn't handle messages, it runs only in initialize()"); }
+protected:
+    virtual int numInitStages() const override
+    {
+        return NUM_INIT_STAGES;
+    }
+    virtual void handleMessage(cMessage *msg) override
+    {
+        throw cRuntimeError("this module doesn't handle messages, it runs only in initialize()");
+    }
     virtual void initialize(int stage) override;
     virtual bool handleOperationStage(LifecycleOperation *operation, IDoneCallback *doneCallback) override;
     virtual void prepareAllInterfaces();

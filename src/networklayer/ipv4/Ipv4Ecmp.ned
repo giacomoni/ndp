@@ -18,8 +18,8 @@ package ndp.networklayer.ipv4;
 moduleinterface IIpv4Ecmp
 {
     gates:
-        input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
-        output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
+        input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader,NdpHeader);
+        output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader,NdpHeader);
         input queueIn @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
         output queueOut @labels(Ipv4HeaderNdp,ArpPacket,Ieee802Ctrl);
 }
@@ -94,7 +94,7 @@ simple Ipv4Ecmp like IIpv4Ecmp
         string routingTableModule;
         string arpModule;
         string icmpModule;
-        string crcMode @enum("declared", "computed") = default("declared");
+        string crcMode @enum("declared","computed") = default("declared");
         double procDelay @unit(s) = default(0s);
         int timeToLive = default(32);
         int multicastTimeToLive = default(32);
@@ -118,8 +118,8 @@ simple Ipv4Ecmp like IIpv4Ecmp
         @statistic[packetDropNoRouteFound](title="packet drop: no route found"; source=packetDropReasonIsNoRouteFound(packetDropped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
         @statistic[packetDropUndefined](title="packet drop: undefined"; source=packetDropReasonIsUndefined(packetDropped); record=count,sum(packetBytes),vector(packetBytes); interpolationmode=none);
     gates:
-        input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
-        output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader, NdpHeader);
+        input transportIn @labels(Ipv4ControlInfo/down,TcpHeader,UdpHeader,SctpHeader,NdpHeader);
+        output transportOut @labels(Ipv4ControlInfo/up,TcpHeader,UdpHeader,SctpHeader,NdpHeader);
         input queueIn @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
         output queueOut @labels(Ipv4Header,ArpPacket,Ieee802Ctrl);
 }

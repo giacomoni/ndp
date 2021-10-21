@@ -45,16 +45,20 @@ class IIpv4RoutingTable;
  */
 class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public INetworkProtocol, public IProtocolRegistrationListener, public cListener
 {
-  public:
+public:
     /**
      * Represents an Ipv4Header, queued by a Hook
      */
     class QueuedDatagramForHook
     {
-      public:
+    public:
         QueuedDatagramForHook(Packet *packet, IHook::Type hookType) :
-            packet(packet), hookType(hookType) {}
-        virtual ~QueuedDatagramForHook() {}
+                packet(packet), hookType(hookType)
+        {
+        }
+        virtual ~QueuedDatagramForHook()
+        {
+        }
 
         Packet *packet = nullptr;
         const IHook::Type hookType = static_cast<IHook::Type>(-1);
@@ -68,11 +72,13 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
         Ipv4Address localAddress;
         Ipv4Address remoteAddress;
 
-        SocketDescriptor(int socketId, int protocolId, Ipv4Address localAddress)
-                : socketId(socketId), protocolId(protocolId), localAddress(localAddress) { }
+        SocketDescriptor(int socketId, int protocolId, Ipv4Address localAddress) :
+                socketId(socketId), protocolId(protocolId), localAddress(localAddress)
+        {
+        }
     };
 
-  protected:
+protected:
     IIpv4RoutingTable *rt = nullptr;  //TODO CHANGE BACK
     IInterfaceTable *ift = nullptr;
     IArp *arp = nullptr;
@@ -93,8 +99,8 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     uint16_t curFragmentId = -1;    // counter, used to assign unique fragmentIds to datagrams
     Ipv4FragBuf fragbuf;    // fragmentation reassembly buffer
     simtime_t lastCheckTime;    // when fragbuf was last checked for state fragments
-    std::set<const Protocol *> upperProtocols;    // where to send packets after decapsulation
-    std::map<int, SocketDescriptor *> socketIdToSocketDescriptor;
+    std::set<const Protocol*> upperProtocols;    // where to send packets after decapsulation
+    std::map<int, SocketDescriptor*> socketIdToSocketDescriptor;
 
     // ARP related
     PendingPackets pendingPackets;    // map indexed with IPv4Address for outbound packets waiting for ARP resolution
@@ -110,14 +116,14 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     typedef std::list<QueuedDatagramForHook> DatagramQueueForHooks;
     DatagramQueueForHooks queuedDatagramsForHooks;
 
-  protected:
+protected:
     // utility: look up interface from getArrivalGate()
-    virtual const InterfaceEntry *getSourceInterface(Packet *packet);
-    virtual const InterfaceEntry *getDestInterface(Packet *packet);
+    virtual const InterfaceEntry* getSourceInterface(Packet *packet);
+    virtual const InterfaceEntry* getDestInterface(Packet *packet);
     virtual Ipv4Address getNextHop(Packet *packet);
 
     // utility: look up route to the source of the datagram and return its interface
-    virtual const InterfaceEntry *getShortestPathInterfaceToSource(const Ptr<const Ipv4Header>& ipv4Header) const;
+    virtual const InterfaceEntry* getShortestPathInterfaceToSource(const Ptr<const Ipv4Header> &ipv4Header) const;
 
     // utility: show current statistics above the icon
     virtual void refreshDisplay() const override;
@@ -129,15 +135,15 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     void arpResolutionTimedOut(IArp::Notification *entry);
 
     // utility: verifying CRC
-    bool verifyCrc(const Ptr<const Ipv4Header>& ipv4Header);
+    bool verifyCrc(const Ptr<const Ipv4Header> &ipv4Header);
 
     // utility: calculate and set CRC
-    void setComputedCrc(Ptr<Ipv4Header>& ipv4Header);
+    void setComputedCrc(Ptr<Ipv4Header> &ipv4Header);
 
-  public:
-    static void insertCrc(const Ptr<Ipv4Header>& ipv4Header);
+public:
+    static void insertCrc(const Ptr<Ipv4Header> &ipv4Header);
 
-  protected:
+protected:
     /**
      * Encapsulate packet coming from higher layers into Ipv4Header, using
      * the given control info. Override if you subclassed controlInfo and/or
@@ -184,7 +190,7 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     /**
      * Determines the output interface for the given multicast datagram.
      */
-    virtual const InterfaceEntry *determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4Header>& ipv4Header, const InterfaceEntry *multicastIFOption);
+    virtual const InterfaceEntry* determineOutgoingInterfaceForMulticastDatagram(const Ptr<const Ipv4Header> &ipv4Header, const InterfaceEntry *multicastIFOption);
 
     /**
      * Forwards packets to all multicast destinations, using fragmentAndSend().
@@ -227,17 +233,20 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
 
     virtual void sendIcmpError(Packet *packet, int inputInterfaceId, IcmpType type, IcmpCode code);
 
-    virtual Packet *prepareForForwarding(Packet *packet) const;
+    virtual Packet* prepareForForwarding(Packet *packet) const;
 
-  public:
+public:
     Ipv4Ecmp();
     virtual ~Ipv4Ecmp();
 
-    virtual void handleRegisterService(const Protocol& protocol, cGate *out, ServicePrimitive servicePrimitive) override;
-    virtual void handleRegisterProtocol(const Protocol& protocol, cGate *in, ServicePrimitive servicePrimitive) override;
+    virtual void handleRegisterService(const Protocol &protocol, cGate *out, ServicePrimitive servicePrimitive) override;
+    virtual void handleRegisterProtocol(const Protocol &protocol, cGate *in, ServicePrimitive servicePrimitive) override;
 
-  protected:
-    virtual int numInitStages() const override { return NUM_INIT_STAGES; }
+protected:
+    virtual int numInitStages() const override
+    {
+        return NUM_INIT_STAGES;
+    }
     virtual void initialize(int stage) override;
     virtual void handleMessageWhenUp(cMessage *msg) override;
 
@@ -245,7 +254,7 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
 
     // NetFilter functions:
 
-  protected:
+protected:
     /**
      * called before a packet arriving from the network is routed
      */
@@ -271,7 +280,7 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
      */
     IHook::Result datagramLocalOutHook(Packet *datagram);
 
-  public:
+public:
     /**
      * registers a Hook to be executed during datagram processing
      */
@@ -295,9 +304,18 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     /**
      * ILifecycle methods
      */
-    virtual bool isInitializeStage(int stage) override { return stage == INITSTAGE_NETWORK_LAYER; }
-    virtual bool isModuleStartStage(int stage) override { return stage == ModuleStartOperation::STAGE_NETWORK_LAYER; }
-    virtual bool isModuleStopStage(int stage) override { return stage == ModuleStopOperation::STAGE_NETWORK_LAYER; }
+    virtual bool isInitializeStage(int stage) override
+    {
+        return stage == INITSTAGE_NETWORK_LAYER;
+    }
+    virtual bool isModuleStartStage(int stage) override
+    {
+        return stage == ModuleStartOperation::STAGE_NETWORK_LAYER;
+    }
+    virtual bool isModuleStopStage(int stage) override
+    {
+        return stage == ModuleStopOperation::STAGE_NETWORK_LAYER;
+    }
     virtual void handleStartOperation(LifecycleOperation *operation) override;
     virtual void handleStopOperation(LifecycleOperation *operation) override;
     virtual void handleCrashOperation(LifecycleOperation *operation) override;
@@ -305,7 +323,7 @@ class INET_API Ipv4Ecmp : public OperationalBase, public NetfilterBase, public I
     /// cListener method
     virtual void receiveSignal(cComponent *source, simsignal_t signalID, cObject *obj, cObject *details) override;
 
-  protected:
+protected:
     virtual void start();
     virtual void stop();
     virtual void flush();

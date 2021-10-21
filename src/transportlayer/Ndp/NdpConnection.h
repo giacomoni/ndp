@@ -20,7 +20,8 @@ class NdpHeader;
 class NdpSendQueue;
 class NdpAlgorithm;
 
-enum NdpState {
+enum NdpState
+{
     NDP_S_INIT = 0,
     NDP_S_CLOSED = FSM_Steady(1),
     NDP_S_LISTEN = FSM_Steady(2),
@@ -39,7 +40,8 @@ enum NdpState {
 // Event, strictly for the FSM state transition purposes.
 // DO NOT USE outside performStateTransition()!
 //
-enum NdpEventCode {
+enum NdpEventCode
+{
     NDP_E_IGNORE,
 
     // app commands
@@ -95,7 +97,8 @@ enum NdpEventCode {
  * into NdpAlgorithm subclasses which can have their own state blocks,
  * subclassed from NDPStateVariables. See NdpAlgorithm::createStateVariables().
  */
-class INET_API NdpStateVariables: public cObject {
+class INET_API NdpStateVariables : public cObject
+{
 public:
     NdpStateVariables();
     virtual std::string str() const override;
@@ -130,10 +133,12 @@ public:
     bool isfinalReceivedPrintedOut;
 };
 
-class INET_API NdpConnection: public cSimpleModule {
+class INET_API NdpConnection : public cSimpleModule
+{
 public:
 
-    struct PacketsToSend {
+    struct PacketsToSend
+    {
         unsigned int pktId;
         Packet *msg;
     };
@@ -142,26 +147,31 @@ public:
 
     // connection identification by apps: socketId
     int socketId = -1;    // identifies connection within the app
-    int getSocketId() const {
+    int getSocketId() const
+    {
         return socketId;
     }
-    void setSocketId(int newSocketId) {
+    void setSocketId(int newSocketId)
+    {
         ASSERT(socketId == -1);
         socketId = newSocketId;
     }
 
     int listeningSocketId = -1; // identifies listening connection within the app
-    int getListeningSocketId() const {
+    int getListeningSocketId() const
+    {
         return listeningSocketId;
     }
 
     // socket pair
     L3Address localAddr;
-    const L3Address& getLocalAddr() const {
+    const L3Address& getLocalAddr() const
+    {
         return localAddr;
     }
     L3Address remoteAddr;
-    const L3Address& getRemoteAddr() const {
+    const L3Address& getRemoteAddr() const
+    {
         return remoteAddr;
     }
     int localPort = -1;
@@ -180,7 +190,8 @@ protected:
 
     // NDP queues
     NdpSendQueue *sendQueue = nullptr;
-    NdpSendQueue* getSendQueue() const {
+    NdpSendQueue* getSendQueue() const
+    {
         return sendQueue;
     }
 
@@ -194,7 +205,8 @@ protected:
     cPacketQueue pullQueue;
     // NDP behavior in data transfer state
     NdpAlgorithm *ndpAlgorithm = nullptr;
-    NdpAlgorithm* getNdpAlgorithm() const {
+    NdpAlgorithm* getNdpAlgorithm() const
+    {
         return ndpAlgorithm;
     }
     // timers
@@ -220,22 +232,17 @@ protected:
 
     /** @name Processing app commands. Invoked from processAppCommand(). */
     //@{
-    virtual void process_OPEN_ACTIVE(NdpEventCode &event,
-            NdpCommand *NdpCommand, cMessage *msg);
-    virtual void process_OPEN_PASSIVE(NdpEventCode &event,
-            NdpCommand *NdpCommand, cMessage *msg);
+    virtual void process_OPEN_ACTIVE(NdpEventCode &event, NdpCommand *NdpCommand, cMessage *msg);
+    virtual void process_OPEN_PASSIVE(NdpEventCode &event, NdpCommand *NdpCommand, cMessage *msg);
 
     /**
      * Process incoming NDP segment. Returns a specific event code (e.g. NDP_E_RCV_SYN)
      * which will drive the state machine.
      */
-    virtual NdpEventCode process_RCV_SEGMENT(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
-    virtual NdpEventCode processSegmentInListen(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
+    virtual NdpEventCode process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
+    virtual NdpEventCode processSegmentInListen(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
 
-    virtual NdpEventCode processSegment1stThru8th(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg);
+    virtual NdpEventCode processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader> &ndpseg);
 
     //@}
 
@@ -256,7 +263,8 @@ protected:
     virtual void configureStateVariables();
 
     /** Utility: returns true if the connection is not yet accepted by the application */
-    virtual bool isToBeAccepted() const {
+    virtual bool isToBeAccepted() const
+    {
         return listeningSocketId != -1;
     }
 public:
@@ -266,11 +274,9 @@ public:
     virtual void sendInitialWindow();
 
     /** Utility: sends RST; does not use connection state */
-    virtual void sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort,
-            int destPort);
+    virtual void sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort, int destPort);
     /** Utility: sends RST+ACK; does not use connection state */
-    virtual void sendRstAck(uint32 seq, uint32 ack, L3Address src,
-            L3Address dest, int srcPort, int destPort);
+    virtual void sendRstAck(uint32 seq, uint32 ack, L3Address src, L3Address dest, int srcPort, int destPort);
 
     /** Utility: adds control info to segment and sends it to IP */
     virtual void sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg);
@@ -282,19 +288,20 @@ public:
     virtual void signalConnectionTimeout();
 
     /** Utility: start a timer */
-    void scheduleTimeout(cMessage *msg, simtime_t timeout) {
+    void scheduleTimeout(cMessage *msg, simtime_t timeout)
+    {
         ndpMain->scheduleAt(simTime() + timeout, msg);
     }
 
 protected:
     /** Utility: cancel a timer */
-    cMessage* cancelEvent(cMessage *msg) {
+    cMessage* cancelEvent(cMessage *msg)
+    {
         return ndpMain->cancelEvent(msg);
     }
 
     /** Utility: send IP packet */
-    virtual void sendToIP(Packet *pkt, const Ptr<NdpHeader> &ndpseg,
-            L3Address src, L3Address dest);
+    virtual void sendToIP(Packet *pkt, const Ptr<NdpHeader> &ndpseg, L3Address src, L3Address dest);
 
     /** Utility: sends packet to application */
     virtual void sendToApp(cMessage *msg);
@@ -309,8 +316,7 @@ public:
     /** Utility: prints local/remote addr/port and app gate index/connId */
     virtual void printConnBrief() const;
     /** Utility: prints important header fields */
-    static void printSegmentBrief(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg);
+    static void printSegmentBrief(Packet *packet, const Ptr<const NdpHeader> &ndpseg);
     /** Utility: returns name of NDP_S_xxx constants */
     static const char* stateName(int state);
     /** Utility: returns name of NDP_E_xxx constants */
@@ -319,11 +325,14 @@ public:
     static const char* indicationName(int code);
 
 public:
-    NdpConnection() {
+    NdpConnection()
+    {
     }
-    NdpConnection(const NdpConnection &other) {
+    NdpConnection(const NdpConnection &other)
+    {
     }    //FIXME kludge
-    void initialize() {
+    void initialize()
+    {
     }
 
     /**
@@ -336,46 +345,52 @@ public:
      */
     virtual ~NdpConnection();
 
-    int getLocalPort() const {
+    int getLocalPort() const
+    {
         return localPort;
     }
-    L3Address getLocalAddress() const {
+    L3Address getLocalAddress() const
+    {
         return localAddr;
     }
 
-    int getRemotePort() const {
+    int getRemotePort() const
+    {
         return remotePort;
     }
-    L3Address getRemoteAddress() const {
+    L3Address getRemoteAddress() const
+    {
         return remoteAddr;
     }
 
-    virtual void segmentArrivalWhileClosed(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
+    virtual void segmentArrivalWhileClosed(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest);
 
     /** @name Various getters **/
     //@{
-    int getFsmState() const {
+    int getFsmState() const
+    {
         return fsm.getState();
     }
-    NdpStateVariables* getState() {
+    NdpStateVariables* getState()
+    {
         return state;
     }
-    NdpSendQueue* getSendQueue() {
+    NdpSendQueue* getSendQueue()
+    {
         return sendQueue;
     }
-    NdpAlgorithm* getNdpAlgorithm() {
+    NdpAlgorithm* getNdpAlgorithm()
+    {
         return ndpAlgorithm;
     }
-    Ndp* getNDPMain() {
+    Ndp* getNDPMain()
+    {
         return ndpMain;
     }
 
     virtual bool processTimer(cMessage *msg);
 
-    virtual bool processNDPSegment(Packet *packet,
-            const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr,
-            L3Address destAddr);
+    virtual bool processNDPSegment(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr);
 
     virtual bool processAppCommand(cMessage *msg);
 

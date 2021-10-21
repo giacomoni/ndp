@@ -1,14 +1,14 @@
 package ndp.transportlayer.Ndp;
 
-import  ndp.transportlayer.contract.INdp;
+import ndp.transportlayer.contract.INdp;
 
 simple Ndp like INdp
 {
     parameters:
         int initialWindow = default(0);  // initialWindow size NDP-style (sender pushes IW pacakets)
-        string ndpAlgorithmClass =default("NDPSimpleAlg");
+        string ndpAlgorithmClass = default("NDPSimpleAlg");
         @display("i=block/wheelbarrow");
-		
+
         @signal[packetReceivedFromUpper](type=cPacket);
         @signal[packetReceivedFromLower](type=cPacket);
     gates:

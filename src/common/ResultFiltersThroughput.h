@@ -37,7 +37,7 @@ namespace filters {
  */
 class INET_API ThroughputFilterA : public cObjectResultFilter
 {
-  protected:
+protected:
     simtime_t interval = 0.1;
     int packetLimit = 100;
     bool emitIntermediateZeros = true;
@@ -46,16 +46,15 @@ class INET_API ThroughputFilterA : public cObjectResultFilter
     double bytes = 0;
     int packets = 0;
 
-  protected:
+protected:
     void emitThroughput(simtime_t endInterval, cObject *details);
-  public:
+public:
     virtual void receiveSignal(cResultFilter *prev, simtime_t_cref t, cObject *object, cObject *details) override;
 };
 
 }
 
 }
-
 
 }
 

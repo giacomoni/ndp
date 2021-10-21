@@ -26,14 +26,13 @@
 #include "ndp_common/NdpHeader.h"
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 
-
 namespace inet {
 
 namespace ndp {
 
 class INET_API NdpSendQueue : public cObject
 {
-  protected:
+protected:
     NdpConnection *conn = nullptr;    // the connection that owns this queue
     uint32 begin = 0;    // 1st sequence number stored
     uint32 end = 0;    // last sequence number stored +1
@@ -41,7 +40,7 @@ class INET_API NdpSendQueue : public cObject
     cPacketQueue dataToSendQueue;      // dataBuffer
     cPacketQueue sentDataQueue;
 
-  public:
+public:
     /**
      * Ctor.
      */
@@ -52,12 +51,21 @@ class INET_API NdpSendQueue : public cObject
      */
     virtual ~NdpSendQueue();
 
-    virtual cPacketQueue& getDataToSendQueue() { return dataToSendQueue; }
-    virtual cPacketQueue& getSentDataQueue() { return sentDataQueue; }
+    virtual cPacketQueue& getDataToSendQueue()
+    {
+        return dataToSendQueue;
+    }
+    virtual cPacketQueue& getSentDataQueue()
+    {
+        return sentDataQueue;
+    }
     /**
      * Set the connection that owns this queue.
      */
-    virtual void setConnection(NdpConnection *_conn) { conn = _conn; }
+    virtual void setConnection(NdpConnection *_conn)
+    {
+        conn = _conn;
+    }
 
     /**
      * Initialize the object. The startSeq parameter tells what sequence number the first
@@ -67,7 +75,7 @@ class INET_API NdpSendQueue : public cObject
      * init() may be called more than once; every call flushes the existing contents
      * of the queue.
      */
-    virtual void init(unsigned int numPacketsToSend , B mss);
+    virtual void init(unsigned int numPacketsToSend, B mss);
 
     /**
      * Returns a string with the region stored.
@@ -99,7 +107,6 @@ class INET_API NdpSendQueue : public cObject
 
     virtual void ackArrived(unsigned int ackNum);
     virtual void nackArrived(unsigned int nackNum);
-
 
     /**
      * Utility function: returns how many bytes are available in the queue, from

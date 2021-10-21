@@ -1,4 +1,3 @@
-
 #include "inet/common/TimeTag_m.h"
 
 #include "NdpSendQueue.h"
@@ -8,15 +7,18 @@ namespace ndp {
 
 Register_Class(NdpSendQueue);
 
-NdpSendQueue::NdpSendQueue() {
+NdpSendQueue::NdpSendQueue()
+{
 }
 
-NdpSendQueue::~NdpSendQueue() {
+NdpSendQueue::~NdpSendQueue()
+{
     dataToSendQueue.clear();
     sentDataQueue.clear();
 }
 
-void NdpSendQueue::init(unsigned int numPacketsToSend, B mss) {
+void NdpSendQueue::init(unsigned int numPacketsToSend, B mss)
+{
     // filling the dataToSendQueue queue with (random data) packets based on the numPacketsToSend value that the application passes
     // TODO: I would update this to get  bytes stream from the application then packetise this data at the transport layer
     EV_INFO << "\ngenerateSymbolsList " << "\n";
@@ -34,13 +36,15 @@ void NdpSendQueue::init(unsigned int numPacketsToSend, B mss) {
     }
 }
 
-std::string NdpSendQueue::str() const {
+std::string NdpSendQueue::str() const
+{
     std::stringstream out;
     out << "[" << begin << ".." << end << ")" << dataToSendQueue;
     return out.str();
 }
 
-void NdpSendQueue::enqueueAppData(Packet *msg) {
+void NdpSendQueue::enqueueAppData(Packet *msg)
+{
     auto &appmsg = msg->removeAtFront<GenericAppMsgNdp>();
     appmsg->setSequenceNumber(0);
     msg->insertAtFront(appmsg);
@@ -51,26 +55,26 @@ void NdpSendQueue::enqueueAppData(Packet *msg) {
     delete msg;
 }
 
-uint32 NdpSendQueue::getBufferStartSeq() {
+uint32 NdpSendQueue::getBufferStartSeq()
+{
     return begin;
 }
 
-uint32 NdpSendQueue::getBufferEndSeq() {
+uint32 NdpSendQueue::getBufferEndSeq()
+{
     return end;
 }
 
-const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader() { //TODO
-    EV_INFO << "\n\n\nDATA QUEUE LENGTH :" << dataToSendQueue.getLength()
-                   << std::endl;
+const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader()
+{ //TODO
+    EV_INFO << "\n\n\nDATA QUEUE LENGTH :" << dataToSendQueue.getLength() << std::endl;
     if (dataToSendQueue.getLength() > 0) {
         const auto &ndpseg = makeShared<NdpHeader>();
         Packet *queuePacket = check_and_cast<Packet*>(dataToSendQueue.pop());
         auto &appmsg = queuePacket->removeAtFront<GenericAppMsgNdp>();
         appmsg->setChunkLength(B(1453));
-        EV_INFO << "\nData Sequence Number :" << appmsg->getSequenceNumber()
-                       << std::endl;
-        std::string packetName = "DATAPKT-"
-                + std::to_string(appmsg->getSequenceNumber());
+        EV_INFO << "\nData Sequence Number :" << appmsg->getSequenceNumber() << std::endl;
+        std::string packetName = "DATAPKT-" + std::to_string(appmsg->getSequenceNumber());
         Packet *packet = new Packet(packetName.c_str());
         packet->insertAtBack(appmsg);
         ndpseg->setDataSequenceNumber(appmsg->getSequenceNumber());
@@ -78,13 +82,15 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader() { //TODO
         sentDataQueue.insert(dupPacket);
         delete queuePacket;
         return std::make_tuple(ndpseg, packet);
-    } else {
+    }
+    else {
         EV_INFO << " Nothing to send !! \n";
         return std::make_tuple(nullptr, nullptr);
     }
 }
 
-void NdpSendQueue::moveFrontDataQueue(unsigned int sequenceNumber) {
+void NdpSendQueue::moveFrontDataQueue(unsigned int sequenceNumber)
+{
     std::string packetName = "NACK DATAPKT-" + std::to_string(sequenceNumber);
     const auto &payload = makeShared<GenericAppMsgNdp>();
     Packet *newPacket = new Packet(packetName.c_str());
@@ -93,13 +99,15 @@ void NdpSendQueue::moveFrontDataQueue(unsigned int sequenceNumber) {
     newPacket->insertAtBack(payload);
     if (dataToSendQueue.getLength() > 0) {
         dataToSendQueue.insertBefore(dataToSendQueue.front(), newPacket);
-    } else {
+    }
+    else {
         dataToSendQueue.insert(newPacket);
     }
 
 }
 
-void NdpSendQueue::ackArrived(unsigned int ackNum) {
+void NdpSendQueue::ackArrived(unsigned int ackNum)
+{
     EV_INFO << "\n ackArrived: " << ackNum << "\n";
     for (int i = 0; i <= sentDataQueue.getLength(); i++) {
         Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
@@ -112,7 +120,8 @@ void NdpSendQueue::ackArrived(unsigned int ackNum) {
     }
 }
 
-void NdpSendQueue::nackArrived(unsigned int nackNum) {
+void NdpSendQueue::nackArrived(unsigned int nackNum)
+{
     bool found = false;
     for (int i = 0; i <= sentDataQueue.getLength(); i++) {
         Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
@@ -125,7 +134,7 @@ void NdpSendQueue::nackArrived(unsigned int nackNum) {
             break;
         }
     }
-    assert(found==false);
+    assert(found == false);
 }
 
 }            // namespace ndp
