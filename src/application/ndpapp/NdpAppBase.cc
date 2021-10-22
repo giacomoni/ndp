@@ -17,7 +17,6 @@ void NdpAppBase::initialize(int stage)
         socket.bind(*localAddress ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
         socket.setCallback(this);
         socket.setOutputGate(gate("socketOut"));
-        setStatusString("Sender ready ...");
     }
 }
 
@@ -57,7 +56,6 @@ void NdpAppBase::connect()
     else {
         EV_INFO << "Connecting to " << connectAddress << "(" << destination << ") port=" << connectPort << endl;
 
-        setStatusString("connecting");
         socket.connect(localAddress, destination, connectPort, numPacketsToSend);
         EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination << ") port=" << connectPort << endl;
     }
@@ -65,23 +63,15 @@ void NdpAppBase::connect()
 
 void NdpAppBase::close()
 {
-    setStatusString("closing");
     EV_INFO << "issuing CLOSE command\n";
     socket.close();
-}
-
-void NdpAppBase::setStatusString(const char *s)
-{
-    if (hasGUI())
-        getDisplayString().setTagArg("t", 0, s);
 }
 
 void NdpAppBase::socketEstablished(NdpSocket*)
 {
 
     // *redefine* to perform or schedule first sending
-    EV_INFO << "\nconnected\n";
-    setStatusString("Established");
+    EV_INFO << "connected" << endl;
 }
 
 void NdpAppBase::socketDataArrived(NdpSocket*, Packet *msg, bool)
@@ -99,14 +89,12 @@ void NdpAppBase::socketClosed(NdpSocket*)
 {
     // *redefine* to start another session etc.
     EV_INFO << "connection closed\n";
-    setStatusString("closed");
 }
 
 void NdpAppBase::socketFailure(NdpSocket*, int code)
 {
     // subclasses may override this function, and add code try to reconnect after a delay.
     EV_WARN << "connection broken\n";
-    setStatusString("broken");
 }
 
 void NdpAppBase::finish()

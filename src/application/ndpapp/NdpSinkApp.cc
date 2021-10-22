@@ -50,6 +50,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
         EV_INFO << "NDP_I_PEER_CLOSED message arrived - end of NDP connection" << endl;
         tEndAdded = simTime();
+
         NdpCommand *controlInfo = check_and_cast<NdpCommand*>(msg->getControlInfo());
         numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
         std::string mod = "FatTreeNdp.centralSchedulerNdp";
@@ -69,8 +70,14 @@ void NdpSinkApp::handleMessage(cMessage *msg)
         emit(rcvdPkSignalNDP, packet);
         // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
         if (firstDataReceived == true) {
-            tStartAdded = simTime();
+            tStartAdded = packet->getTag<CreationTimeTag>()->getCreationTime();
             firstDataReceived = false;
+        }
+        else{
+            simtime_t startTime = packet->getTag<CreationTimeTag>()->getCreationTime();
+            if(startTime < tStartAdded){
+                tStartAdded = startTime;
+            }
         }
         EV_INFO << "bytesRcvd  " << bytesRcvd << " " << this->getFullPath() << std::endl;
     }

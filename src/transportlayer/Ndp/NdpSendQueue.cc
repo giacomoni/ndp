@@ -29,10 +29,9 @@ void NdpSendQueue::init(int numPacketsToSend, B mss)
         Packet *packet = new Packet(packetName.c_str());
         payload->setSequenceNumber(i);
         payload->setChunkLength(mss);
-        payload->addTag<CreationTimeTag>()->setCreationTime(simTime());
         packet->insertAtBack(payload);
         dataToSendQueue.insert(packet);
-        EV_INFO << "\nSQN: " << i << " msgName " << packet->str() << "\n";
+        EV_INFO << "SQN: " << i << " msgName " << packet->str() << endl;
     }
 }
 
@@ -70,10 +69,11 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader()
         Packet *dupPacket = packet->dup();
         sentDataQueue.insert(dupPacket);
         delete queuePacket;
+        ndpseg->addTag<CreationTimeTag>()->setCreationTime(simTime());
         return std::make_tuple(ndpseg, packet);
     }
     else {
-        EV_INFO << " Nothing to send !! \n";
+        EV_WARN << " Nothing to send at NdpSendQueue!" << endl;
         return std::make_tuple(nullptr, nullptr);
     }
 }

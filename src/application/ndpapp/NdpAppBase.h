@@ -35,7 +35,6 @@ protected:
     virtual void connect();
     // Closes the socket.
     virtual void close();
-    virtual void setStatusString(const char *s);
 
     /* NdpSocket::ICallback callback methods */
     virtual void handleTimer(cMessage *msg) = 0;

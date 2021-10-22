@@ -1,7 +1,7 @@
 #include <string.h>
 
 #include <inet/applications/common/SocketTag_m.h>
-
+#include <inet/common/TimeTag_m.h>
 #include "Ndp.h"
 #include "NdpAlgorithm.h"
 #include "NdpConnection.h"
@@ -189,8 +189,10 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             // %%%%%%%%%%%%%%%%%%%%%%%%%  4  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
             //  send any received Packet to the app
-            Ptr<Chunk> msgRx;
-            msgRx = packet->removeAll(); // each segment has just one packet
+            auto tag = ndpseg->getTag(0);
+            const CreationTimeTag *timeTag = dynamic_cast<const CreationTimeTag *>(tag);
+            packet->setFrontOffset(B(0));
+            packet->setBackOffset(B(1500));
             if (state->connFinished == false) {
                 EV_INFO << "Sending Data Packet to Application" << endl;
                 // buffer the received Packet segment
@@ -198,12 +200,13 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 itR = receivedPacketsList.begin();
                 std::advance(itR, seqNo); // increment the iterator by esi
                 // MOH: Send any received Packet to the app, just for now to test the Incast example, this shouldn't be the normal case
-                Packet *newPacket = new Packet("ReceivedPacket", msgRx);
+                Packet *newPacket = packet->dup();
+                newPacket->addTag<CreationTimeTag>()->setCreationTime(timeTag->getCreationTime());
                 PacketsToSend receivedPkts;
                 receivedPkts.pktId = seqNo;
                 receivedPkts.msg = newPacket;
                 receivedPacketsList.push_back(receivedPkts);
-                newPacket->setKind(NDP_I_DATA); // TBD currently we never send TCP_I_URGENT_DATA
+                newPacket->setKind(NDP_I_DATA); // TBD currently we never send NDP_I_URGENT_DATA
                 newPacket->addTag<SocketInd>()->setSocketId(socketId);
                 sendToApp(newPacket);
             }

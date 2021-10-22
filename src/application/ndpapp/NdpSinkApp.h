@@ -2,9 +2,12 @@
 #define __INET_NdpSinkApp_H
 
 #include <inet/common/INETDefs.h>
+#include <inet/common/TimeTag_m.h>
 #include <inet/common/lifecycle/LifecycleOperation.h>
 #include <inet/common/lifecycle/ILifecycle.h>
+#include <inet/networklayer/ipv4/Ipv4Header_m.h>
 
+#include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 #include "../../transportlayer/contract/ndp/NdpSocket.h"
 namespace inet {
 

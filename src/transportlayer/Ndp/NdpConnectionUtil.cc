@@ -11,6 +11,7 @@
 #include <inet/networklayer/common/L3AddressTag_m.h>
 #include <inet/networklayer/common/HopLimitTag_m.h>
 #include <inet/common/Protocol.h>
+#include <inet/common/TimeTag_m.h>
 
 #include "NdpAlgorithm.h"
 #include "NdpConnection.h"

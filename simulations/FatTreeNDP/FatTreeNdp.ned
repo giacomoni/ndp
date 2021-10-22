@@ -56,7 +56,6 @@ network FatTreeNdp
 
         }
 
-
         visualizer: <default("IntegratedCanvasVisualizer")> like IIntegratedVisualizer if hasVisualizer() {
             @display("p=305.665,67.625`");
         }

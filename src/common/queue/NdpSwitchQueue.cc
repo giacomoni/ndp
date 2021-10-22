@@ -120,7 +120,7 @@ void NdpSwitchQueue::pushPacket(Packet *packet, cGate *gate)
 {
     Enter_Method("pushPacket");
     emit(packetPushedSignal, packet);
-    EV_INFO << "\nPACKET STRING" << packet->str() << std::endl;
+    EV_INFO << "PACKET STRING" << packet->str() << endl;
     EV_INFO << "Pushing packet " << packet->getName() << " into the queue." << endl;
     const auto& ipv4Datagram = packet->peekAtFront<Ipv4Header>();
     const auto& ndpHeaderPeek = packet->peekDataAt<ndp::NdpHeader>(ipv4Datagram->getChunkLength());
@@ -157,9 +157,9 @@ void NdpSwitchQueue::pushPacket(Packet *packet, cGate *gate)
 
             unsigned short srcPort = ndpHeader->getSrcPort();
             unsigned short destPort = ndpHeader->getDestPort();
-            EV << "   hhh   " << srcPort << "\n\n\n\n";
-            EV << "   hhh   " << destPort << "\n\n\n\n";
-            EV << "   hhh   " << ndpHeader->getFullName() << "\n\n\n\n";
+            EV << "NdpSwitchQueue srcPort:" << srcPort << endl;
+            EV << "NdpSwitchQueue destPort:" << destPort << endl;
+            EV << "NdpSwitchQueue Header Full Name:" << ndpHeader->getFullName() << endl;
         }
         packet->insertAtFront(ndpHeader);
         ipv4Header->setTotalLengthField(ipv4Header->getChunkLength() + packet->getDataLength());
