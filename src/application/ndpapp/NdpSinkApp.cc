@@ -1,10 +1,10 @@
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/common/lifecycle/NodeStatus.h"
-#include "inet/common/packet/Message.h"
-#include "inet/common/ResultFilters.h"
+#include <inet/common/lifecycle/ModuleOperations.h>
+#include <inet/networklayer/common/L3AddressResolver.h>
+#include <inet/common/ModuleAccess.h>
+#include <inet/common/ProtocolTag_m.h>
+#include <inet/common/lifecycle/NodeStatus.h>
+#include <inet/common/packet/Message.h>
+#include <inet/common/ResultFilters.h>
 
 #include "../../transportlayer/contract/ndp/NdpCommand_m.h"
 #include "../../transportlayer/contract/ndp/NdpCommand_m.h"
@@ -31,7 +31,6 @@ void NdpSinkApp::initialize(int stage)
         WATCH(bytesRcvd);
     }
     else if (stage == INITSTAGE_APPLICATION_LAYER) {
-        timeoutMsg = new cMessage("timer");
         bool isOperational;
         NodeStatus *nodeStatus = dynamic_cast<NodeStatus*>(findContainingNode(this)->getSubmodule("status"));
         isOperational = (!nodeStatus) || nodeStatus->getState() == NodeStatus::UP;
@@ -42,8 +41,6 @@ void NdpSinkApp::initialize(int stage)
         socket.setOutputGate(gate("socketOut"));
         socket.bind(localAddress[0] ? L3AddressResolver().resolve(localAddress) : L3Address(), localPort);
         socket.listen();
-        timeoutMsg->setKind(SEND_INIT_REQUEST_TO_READ);
-        scheduleAt(simTime(), timeoutMsg);
     }
 }
 

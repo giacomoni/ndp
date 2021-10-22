@@ -20,18 +20,18 @@
 #include <map>
 #include <set>
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/lifecycle/OperationalBase.h"
-#include "inet/common/packet/Message.h"
-#include "inet/networklayer/contract/IArp.h"
-#include "inet/networklayer/contract/INetfilter.h"
-#include "inet/networklayer/contract/INetworkProtocol.h"
-#include "inet/networklayer/ipv4/Icmp.h"
-#include "inet/networklayer/ipv4/Ipv4FragBuf.h"
-#include "inet/networklayer/ipv4/Ipv4FragBuf.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/IProtocolRegistrationListener.h>
+#include <inet/common/lifecycle/ModuleOperations.h>
+#include <inet/common/lifecycle/OperationalBase.h>
+#include <inet/common/packet/Message.h>
+#include <inet/networklayer/contract/IArp.h>
+#include <inet/networklayer/contract/INetfilter.h>
+#include <inet/networklayer/contract/INetworkProtocol.h>
+#include <inet/networklayer/ipv4/Icmp.h>
+#include <inet/networklayer/ipv4/Ipv4FragBuf.h>
+#include <inet/networklayer/ipv4/Ipv4FragBuf.h>
+#include <inet/networklayer/ipv4/Ipv4Header_m.h>
 
 namespace inet {
 

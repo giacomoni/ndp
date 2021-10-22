@@ -125,8 +125,6 @@ bool NdpConnection::processAppCommand(cMessage *msg) {
     case NDP_E_OPEN_PASSIVE:
         process_OPEN_PASSIVE(event, ndpCommand, msg);
         break;
-    case NDP_E_CLOSE:
-        break;
 
     default:
         throw cRuntimeError(ndpMain, "wrong event code");
@@ -143,12 +141,6 @@ NdpEventCode NdpConnection::preanalyseAppCommandEvent(int commandCode) {
 
     case NDP_C_OPEN_PASSIVE:
         return NDP_E_OPEN_PASSIVE;
-
-    case NDP_C_SEND:
-        return NDP_E_SEND;
-
-    case NDP_C_CLOSE:
-        return NDP_E_CLOSE;
 
     default:
         throw cRuntimeError(ndpMain, "Unknown message kind in app command");
@@ -193,18 +185,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
             FSM_Goto(fsm, NDP_S_SYN_SENT);
             break;
 
-        case NDP_E_SEND:
-            FSM_Goto(fsm, NDP_S_SYN_SENT);
-            break;
-
-        case NDP_E_CLOSE:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
         case NDP_E_RCV_SYN:
             FSM_Goto(fsm, NDP_S_SYN_RCVD);
             break;
@@ -216,29 +196,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
 
     case NDP_S_SYN_RCVD:
         switch (event) {
-        case NDP_E_CLOSE:
-            FSM_Goto(fsm, NDP_S_FIN_WAIT_1);
-            break;
-
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, state->active ? NDP_S_CLOSED : NDP_S_LISTEN);
-            break;
-
-        case NDP_E_RCV_ACK:
-            FSM_Goto(fsm, NDP_S_ESTABLISHED);
-            break;
-
-        case NDP_E_RCV_FIN:
-            FSM_Goto(fsm, NDP_S_CLOSE_WAIT);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
 
         default:
             break;
@@ -247,21 +204,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
 
     case NDP_S_SYN_SENT:
         switch (event) {
-        case NDP_E_CLOSE:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_SYN_ACK:
-            FSM_Goto(fsm, NDP_S_ESTABLISHED);
-            break;
 
         case NDP_E_RCV_SYN:
             FSM_Goto(fsm, NDP_S_SYN_RCVD);
@@ -274,167 +216,6 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
 
     case NDP_S_ESTABLISHED:
         switch (event) {
-        case NDP_E_CLOSE:
-            FSM_Goto(fsm, NDP_S_FIN_WAIT_1);
-            break;
-
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_FIN:
-            FSM_Goto(fsm, NDP_S_CLOSE_WAIT);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_CLOSE_WAIT:
-        switch (event) {
-        case NDP_E_CLOSE:
-            FSM_Goto(fsm, NDP_S_LAST_ACK);
-            break;
-
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_LAST_ACK:
-        switch (event) {
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_ACK:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_FIN_WAIT_1:
-        switch (event) {
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_FIN:
-            FSM_Goto(fsm, NDP_S_CLOSING);
-            break;
-
-        case NDP_E_RCV_ACK:
-            FSM_Goto(fsm, NDP_S_FIN_WAIT_2);
-            break;
-
-        case NDP_E_RCV_FIN_ACK:
-            FSM_Goto(fsm, NDP_S_TIME_WAIT);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_FIN_WAIT_2:
-        switch (event) {
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_FIN:
-            FSM_Goto(fsm, NDP_S_TIME_WAIT);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_CLOSING:
-        switch (event) {
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_ACK:
-            FSM_Goto(fsm, NDP_S_TIME_WAIT);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_TIME_WAIT:
-        switch (event) {
-        case NDP_E_ABORT:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_RST:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
-
-        case NDP_E_RCV_UNEXP_SYN:
-            FSM_Goto(fsm, NDP_S_CLOSED);
-            break;
 
         default:
             break;
@@ -484,24 +265,8 @@ void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
         // NDP_I_ESTAB notification moved inside event processing
         break;
 
-    case NDP_S_CLOSE_WAIT:
-    case NDP_S_LAST_ACK:
-    case NDP_S_FIN_WAIT_1:
-    case NDP_S_FIN_WAIT_2:
-    case NDP_S_CLOSING:
-        if (state == NDP_S_CLOSE_WAIT)
-            sendIndicationToApp (NDP_I_PEER_CLOSED);
-        // whether connection setup succeeded (ESTABLISHED) or not (others),
-        // cancel these timers
-        break;
-
-    case NDP_S_TIME_WAIT:
-        sendIndicationToApp (NDP_I_CLOSED);
-        break;
-
     case NDP_S_CLOSED:
-        if (oldState != NDP_S_TIME_WAIT && event != NDP_E_ABORT)
-            sendIndicationToApp(NDP_I_CLOSED);
+        sendIndicationToApp(NDP_I_CLOSED);
         // all timers need to be cancelled
         ndpAlgorithm->connectionClosed();
         break;

@@ -19,7 +19,7 @@
 #ifndef __INET_NdpAlgorithm_H
 #define __INET_NdpAlgorithm_H
 
-#include "inet/common/INETDefs.h"
+#include <inet/common/INETDefs.h>
 
 #include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"
 #include "../../transportlayer/Ndp/NdpConnection.h"

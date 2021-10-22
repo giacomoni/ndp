@@ -13,13 +13,13 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/Simsignals.h"
-#include "inet/queueing/function/PacketComparatorFunction.h"
-#include "inet/queueing/function/PacketDropperFunction.h"
-#include "inet/networklayer/ipv4/Ipv4Header_m.h"
-#include "inet/queueing/base/PacketQueueBase.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/ModuleAccess.h>
+#include <inet/common/Simsignals.h>
+#include <inet/queueing/function/PacketComparatorFunction.h>
+#include <inet/queueing/function/PacketDropperFunction.h>
+#include <inet/networklayer/ipv4/Ipv4Header_m.h>
+#include <inet/queueing/base/PacketQueueBase.h>
 
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 #include "../../transportlayer/Ndp/ndp_common/NdpHeader.h"

@@ -22,11 +22,11 @@
 #include <map>
 #include <set>
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/networklayer/common/L3Address.h"
-#include "inet/transportlayer/base/TransportProtocolBase.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/lifecycle/ModuleOperations.h>
+#include <inet/common/packet/Packet.h>
+#include <inet/networklayer/common/L3Address.h>
+#include <inet/transportlayer/base/TransportProtocolBase.h>
 
 #include "../contract/ndp/NdpCommand_m.h"
 #include "ndp_common/NdpHeader.h"

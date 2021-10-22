@@ -16,7 +16,7 @@
 #ifndef NETWORKLAYER_IPV4_IPV4NETWORKLAYERECMP_H_
 #define NETWORKLAYER_IPV4_IPV4NETWORKLAYERECMP_H_
 
-#include "inet/common/INETDefs.h"
+#include <inet/common/INETDefs.h>
 
 namespace inet {
 

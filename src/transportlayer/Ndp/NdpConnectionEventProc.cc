@@ -36,7 +36,7 @@ void NdpConnection::process_OPEN_ACTIVE(NdpEventCode &event, NdpCommand *ndpComm
                 localPort = ndpMain->getEphemeralPort();
                 EV_DETAIL << "Assigned ephemeral port " << localPort << "\n";
             }
-            EV_DETAIL << "\nprocess_OPEN_ACTIVE OPEN: " << localAddr << ":" << localPort << " --> " << remoteAddr << ":" << remotePort << "\n";
+            EV_DETAIL << "process_OPEN_ACTIVE OPEN: " << localAddr << ":" << localPort << " --> " << remoteAddr << ":" << remotePort << endl;
             ndpMain->addSockPair(this, localAddr, remoteAddr, localPort, remotePort);
             sendEstabIndicationToApp();
             sendQueue->init(state->numPacketsToSend, B(1460)); //added B

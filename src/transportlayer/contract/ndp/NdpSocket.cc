@@ -1,10 +1,10 @@
+
+#include <inet/common/packet/Message.h>
+#include <inet/common/ProtocolTag_m.h>
+#include <inet/applications/common/SocketTag_m.h>
+#include <inet/common/Protocol.h>
+
 #include "NdpSocket.h"
-
-#include "inet/common/packet/Message.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/applications/common/SocketTag_m.h"
-#include "inet/common/Protocol.h"
-
 namespace inet {
 
 NdpSocket::NdpSocket()

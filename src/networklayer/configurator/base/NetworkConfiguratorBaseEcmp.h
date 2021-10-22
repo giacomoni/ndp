@@ -18,13 +18,14 @@
 
 #include <algorithm>
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/INETMath.h"
-#include "inet/common/PatternMatcher.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/INETMath.h>
+#include <inet/common/PatternMatcher.h>
+#include <inet/networklayer/common/L3AddressResolver.h>
+#include <inet/networklayer/contract/IInterfaceTable.h>
+#include <inet/networklayer/contract/IRoutingTable.h>
+
 #include "../../../common/TopologyEcmp.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/networklayer/contract/IInterfaceTable.h"
-#include "inet/networklayer/contract/IRoutingTable.h"
 
 namespace inet {
 

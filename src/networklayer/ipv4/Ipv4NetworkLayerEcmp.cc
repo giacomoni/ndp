@@ -13,7 +13,7 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "inet/common/StringFormat.h"
+#include <inet/common/StringFormat.h>
 #include "Ipv4NetworkLayerEcmp.h"
 
 namespace inet {

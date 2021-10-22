@@ -1,9 +1,9 @@
 #ifndef __INET_NdpBasicClientApp_H
 #define __INET_NdpBasicClientApp_H
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/lifecycle/NodeStatus.h"
-#include "inet/common/lifecycle/ILifecycle.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/lifecycle/NodeStatus.h>
+#include <inet/common/lifecycle/ILifecycle.h>
 #include "NdpAppBase.h"
 
 namespace inet {

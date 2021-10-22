@@ -20,28 +20,25 @@
 
 #include <set>
 
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/common/XMLUtils.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/common/packet/chunk/ByteCountChunk.h"
-#include "inet/common/stlutils.h"
-#include "inet/networklayer/common/InterfaceEntry.h"
+#include <inet/common/ModuleAccess.h>
+#include <inet/common/ProtocolTag_m.h>
+#include <inet/common/XMLUtils.h>
+#include <inet/common/packet/Packet.h>
+#include <inet/common/packet/chunk/ByteCountChunk.h>
+#include <inet/common/stlutils.h>
+#include <inet/networklayer/common/InterfaceEntry.h>
+#include <inet/linklayer/ieee80211/mib/Ieee80211Mib.h>
+#include <inet/physicallayer/base/packetlevel/FlatReceiverBase.h>
+#include <inet/physicallayer/base/packetlevel/FlatTransmitterBase.h>
+#include <inet/physicallayer/common/packetlevel/Interference.h>
+#include <inet/physicallayer/common/packetlevel/Radio.h>
+#include <inet/physicallayer/common/packetlevel/ReceptionDecision.h>
+#include <inet/physicallayer/contract/packetlevel/IRadio.h>
+#include <inet/physicallayer/contract/packetlevel/IRadioMedium.h>
+#include <inet/physicallayer/contract/packetlevel/SignalTag_m.h>
+#include <inet/physicallayer/unitdisk/UnitDiskPhyHeader_m.h>
+
 #include "NetworkConfiguratorBaseEcmp.h"
-
-#include "inet/linklayer/ieee80211/mib/Ieee80211Mib.h"
-
-#include "inet/physicallayer/base/packetlevel/FlatReceiverBase.h"
-#include "inet/physicallayer/base/packetlevel/FlatTransmitterBase.h"
-#include "inet/physicallayer/common/packetlevel/Interference.h"
-#include "inet/physicallayer/common/packetlevel/Radio.h"
-#include "inet/physicallayer/common/packetlevel/ReceptionDecision.h"
-#include "inet/physicallayer/contract/packetlevel/IRadio.h"
-#include "inet/physicallayer/contract/packetlevel/IRadioMedium.h"
-#include "inet/physicallayer/contract/packetlevel/SignalTag_m.h"
-
-#include "inet/physicallayer/unitdisk/UnitDiskPhyHeader_m.h"
-
 namespace inet {
 
 using namespace inet::physicallayer;

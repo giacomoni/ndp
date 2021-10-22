@@ -1,9 +1,9 @@
 #ifndef __INET_NdpConnection_H
 #define __INET_NdpConnection_H
 
-#include "inet/common/INETDefs.h"
-#include "inet/networklayer/common/L3Address.h"
-#include "inet/common/packet/ChunkQueue.h"
+#include <inet/common/INETDefs.h>
+#include <inet/networklayer/common/L3Address.h>
+#include <inet/common/packet/ChunkQueue.h>
 #include <queue>
 
 #include "ndp_common/NdpHeader.h"
@@ -22,18 +22,7 @@ class NdpAlgorithm;
 
 enum NdpState
 {
-    NDP_S_INIT = 0,
-    NDP_S_CLOSED = FSM_Steady(1),
-    NDP_S_LISTEN = FSM_Steady(2),
-    NDP_S_SYN_SENT = FSM_Steady(3),
-    NDP_S_SYN_RCVD = FSM_Steady(4),
-    NDP_S_ESTABLISHED = FSM_Steady(5),
-    NDP_S_CLOSE_WAIT = FSM_Steady(6),
-    NDP_S_LAST_ACK = FSM_Steady(7),
-    NDP_S_FIN_WAIT_1 = FSM_Steady(8),
-    NDP_S_FIN_WAIT_2 = FSM_Steady(9),
-    NDP_S_CLOSING = FSM_Steady(10),
-    NDP_S_TIME_WAIT = FSM_Steady(11)
+    NDP_S_INIT = 0, NDP_S_CLOSED = FSM_Steady(1), NDP_S_LISTEN = FSM_Steady(2), NDP_S_SYN_SENT = FSM_Steady(3), NDP_S_SYN_RCVD = FSM_Steady(4), NDP_S_ESTABLISHED = FSM_Steady(5),
 };
 
 //
@@ -45,29 +34,10 @@ enum NdpEventCode
     NDP_E_IGNORE,
 
     // app commands
-    // (Note: no RECEIVE command, data are automatically passed up)
     NDP_E_OPEN_ACTIVE,
     NDP_E_OPEN_PASSIVE,
-    NDP_E_SEND,
-    NDP_E_CLOSE,
-    NDP_E_ABORT,
-    NDP_E_DESTROY,
-    NDP_E_STATUS,
-    NDP_E_READ,
-
-    // TPDU types
     NDP_E_RCV_DATA,
-    NDP_E_RCV_ACK,
     NDP_E_RCV_SYN,
-    NDP_E_RCV_SYN_ACK,
-    NDP_E_RCV_FIN,
-    NDP_E_RCV_FIN_ACK,
-    NDP_E_RCV_RST,    // covers RST+ACK too
-
-    NDP_E_RCV_UNEXP_SYN,    // unexpected SYN
-
-// All other timers (REXMT, PERSIST, DELAYED-ACK, KEEP-ALIVE, etc.),
-// are handled in NdpAlgorithm.
 };
 
 /**
@@ -109,9 +79,6 @@ public:
     int numberReceivedPackets;
     int numberSentPackets;
 
-    int request_rexmit_count; // number of SYN/SYN+ACK retransmissions (=1 after first rexmit)
-
-    simtime_t request_rexmit_timeout;  // current request retransmission timeout
     bool connNotAddedYet;
     bool isfinalReceivedPrintedOut;
 };
@@ -236,11 +203,6 @@ public:
     virtual void sendNackNdp(unsigned int nackNum); // MOH: HAS BEEN ADDED
     virtual void sendInitialWindow();
 
-    /** Utility: sends RST; does not use connection state */
-    virtual void sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort, int destPort);
-    /** Utility: sends RST+ACK; does not use connection state */
-    virtual void sendRstAck(uint32 seq, uint32 ack, L3Address src, L3Address dest, int srcPort, int destPort);
-
     /** Utility: adds control info to segment and sends it to IP */
     virtual void sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg);
     virtual void addRequestToPullsQueue();
@@ -291,7 +253,7 @@ public:
     }
     NdpConnection(const NdpConnection &other)
     {
-    }    //FIXME kludge
+    }
     void initialize()
     {
     }

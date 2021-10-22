@@ -25,8 +25,8 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "inet/common/PatternMatcher.h"
-#include "inet/common/stlutils.h"
+#include <inet/common/PatternMatcher.h>
+#include <inet/common/stlutils.h>
 
 namespace inet {
 

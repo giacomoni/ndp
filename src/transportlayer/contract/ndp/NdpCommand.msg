@@ -16,9 +16,6 @@ enum NdpCommandCode
     NDP_C_OPEN_ACTIVE = 1;   // active open (must carry ~NDPOpenCommand)
     NDP_C_OPEN_PASSIVE = 2;  // passive open (must carry ~NDPOpenCommand)
     NDP_C_ACCEPT = 3;
-    NDP_C_SEND = 4;          // send data (set on data packet)
-    NDP_C_CLOSE = 5;         // "I have no more data to send"
-    NDP_C_ABORT = 6;         // abort connection
 }
 
 //

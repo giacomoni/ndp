@@ -17,8 +17,8 @@
 #define TRANSPORTLAYER_COMMON_L4TOOLSNDP_H_
 
 
-#include "inet/common/ProtocolTools.h"
-#include "inet/transportlayer/contract/TransportHeaderBase_m.h"
+#include <inet/common/ProtocolTools.h>
+#include <inet/transportlayer/contract/TransportHeaderBase_m.h>
 
 namespace inet {
 

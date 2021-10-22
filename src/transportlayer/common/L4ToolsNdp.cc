@@ -13,23 +13,22 @@
 // along with this program.  If not, see http://www.gnu.org/licenses/.
 // 
 
-#include "inet/transportlayer/common/L4Tools.h"
-#include "inet/common/Protocol.h"
+#include <inet/transportlayer/common/L4Tools.h>
+#include <inet/common/Protocol.h>
 #ifdef WITH_TCP_COMMON
-#include "inet/transportlayer/tcp_common/TcpHeader.h"
-#include "../Ndp/ndp_common/NdpHeader.h"
+#include <inet/transportlayer/tcp_common/TcpHeader.h>
 #endif
 
 #ifdef WITH_UDP
-#include "inet/transportlayer/udp/UdpHeader_m.h"
+#include <inet/transportlayer/udp/UdpHeader_m.h>
 #endif
-
-#include "../Ndp/ndp_common/NdpHeader_m.h"
 
 #ifdef WITH_SCTP
 //TODO
 #endif
 
+#include "../Ndp/ndp_common/NdpHeader_m.h"
+#include "../Ndp/ndp_common/NdpHeader.h"
 namespace inet {
 
 bool isTransportProtocol(const Protocol& protocol)

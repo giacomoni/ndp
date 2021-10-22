@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for $(LIB_PREFIX)ndp
 #
 # This file was generated with the command:
-#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -KNDP_PROJ=.. -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
+#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -66,7 +66,6 @@ SMFILES =
 
 # Other makefile variables (-K)
 INET4_PROJ=../../inet4
-NDP_PROJ=..
 
 #------------------------------------------------------------------------------
 

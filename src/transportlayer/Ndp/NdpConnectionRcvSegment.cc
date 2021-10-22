@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include "inet/applications/common/SocketTag_m.h"
+#include <inet/applications/common/SocketTag_m.h>
 
 #include "Ndp.h"
 #include "NdpAlgorithm.h"
@@ -10,13 +10,6 @@
 #include "ndp_common/NdpHeader.h"
 #include "../contract/ndp/NdpCommand_m.h"
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
-//Preprocessor directives
-//  #define  ShowOut
-#ifdef ShowOut
-#define MY_COUT std::cout
-#else
-#define MY_COUT if(false) std::cout
-#endif
 
 namespace inet {
 namespace ndp {
@@ -100,7 +93,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         sendQueue->ackArrived(ndpseg->getAckNo());
     }
 
-        // (S.3)  at the sender: PULL pkt arrived, this pkt triggers either retransmission of trimmed pkt or sending a new data pkt.
+    // (S.3)  at the sender: PULL pkt arrived, this pkt triggers either retransmission of trimmed pkt or sending a new data pkt.
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // ££££££££££££££££££££££££ REQUEST Arrived at the sender £££££££££££££££
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
@@ -189,7 +182,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 getNDPMain()->requestCONNMap[getNDPMain()->connIndex] = this; // moh added
                 ++getNDPMain()->connIndex;
                 state->connNotAddedYet = false;
-                EV << "sendFirstRequest. \n";
+                EV << "sendFirstRequest() " << endl;
                 getNDPMain()->sendFirstRequest();
             }
             // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -224,7 +217,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                     while (iter != receivedPacketsList.end()) {
                         iter++;
                     }
-
                     EV_INFO << " numRcvTrimmedHeader:    " << state->numRcvTrimmedHeader << endl;
                     EV_INFO << "CONNECTION FINISHED!" << endl;
                     sendIndicationToApp(NDP_I_PEER_CLOSED); // this is ok if the sinkApp is used by one conn
@@ -318,27 +310,11 @@ void NdpConnection::segmentArrivalWhileClosed(Packet *packet, const Ptr<const Nd
     EV_TRACE << "NdpConnection::segmentArrivalWhileClosed" << endl;
     EV_INFO << "Seg arrived: " << endl;
     printSegmentBrief(packet, ndpseg);
-
     // This segment doesn't belong to any connection, so this object
     // must be a temp object created solely for the purpose of calling us
-
     ASSERT(state == nullptr);
     EV_INFO << "Segment doesn't belong to any existing connection" << endl;
-
-    if (ndpseg->getRstBit()) {
-        EV_DETAIL << "RST bit set: dropping segment" << endl;
-        return;
-    }
-
-    if (!ndpseg->getAckBit()) {
-        EV_DETAIL << "ACK bit not set: sending RST+ACK" << endl;
-        uint32 ackNo = ndpseg->getDataSequenceNumber() + packet->getByteLength();
-        sendRstAck(0, ackNo, destAddr, srcAddr, ndpseg->getDestPort(), ndpseg->getSrcPort());
-    }
-    else {
-        EV_DETAIL << "ACK bit set: sending RST" << endl;
-        sendRst(ndpseg->getAckNo(), destAddr, srcAddr, ndpseg->getDestPort(), ndpseg->getSrcPort());
-    }
+    EV_FATAL << "NdpConnection::segmentArrivalWhileClosed should not be called!";
 }
 
 }    // namespace ndp

@@ -1,6 +1,6 @@
 #include "NdpAppBase.h"
 
-#include "inet/networklayer/common/L3AddressResolver.h"
+#include <inet/networklayer/common/L3AddressResolver.h>
 #include  "../../transportlayer/contract/ndp/NdpSocket.h"
 
 namespace inet {
@@ -9,10 +9,7 @@ void NdpAppBase::initialize(int stage)
 {
     EV_TRACE << "NdpAppBase::initialize stage " << stage;
     ApplicationBase::initialize(stage);
-    if (stage == INITSTAGE_LOCAL) {
-        numSessions = numBroken = packetsSent = packetsRcvd = bytesSent = bytesRcvd = 0;
-    }
-    else if (stage == INITSTAGE_APPLICATION_LAYER) {
+    if (stage == INITSTAGE_APPLICATION_LAYER) {
         // parameters
         const char *localAddress = par("localAddress");
         int localPort = par("localPort");
@@ -63,8 +60,6 @@ void NdpAppBase::connect()
         setStatusString("connecting");
         socket.connect(localAddress, destination, connectPort, numPacketsToSend);
         EV_INFO << "Connecting to mmmmm" << connectAddress << "(" << destination << ") port=" << connectPort << endl;
-
-        numSessions++;
     }
 }
 
@@ -92,8 +87,6 @@ void NdpAppBase::socketEstablished(NdpSocket*)
 void NdpAppBase::socketDataArrived(NdpSocket*, Packet *msg, bool)
 {
     // *redefine* to perform or schedule next sending
-    packetsRcvd++;
-    bytesRcvd += msg->getByteLength();
     delete msg;
 }
 
@@ -114,16 +107,11 @@ void NdpAppBase::socketFailure(NdpSocket*, int code)
     // subclasses may override this function, and add code try to reconnect after a delay.
     EV_WARN << "connection broken\n";
     setStatusString("broken");
-    numBroken++;
 }
 
 void NdpAppBase::finish()
 {
     std::string modulePath = getFullPath();
-    EV_INFO << modulePath << ": opened " << numSessions << " sessions\n";
-    EV_INFO << modulePath << ": sent " << bytesSent << " bytes in " << packetsSent << " packets\n";
-    EV_INFO << modulePath << ": received " << bytesRcvd << " bytes in " << packetsRcvd << " packets\n";
-
 }
 
 } // namespace inet

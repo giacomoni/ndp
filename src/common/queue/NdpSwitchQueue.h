@@ -16,16 +16,16 @@
 #ifndef COMMON_QUEUE_NDPSWITCHQUEUE_H_
 #define COMMON_QUEUE_NDPSWITCHQUEUE_H_
 
-#include "inet/queueing/base/PacketQueueBase.h"
-#include "inet/queueing/contract/IPacketBuffer.h"
-#include "inet/queueing/contract/IPacketCollection.h"
-#include "inet/queueing/contract/IPassivePacketSink.h"
-#include "inet/queueing/contract/IPacketComparatorFunction.h"
-#include "inet/queueing/contract/IPacketDropperFunction.h"
-#include "inet/queueing/contract/IPassivePacketSource.h"
-#include "inet/queueing/contract/IActivePacketSink.h"
-#include "inet/queueing/contract/IActivePacketSource.h"
-#include "inet/common/INETDefs.h"
+#include <inet/queueing/base/PacketQueueBase.h>
+#include <inet/queueing/contract/IPacketBuffer.h>
+#include <inet/queueing/contract/IPacketCollection.h>
+#include <inet/queueing/contract/IPassivePacketSink.h>
+#include <inet/queueing/contract/IPacketComparatorFunction.h>
+#include <inet/queueing/contract/IPacketDropperFunction.h>
+#include <inet/queueing/contract/IPassivePacketSource.h>
+#include <inet/queueing/contract/IActivePacketSink.h>
+#include <inet/queueing/contract/IActivePacketSource.h>
+#include <inet/common/INETDefs.h>
 
 namespace inet {
 namespace queueing {

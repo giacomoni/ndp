@@ -16,7 +16,7 @@
 #ifndef COMMON_RESULTFILTERSTHROUGHPUT_H_
 #define COMMON_RESULTFILTERSTHROUGHPUT_H_
 
-#include "inet/common/INETDefs.h"
+#include <inet/common/INETDefs.h>
 
 namespace inet {
 

@@ -11,10 +11,10 @@
 #include <time.h>
 #include <fstream>
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/common/lifecycle/ILifecycle.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/ModuleAccess.h>
+#include <inet/networklayer/common/L3AddressResolver.h>
+#include <inet/common/lifecycle/ILifecycle.h>
 
 #include "../../application/ndpapp/NdpBasicClientApp.h"
 #include "../../application/ndpapp/NdpSinkApp.h"

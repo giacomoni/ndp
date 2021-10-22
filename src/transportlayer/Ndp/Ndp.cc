@@ -15,27 +15,27 @@
 // along with this program; if not, see <http://www.gnu.org/licenses/>.
 //
 
-#include "inet/applications/common/SocketTag_m.h"
-#include "inet/common/IProtocolRegistrationListener.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/ProtocolTag_m.h"
-#include "inet/common/checksum/TcpIpChecksum.h"
-#include "inet/common/lifecycle/LifecycleOperation.h"
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/lifecycle/NodeStatus.h"
-#include "inet/common/packet/Message.h"
-#include "inet/networklayer/common/EcnTag_m.h"
-#include "inet/networklayer/common/IpProtocolId_m.h"
-#include "inet/networklayer/common/L3AddressTag_m.h"
-#include "inet/common/Protocol.h"
-#include "inet/transportlayer/common/TransportPseudoHeader_m.h"
+#include <inet/applications/common/SocketTag_m.h>
+#include <inet/common/IProtocolRegistrationListener.h>
+#include <inet/common/ModuleAccess.h>
+#include <inet/common/ProtocolTag_m.h>
+#include <inet/common/checksum/TcpIpChecksum.h>
+#include <inet/common/lifecycle/LifecycleOperation.h>
+#include <inet/common/lifecycle/ModuleOperations.h>
+#include <inet/common/lifecycle/NodeStatus.h>
+#include <inet/common/packet/Message.h>
+#include <inet/networklayer/common/EcnTag_m.h>
+#include <inet/networklayer/common/IpProtocolId_m.h>
+#include <inet/networklayer/common/L3AddressTag_m.h>
+#include <inet/common/Protocol.h>
+#include <inet/transportlayer/common/TransportPseudoHeader_m.h>
 
 #ifdef WITH_IPv4
-#include "inet/networklayer/ipv4/IcmpHeader_m.h"
+#include <inet/networklayer/ipv4/IcmpHeader_m.h>
 #endif // ifdef WITH_IPv4
 
 #ifdef WITH_IPv6
-#include "inet/networklayer/icmpv6/Icmpv6Header_m.h"
+#include <inet/networklayer/icmpv6/Icmpv6Header_m.h>
 #endif // ifdef WITH_IPv6
 
 #define PACING_TIME 12  //    MTU/linkRate
@@ -385,7 +385,7 @@ void Ndp::refreshDisplay() const
         getDisplayString().setTagArg("t", 0, "");
         return;
     }
-    int numINIT = 0, numCLOSED = 0, numLISTEN = 0, numSYN_SENT = 0, numSYN_RCVD = 0, numESTABLISHED = 0, numCLOSE_WAIT = 0, numLAST_ACK = 0, numFIN_WAIT_1 = 0, numFIN_WAIT_2 = 0, numCLOSING = 0, numTIME_WAIT = 0;
+    int numINIT = 0, numCLOSED = 0, numLISTEN = 0, numSYN_SENT = 0, numSYN_RCVD = 0, numESTABLISHED = 0, numCLOSE_WAIT = 0, numLAST_ACK = 0, numCLOSING = 0;
 
     for (auto &elem : ndpAppConnMap) {
         int state = (elem).second->getFsmState();
@@ -414,26 +414,6 @@ void Ndp::refreshDisplay() const
             case NDP_S_ESTABLISHED:
                 numESTABLISHED++;
                 break;
-
-            case NDP_S_CLOSE_WAIT:
-                numCLOSE_WAIT++;
-                break;
-
-            case NDP_S_FIN_WAIT_1:
-                numFIN_WAIT_1++;
-                break;
-
-            case NDP_S_FIN_WAIT_2:
-                numFIN_WAIT_2++;
-                break;
-
-            case NDP_S_CLOSING:
-                numCLOSING++;
-                break;
-
-            case NDP_S_TIME_WAIT:
-                numTIME_WAIT++;
-                break;
         }
     }
 
@@ -456,14 +436,8 @@ void Ndp::refreshDisplay() const
         sprintf(buf2 + strlen(buf2), "close_wait:%d ", numCLOSE_WAIT);
     if (numLAST_ACK > 0)
         sprintf(buf2 + strlen(buf2), "last_ack:%d ", numLAST_ACK);
-    if (numFIN_WAIT_1 > 0)
-        sprintf(buf2 + strlen(buf2), "fin_wait_1:%d ", numFIN_WAIT_1);
-    if (numFIN_WAIT_2 > 0)
-        sprintf(buf2 + strlen(buf2), "fin_wait_2:%d ", numFIN_WAIT_2);
     if (numCLOSING > 0)
         sprintf(buf2 + strlen(buf2), "closing:%d ", numCLOSING);
-    if (numTIME_WAIT > 0)
-        sprintf(buf2 + strlen(buf2), "time_wait:%d ", numTIME_WAIT);
 
     getDisplayString().setTagArg("t", 0, buf2);
 }

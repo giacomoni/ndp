@@ -1,15 +1,14 @@
 #include <iostream>
 #include <random>
-#include "inet/common/lifecycle/ModuleOperations.h"
-#include "inet/common/ModuleAccess.h"
-#include "inet/common/TimeTag_m.h"
+#include <inet/common/lifecycle/ModuleOperations.h>
+#include <inet/common/ModuleAccess.h>
+#include <inet/common/TimeTag_m.h>
 
 #include "GenericAppMsgNdp_m.h"
 #include "NdpBasicClientApp.h"
 namespace inet {
 
 #define MSGKIND_CONNECT    0
-#define MSGKIND_SEND       1
 
 Define_Module(NdpBasicClientApp);
 

@@ -20,7 +20,7 @@
 
 #include <list>
 
-#include "inet/common/INETDefs.h"
+#include <inet/common/INETDefs.h>
 #include "NdpHeader_m.h"
 
 namespace inet {

@@ -1,16 +1,16 @@
 #include <string.h>
 #include <algorithm>
-#include "inet/networklayer/contract/IL3AddressType.h"
-#include "inet/networklayer/common/IpProtocolId_m.h"
-#include "inet/applications/common/SocketTag_m.h"
-#include "inet/common/INETUtils.h"
-#include "inet/common/packet/Message.h"
-#include "inet/networklayer/common/EcnTag_m.h"
-#include "inet/networklayer/common/IpProtocolId_m.h"
-#include "inet/networklayer/common/L3AddressResolver.h"
-#include "inet/networklayer/common/L3AddressTag_m.h"
-#include "inet/networklayer/common/HopLimitTag_m.h"
-#include "inet/common/Protocol.h"
+#include <inet/networklayer/contract/IL3AddressType.h>
+#include <inet/networklayer/common/IpProtocolId_m.h>
+#include <inet/applications/common/SocketTag_m.h>
+#include <inet/common/INETUtils.h>
+#include <inet/common/packet/Message.h>
+#include <inet/networklayer/common/EcnTag_m.h>
+#include <inet/networklayer/common/IpProtocolId_m.h>
+#include <inet/networklayer/common/L3AddressResolver.h>
+#include <inet/networklayer/common/L3AddressTag_m.h>
+#include <inet/networklayer/common/HopLimitTag_m.h>
+#include <inet/common/Protocol.h>
 
 #include "NdpAlgorithm.h"
 #include "NdpConnection.h"
@@ -52,8 +52,6 @@ const char* NdpConnection::eventName(int event)
         CASE(NDP_E_IGNORE)
 ;            CASE(NDP_E_OPEN_ACTIVE);
             CASE(NDP_E_OPEN_PASSIVE);
-            CASE(NDP_E_SEND);
-            CASE(NDP_E_CLOSE);
         }
     return s;
 #undef CASE
@@ -212,32 +210,6 @@ void NdpConnection::printSegmentBrief(Packet *packet, const Ptr<const NdpHeader>
     if (ndpseg->getAckBit())
         EV_INFO << "ack " << ndpseg->getAckNo() << " ";
     EV_INFO << endl;
-}
-
-void NdpConnection::sendRst(uint32 seq, L3Address src, L3Address dest, int srcPort, int destPort)
-{
-    const auto &ndpseg = makeShared<NdpHeader>();
-    ndpseg->setSrcPort(srcPort);
-    ndpseg->setDestPort(destPort);
-    ndpseg->setRstBit(true);
-    ndpseg->setDataSequenceNumber(seq);
-    Packet *fp = new Packet("RST");
-    // send it
-    sendToIP(fp, ndpseg, src, dest);
-}
-
-void NdpConnection::sendRstAck(uint32 seq, uint32 ack, L3Address src, L3Address dest, int srcPort, int destPort)
-{
-    const auto &ndpseg = makeShared<NdpHeader>();
-    ndpseg->setSrcPort(srcPort);
-    ndpseg->setDestPort(destPort);
-    ndpseg->setRstBit(true);
-    ndpseg->setAckBit(true);
-    ndpseg->setDataSequenceNumber(seq);
-    ndpseg->setAckNo(ack);
-    Packet *fp = new Packet("RST+ACK");
-    // send it
-    sendToIP(fp, ndpseg, src, dest);
 }
 
 uint32 NdpConnection::convertSimtimeToTS(simtime_t simtime)

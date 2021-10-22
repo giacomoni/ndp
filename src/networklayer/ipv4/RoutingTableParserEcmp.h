@@ -16,7 +16,7 @@
 #ifndef NETWORKLAYER_IPV4_ROUTINGTABLEPARSERECMP_H_
 #define NETWORKLAYER_IPV4_ROUTINGTABLEPARSERECMP_H_
 
-#include "inet/common/INETDefs.h"
+#include <inet/common/INETDefs.h>
 #include "Ipv4RoutingTableEcmp.h"
 
 namespace inet {

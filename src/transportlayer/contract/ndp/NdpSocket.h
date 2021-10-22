@@ -1,12 +1,12 @@
 #ifndef __NDP_NdpSocket_H
 #define __NDP_NdpSocket_H
 
-#include "inet/common/INETDefs.h"
-#include "inet/common/packet/ChunkQueue.h"
-#include "inet/common/packet/Message.h"
-#include "inet/common/packet/Packet.h"
-#include "inet/networklayer/common/L3Address.h"
-#include "inet/common/socket/ISocket.h"
+#include <inet/common/INETDefs.h>
+#include <inet/common/packet/ChunkQueue.h>
+#include <inet/common/packet/Message.h>
+#include <inet/common/packet/Packet.h>
+#include <inet/networklayer/common/L3Address.h>
+#include <inet/common/socket/ISocket.h>
 #include "NdpCommand_m.h"
 
 namespace inet {

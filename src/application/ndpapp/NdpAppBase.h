@@ -1,8 +1,8 @@
 #ifndef __NDP_RAPTONDPAPPBASE_H
 #define __NDP_RAPTONDPAPPBASE_H
 
-#include "inet/common/INETDefs.h"
-#include "inet/applications/base/ApplicationBase.h"
+#include <inet/common/INETDefs.h>
+#include <inet/applications/base/ApplicationBase.h>
 #include "../../transportlayer/contract/ndp/NdpSocket.h"
 
 namespace inet {
@@ -17,14 +17,6 @@ class INET_API NdpAppBase : public ApplicationBase, public NdpSocket::ICallback
 {
 protected:
     NdpSocket socket;
-
-    // statistics
-    int numSessions;
-    int numBroken;
-    int packetsSent;
-    int packetsRcvd;
-    int bytesSent;
-    long bytesRcvd;
 
 protected:
     // Initializes the application, binds the socket to the local address and port.

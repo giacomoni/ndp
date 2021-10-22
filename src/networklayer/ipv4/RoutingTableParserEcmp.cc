@@ -23,8 +23,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "inet/networklayer/contract/IInterfaceTable.h"
-#include "inet/networklayer/ipv4/Ipv4InterfaceData.h"
+#include <inet/networklayer/contract/IInterfaceTable.h>
+#include <inet/networklayer/ipv4/Ipv4InterfaceData.h>
 #include "RoutingTableParserEcmp.h"
 namespace inet {
 
