@@ -18,7 +18,7 @@ module StandardHostNdp extends ApplicationLayerNodeBaseEcmp
     parameters:
         @display("i=device/pc2");
         @figure[submodules];
-
+		forwarding = default(false);
         *.routingTableModule = default("^.ipv4.routingTable");
 
 }

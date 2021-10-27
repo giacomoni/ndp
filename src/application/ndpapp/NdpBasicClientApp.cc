@@ -26,9 +26,21 @@ void NdpBasicClientApp::initialize(int stage)
         stopTime = par("stopTime");
         if (stopTime >= SIMTIME_ZERO && stopTime < startTime)
             throw cRuntimeError("Invalid startTime/stopTime parameters");
-        timeoutMsg = new cMessage("timer");
+        //timeoutMsg = new cMessage("timer");
+    }
+    else if (stage == INITSTAGE_APPLICATION_LAYER) {
+            timeoutMsg = new cMessage("timer");
+            nodeStatus = dynamic_cast<NodeStatus *>(findContainingNode(this)->getSubmodule("status"));
+            if (isNodeUp()) {
+                timeoutMsg->setKind(MSGKIND_CONNECT);
+                scheduleAt(startTime, timeoutMsg);
+            }
     }
     // TODO update timer to make it more up to date
+}
+
+bool NdpBasicClientApp::isNodeUp() {
+    return !nodeStatus || nodeStatus->getState() == NodeStatus::UP;
 }
 
 void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
@@ -44,8 +56,9 @@ void NdpBasicClientApp::handleStartOperation(LifecycleOperation *operation)
 void NdpBasicClientApp::handleStopOperation(LifecycleOperation *operation)
 {
     cancelEvent(timeoutMsg);
-    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING)
+    if (socket.getState() == NdpSocket::CONNECTED || socket.getState() == NdpSocket::CONNECTING){
         close();
+    }
 }
 
 void NdpBasicClientApp::handleCrashOperation(LifecycleOperation *operation)

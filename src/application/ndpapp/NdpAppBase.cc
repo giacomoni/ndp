@@ -48,7 +48,6 @@ void NdpAppBase::connect()
     const char *srcAddress = par("localAddress");
     L3Address localAddress;
     L3AddressResolver().tryResolve(srcAddress, localAddress);
-    EV_INFO << "localAddress add " << localAddress << endl;
 
     if (destination.isUnspecified()) {
         EV_ERROR << "Connecting to " << connectAddress << " port=" << connectPort << ": cannot resolve destination address\n";

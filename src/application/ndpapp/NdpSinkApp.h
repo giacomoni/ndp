@@ -25,6 +25,9 @@ protected:
     // MOH: added
     simtime_t tStartAdded;
     simtime_t tEndAdded;
+
+    bool recordStatistics;
+
     double numRcvTrimmedHeader = 0;
     bool firstDataReceived = true;
 

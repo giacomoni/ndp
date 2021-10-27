@@ -87,13 +87,11 @@ class INET_API NdpSwitchQueue : public PacketQueueBase, public cListener
     virtual bool canPushSomePacket(cGate *gate) const override {return true;};
     virtual bool canPushPacket(Packet *packet, cGate *gate) const override {return true;};
     virtual void pushPacket(Packet *packet, cGate *gate) override;
-    //pushPacket replaces enqueue(cMessage *msg)
 
     virtual bool supportsPopPacket(cGate *gate) const override { return outputGate == gate; }
     virtual bool canPopSomePacket(cGate *gate) const override { return !isEmpty(); }
     virtual Packet *canPopPacket(cGate *gate) const override { return !isEmpty() ? getPacket(0) : nullptr; }
     virtual Packet *popPacket(cGate *gate) override;
-    //popPacket replaces dequeue()
 
     virtual void receiveSignal(cComponent *source, simsignal_t signal, cObject *object, cObject *details) override;
     virtual void dropPacket(Packet *packet, PacketDropReason reason, int limit) override;

@@ -448,9 +448,10 @@ Ipv4Route* Ipv4RoutingTableEcmp::findBestMatchingRouteEcmp(Packet *packet, const
     range = routingCache.equal_range(dest);                     // slower
     int numPossibleEcmpRoutesCaches = std::distance(range.first, range.second);                     // faster
     if (numPossibleEcmpRoutesCaches == 0) {
+        EV_DETAIL << "Finding best match" << endl;
         for (auto e : routes) {
             if (e->isValid()) {
-                EV_DETAIL << "hiiii find best match" << e->getDestination() << "\n";
+                EV_DETAIL << e->getDestination() << endl;
                 if (Ipv4Address::maskedAddrAreEqual(dest, e->getDestination(), e->getNetmask())) { // match
                     bestRoute = const_cast<Ipv4Route*>(e);
                     routingCache.insert(std::pair<Ipv4Address, Ipv4Route*>(dest, bestRoute));

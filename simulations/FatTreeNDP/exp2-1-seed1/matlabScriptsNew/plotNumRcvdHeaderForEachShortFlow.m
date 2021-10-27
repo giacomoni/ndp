@@ -18,6 +18,7 @@ numlongflowsRunningServers = floor(numServers * percentLongFlowNodes);
 
 numHeaders=0; 
 fid = fopen(fullfile('..','MatNumRcvHeader.csv'));
+rmmissing(fid);
 textLine = fgets(fid); % Read first line.
 lineCounter = 1;
 while ischar(textLine)

@@ -18,6 +18,7 @@ protected:
 
     simtime_t startTime;
     simtime_t stopTime;
+    NodeStatus *nodeStatus = nullptr;
 
     virtual void rescheduleOrDeleteTimer(simtime_t d, short int msgKind);
 
@@ -50,6 +51,8 @@ protected:
 
     // TODO - not implemented
     virtual void handleCrashOperation(LifecycleOperation *operation) override;
+
+    virtual bool isNodeUp();
 
     virtual void close() override;
 

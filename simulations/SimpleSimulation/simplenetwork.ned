@@ -19,8 +19,8 @@ network simplenetwork
     	@display("bgb=512,395");
     	int numberOfClients = default(1);
     	int numberOfNormalFlows = default(1);
-    	int numberOfLongerFlows = default(2);
-        int numberOfRouters = default(1);
+    	int numberOfLongerFlows = default(5);
+        int numberOfRouters = default(3);
     types:
         channel ethernetline extends DatarateChannel
         {

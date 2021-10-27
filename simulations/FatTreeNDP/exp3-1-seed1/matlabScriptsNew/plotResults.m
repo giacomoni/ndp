@@ -11,6 +11,8 @@ function plotResults
  plotThroughput
  saveas(gcf,'plotThroughput.png')
 
+ plotThroughput2
+ saveas(gcf,'plotThroughput2.png')
   
  plotCoreRcvAndDropPkt
  saveas(gcf,'plotCoreRcvAndDropPkt.png')

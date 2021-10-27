@@ -761,8 +761,6 @@ void Ipv4Ecmp::reassembleAndDeliverFinish(Packet *packet)
     auto remoteAddress(ipv4Header->getSrcAddress());
     auto localAddress(ipv4Header->getDestAddress());
     decapsulate(packet);
-    EV_INFO << "\n\nIpv4Header PROTOCOL2: " << ipv4Header->getProtocol() << std::endl;
-    EV_INFO << "\n\nIpv4Header PROTOCOL3: " << protocol << std::endl;
     bool hasSocket = false;
     for (const auto &elem: socketIdToSocketDescriptor) {
         if (elem.second->protocolId == protocol->getId()
@@ -808,8 +806,6 @@ void Ipv4Ecmp::decapsulate(Packet *packet)
     // original Ipv4 datagram might be needed in upper layers to send back ICMP error message
 
     auto transportProtocol = ProtocolGroup::ipprotocol.getProtocol(ipv4Header->getProtocolId());
-    EV_INFO << "\n\nIpv4Header PROTOCOL" << ipv4Header->getProtocolId() << std::endl;
-    EV_INFO << "\n\nTRANSPORT PROTOCOL" << transportProtocol << std::endl;
     packet->addTagIfAbsent<PacketProtocolTag>()->setProtocol(transportProtocol);
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(transportProtocol);
     auto l3AddressInd = packet->addTagIfAbsent<L3AddressInd>();

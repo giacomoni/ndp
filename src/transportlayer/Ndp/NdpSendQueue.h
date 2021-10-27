@@ -38,7 +38,8 @@ protected:
     uint32 end = 0;    // last sequence number stored +1
 
     cPacketQueue dataToSendQueue;      // dataBuffer
-    cPacketQueue sentDataQueue;
+    //cPacketQueue sentDataQueue;
+    std::map<int, cPacket*> sentDataQueue;
 
 public:
     /**
@@ -54,10 +55,6 @@ public:
     virtual cPacketQueue& getDataToSendQueue()
     {
         return dataToSendQueue;
-    }
-    virtual cPacketQueue& getSentDataQueue()
-    {
-        return sentDataQueue;
     }
     /**
      * Set the connection that owns this queue.

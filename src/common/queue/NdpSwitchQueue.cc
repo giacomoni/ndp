@@ -129,18 +129,17 @@ void NdpSwitchQueue::pushPacket(Packet *packet, cGate *gate)
        synAckQueueLength=synAckQueue.getLength();
        return;
     }
-    if (ndpHeaderPeek->isHeader() == true ) {
+    else if (ndpHeaderPeek->isHeader() == true ) {
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         return;
     }
-    if (ndpHeaderPeek->isPullPacket() == true ) {
-        EV_INFO << "\n\n\n\nPACKET INFO ROUTER: " << packet->str() << "\n\n\n";
+    else if (ndpHeaderPeek->isPullPacket() == true ) {
         headersQueue.insert(packet);
         headersQueueLength = headersQueue.getLength();
         return;
     }
-    if (isOverloaded()) {
+    else if (isOverloaded()) {
         std::string header="Header-";
         auto ipv4Header = packet->removeAtFront<Ipv4Header>();
         ASSERT(B(ipv4Header->getTotalLengthField()) >= ipv4Header->getChunkLength());
@@ -171,7 +170,7 @@ void NdpSwitchQueue::pushPacket(Packet *packet, cGate *gate)
         numTrimmedPacketsVec.record(numTrimmedPkt);
         cSimpleModule::emit(numTrimmedPktSig, numTrimmedPkt);
         return;
-        }
+    }
     else {
         dataQueue.insert(packet);
         dataQueueLength=dataQueue.getLength();
@@ -182,16 +181,17 @@ void NdpSwitchQueue::pushPacket(Packet *packet, cGate *gate)
 
 Packet *NdpSwitchQueue::popPacket(cGate *gate) {
     Enter_Method("popPacket");
-    if (dataQueue.isEmpty() && headersQueue.isEmpty() && synAckQueue.isEmpty())
+    if (dataQueue.isEmpty() && headersQueue.isEmpty() && synAckQueue.isEmpty()){
         return nullptr;
-    if (synAckQueue.getLength()!=0){
+    }
+    else if (synAckQueue.getLength()!=0){  //syn/ack pop
         auto packet = check_and_cast<Packet *>(synAckQueue.pop());
         cSimpleModule::emit(packetRemovedSignal, packet);
         updateDisplayString();
         animateSend(packet, outputGate);
         return packet;
     }
-    if (headersQueue.getLength() == 0 && dataQueue.getLength() != 0) {
+    else if (headersQueue.getLength() == 0 && dataQueue.getLength() != 0) { //dataQueue pop
         auto packet = check_and_cast<Packet *>(dataQueue.pop());
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
         emit(packetRemovedSignal, packet);
@@ -199,7 +199,7 @@ Packet *NdpSwitchQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    if (headersQueue.getLength() != 0 && dataQueue.getLength() == 0) {
+    else if (headersQueue.getLength() != 0 && dataQueue.getLength() == 0) { //header/pull pop
         auto packet = check_and_cast<Packet *>(headersQueue.pop());
         cSimpleModule::emit(headersQueueLengthSignal, headersQueue.getLength());
         emit(packetRemovedSignal, packet);
@@ -207,7 +207,7 @@ Packet *NdpSwitchQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    if ( headersQueue.getLength() != 0 && dataQueue.getLength() != 0 && weight%10 == 0) {
+    else if ( headersQueue.getLength() != 0 && dataQueue.getLength() != 0 && weight%10 == 0) { //round robin dataQueue pop
         auto packet = check_and_cast<Packet *>(dataQueue.pop());
         cSimpleModule::emit(dataQueueLengthSignal, dataQueue.getLength());
         emit(packetRemovedSignal, packet);
@@ -215,10 +215,10 @@ Packet *NdpSwitchQueue::popPacket(cGate *gate) {
         animateSend(packet, outputGate);
         return packet;
     }
-    if (headersQueue.getLength() != 0 && dataQueue.getLength() != 0 ) {
+    else if (headersQueue.getLength() != 0 && dataQueue.getLength() != 0 ) {
         auto packet = check_and_cast<Packet *>(headersQueue.pop());
         emit(packetRemovedSignal, packet);
-        EV_INFO << " get from header queue- size = " << packet->getByteLength() << "\n\n\n\n\n\n";
+        EV_INFO << " get from header queue- size = " << packet->getByteLength() << endl;
         cSimpleModule::emit(headersQueueLengthSignal, headersQueue.getLength());
         ++weight;
         updateDisplayString();
@@ -270,10 +270,7 @@ void NdpSwitchQueue::receiveSignal(cComponent *source, simsignal_t signal, cObje
 void NdpSwitchQueue::finish(){
     recordScalar("numTrimmedPkt ",numTrimmedPkt );
     cSimpleModule::emit(numTrimmedPktSig, numTrimmedPkt);
-    if (numTrimmedPkt>0)
-      std::cout << " mmmmmmmmmmmmmmmmmmmmmm " << numTrimmedPkt << "\n\n";
 }
-
 
 }
 } // namespace inet

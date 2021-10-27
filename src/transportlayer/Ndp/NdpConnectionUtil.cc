@@ -64,8 +64,10 @@ const char* NdpConnection::indicationName(int code)
         s = #x + 5; break
     const char *s = "unknown";
     switch (code) {
-        CASE(NDP_I_DATA)
-;            CASE(NDP_I_ESTABLISHED);
+        CASE(NDP_I_DATA);
+        CASE(NDP_I_ESTABLISHED);
+        CASE(NDP_I_PEER_CLOSED);
+
         }
     return s;
 #undef CASE
@@ -74,14 +76,12 @@ const char* NdpConnection::indicationName(int code)
 void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg)
 {
     EV_TRACE << "NdpConnection::sendToIP" << endl;
-    EV_INFO << "sendToIP Local Port" << localPort << endl;
     ndpseg->setSrcPort(localPort);
     ndpseg->setDestPort(remotePort);
-    EV_INFO << "Sending: " << endl;
-    printSegmentBrief(packet, ndpseg);
+    //EV_INFO << "Sending: " << endl;
+    //printSegmentBrief(packet, ndpseg);
     IL3AddressType *addressType = remoteAddr.getAddressType();
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
-    EV_INFO << "Dispatch Protocol: " << addressType->getNetworkProtocol()->str() << endl;
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
     addresses->setSrcAddress(localAddr);
     addresses->setDestAddress(remoteAddr);
@@ -91,8 +91,8 @@ void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg)
 
 void NdpConnection::sendToIP(Packet *packet, const Ptr<NdpHeader> &ndpseg, L3Address src, L3Address dest)
 {
-    EV_INFO << "Sending: ";
-    printSegmentBrief(packet, ndpseg);
+    //EV_INFO << "Sending: ";
+    //printSegmentBrief(packet, ndpseg);
     IL3AddressType *addressType = dest.getAddressType();
     packet->addTagIfAbsent<DispatchProtocolReq>()->setProtocol(addressType->getNetworkProtocol());
     auto addresses = packet->addTagIfAbsent<L3AddressReq>();
@@ -162,6 +162,7 @@ void NdpConnection::configureStateVariables()
 // the receiver sends NACK when receiving a header
 void NdpConnection::sendNackNdp(unsigned int nackNum)
 {
+    EV_INFO << "Sending Nack! NackNum: " << nackNum << endl;
     const auto &ndpseg = makeShared<NdpHeader>();
     ndpseg->setAckBit(false);
     ndpseg->setNackBit(true);
@@ -178,6 +179,7 @@ void NdpConnection::sendNackNdp(unsigned int nackNum)
 
 void NdpConnection::sendAckNdp(unsigned int AckNum)
 {
+    EV_INFO << "Sending Ack! AckNum: " << AckNum << endl;
     const auto &ndpseg = makeShared<NdpHeader>();
     ndpseg->setAckBit(true);
     ndpseg->setAckNo(AckNum);

@@ -14,6 +14,11 @@ NdpSendQueue::NdpSendQueue()
 NdpSendQueue::~NdpSendQueue()
 {
     dataToSendQueue.clear();
+    auto iter = sentDataQueue.begin();
+    while (iter != sentDataQueue.end()) {
+        delete iter->second;
+        iter++;
+    }
     sentDataQueue.clear();
 }
 
@@ -22,7 +27,7 @@ void NdpSendQueue::init(int numPacketsToSend, B mss)
     // filling the dataToSendQueue queue with (random data) packets based on the numPacketsToSend value that the application passes
     // TODO: I would update this to get  bytes stream from the application then packetise this data at the transport layer
     EV_TRACE << "NdpSendQueue::init" << endl;
-    EV_INFO << "generateSymbolsList " << endl;
+    EV_INFO << "Filling Data to Send Queue with "<< numPacketsToSend << " packets!" << endl;
     for (int i = 1; i <= numPacketsToSend; i++) {
         const auto &payload = makeShared<GenericAppMsgNdp>();
         std::string packetName = "DATAPKT-" + std::to_string(i);
@@ -31,7 +36,6 @@ void NdpSendQueue::init(int numPacketsToSend, B mss)
         payload->setChunkLength(mss);
         packet->insertAtBack(payload);
         dataToSendQueue.insert(packet);
-        EV_INFO << "SQN: " << i << " msgName " << packet->str() << endl;
     }
 }
 
@@ -67,7 +71,8 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader()
         packet->insertAtBack(appmsg);
         ndpseg->setDataSequenceNumber(appmsg->getSequenceNumber());
         Packet *dupPacket = packet->dup();
-        sentDataQueue.insert(dupPacket);
+        //sentDataQueue.insert(dupPacket);
+        sentDataQueue[appmsg->getSequenceNumber()] = dupPacket;
         delete queuePacket;
         ndpseg->addTag<CreationTimeTag>()->setCreationTime(simTime());
         return std::make_tuple(ndpseg, packet);
@@ -98,32 +103,45 @@ void NdpSendQueue::moveFrontDataQueue(unsigned int sequenceNumber)
 void NdpSendQueue::ackArrived(unsigned int ackNum)
 {
     EV_INFO << "NdpSendQueue::ackArrived: " << ackNum << endl;
-    for (int i = 0; i <= sentDataQueue.getLength(); i++) {
-        Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
-        auto &appmsg = packet->peekData<GenericAppMsgNdp>();
-        if (appmsg->getSequenceNumber() == ackNum) {
-            sentDataQueue.remove(sentDataQueue.get(i));
-            delete packet;
-            break;
-        }
-    }
+//    for (int i = 0; i <= sentDataQueue.getLength(); i++) {
+//        Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
+//        auto &appmsg = packet->peekData<GenericAppMsgNdp>();
+//        if (appmsg->getSequenceNumber() == ackNum) {
+//            sentDataQueue.remove(sentDataQueue.get(i));
+//            delete packet;
+//            break;
+//        }
+//    }
+    Packet *packet = check_and_cast<Packet*>(sentDataQueue[ackNum]);
+    //auto &appmsg = packet->peekData<GenericAppMsgNdp>();
+   // if (appmsg->getSequenceNumber() == ackNum) {
+    sentDataQueue.erase(ackNum);
+    delete packet;
+    //}
 }
 
 void NdpSendQueue::nackArrived(unsigned int nackNum)
 {
-    bool found = false;
-    for (int i = 0; i <= sentDataQueue.getLength(); i++) {
-        Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
-        auto &appmsg = packet->peekData<GenericAppMsgNdp>();
-        if (appmsg->getSequenceNumber() == nackNum) {
-            moveFrontDataQueue(nackNum);
-            sentDataQueue.remove(packet);
-            delete packet;
-            found = true;
-            break;
-        }
-    }
-    ASSERT(found == true);
+//    bool found = false;
+//    for (int i = 0; i <= sentDataQueue.getLength(); i++) {
+//        Packet *packet = check_and_cast<Packet*>(sentDataQueue.get(i));
+//        auto &appmsg = packet->peekData<GenericAppMsgNdp>();
+//        if (appmsg->getSequenceNumber() == nackNum) {
+//            moveFrontDataQueue(nackNum);
+//            sentDataQueue.remove(packet);
+//            delete packet;
+//            found = true;
+//            break;
+//        }
+//    }
+//    ASSERT(found == true);
+    Packet *packet = check_and_cast<Packet*>(sentDataQueue[nackNum]);
+    //auto &appmsg = packet->peekData<GenericAppMsgNdp>();
+    //if (appmsg->getSequenceNumber() == nackNum) {
+    moveFrontDataQueue(nackNum);
+    sentDataQueue.erase(nackNum);
+    delete packet;
+    //}
 }
 }            // namespace ndp
 

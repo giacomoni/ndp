@@ -22,7 +22,7 @@ simple NdpSwitchQueue extends PacketQueueBase like IPacketQueue
 {
     parameters:
         @class("inet::queueing::NdpSwitchQueue");
-        int packetCapacity ; //= default(100);
+        int packetCapacity = default(8); //= default(100);
         string queueNameData = default("L2DataQueue"); // name of the inner cQueue object, used in the 'q' tag of the display string
         string queueNameHeader = default("L2HeadersQueue"); // name of the inner cQueue object, used in the 'q' tag of the display string
         

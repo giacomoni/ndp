@@ -218,10 +218,6 @@ NdpConnection* Ndp::findConnForSegment(const Ptr<const NdpHeader> &ndpseg, L3Add
     key.remotePort = ndpseg->getSrcPort();
     SockPair save = key;
     EV_TRACE << "Ndp::findConnForSegment" << endl;
-    EV_INFO << "localPort   " << key.localPort << endl;
-    EV_INFO << "localAddr  " << destAddr << endl;
-    EV_INFO << "destAddr " << srcAddr << endl;
-    EV_INFO << "remotePort  " << key.remotePort << endl;
 
     // try with fully qualified SockPair
     auto i = ndpConnMap.find(key);
@@ -290,11 +286,6 @@ void Ndp::addSockPair(NdpConnection *conn, L3Address localAddr, L3Address remote
     key.localPort = conn->localPort = localPort;
     key.remotePort = conn->remotePort = remotePort;
 
-    EV_INFO << "\nlocalAddr " << localAddr << " \n";
-    EV_INFO << "\nremoteAddr   " << remoteAddr << " \n";
-    EV_INFO << "\nlocalPort  " << localPort << " \n";
-    EV_INFO << "\nremotePort  " << remotePort << " \n";
-
     // make sure connection is unique
     auto it = ndpConnMap.find(key);
     if (it != ndpConnMap.end()) {
@@ -336,10 +327,6 @@ void Ndp::updateSockPair(NdpConnection *conn, L3Address localAddr, L3Address rem
     ndpConnMap[key] = conn;
 
     EV_TRACE << "Ndp::updateSockPair" << endl;
-    EV_INFO << "localAddr " << localAddr << endl;
-    EV_INFO << "remoteAddr   " << remoteAddr << endl;
-    EV_INFO << "localPort  " << localPort << endl;
-    EV_INFO << "remotePort  " << remotePort << endl;
     // localPort doesn't change (see ASSERT above), so there's no need to update usedEphemeralPorts[].
 }
 

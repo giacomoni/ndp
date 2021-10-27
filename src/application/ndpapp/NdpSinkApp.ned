@@ -8,6 +8,9 @@ simple NdpSinkApp like IApp
     parameters:
         volatile string localAddress = default(""); // may be left empty ("")
         volatile int localPort; // port number to listen on
+        
+        bool recordStatistics = default(true);
+        
         @class("inet::NdpSinkApp");
         @display("i=block/sink");
 

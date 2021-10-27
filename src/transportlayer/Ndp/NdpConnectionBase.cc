@@ -19,7 +19,6 @@ NdpStateVariables::NdpStateVariables() {
 
     numPacketsToGet = 0;
     numPacketsToSend = 0;
-    isLongFlow = false;
 
     numRcvTrimmedHeader = 0;
     numberReceivedPackets = 0;
@@ -28,7 +27,7 @@ NdpStateVariables::NdpStateVariables() {
     connFinished = false;
     isfinalReceivedPrintedOut = false;
     numRcvdPkt = 0;
-    isHeader = false;
+    delayedNack = false;
     connNotAddedYet = true;
 
     active = false;

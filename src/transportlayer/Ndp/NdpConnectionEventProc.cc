@@ -34,7 +34,6 @@ void NdpConnection::process_OPEN_ACTIVE(NdpEventCode &event, NdpCommand *ndpComm
             }
             if (localPort == -1) {
                 localPort = ndpMain->getEphemeralPort();
-                EV_DETAIL << "Assigned ephemeral port " << localPort << "\n";
             }
             EV_DETAIL << "process_OPEN_ACTIVE OPEN: " << localAddr << ":" << localPort << " --> " << remoteAddr << ":" << remotePort << endl;
             ndpMain->addSockPair(this, localAddr, remoteAddr, localPort, remotePort);
@@ -62,7 +61,6 @@ void NdpConnection::process_OPEN_PASSIVE(NdpEventCode &event, NdpCommand *ndpCom
             localPort = openCmd->getLocalPort();
             if (localPort == -1)
                 throw cRuntimeError(ndpMain, "Error processing command OPEN_PASSIVE: local port must be specified");
-            EV_DETAIL << "Starting to listen on: " << localAddr << ":" << localPort << "\n";
             ndpMain->addSockPair(this, localAddr, L3Address(), localPort, -1);
             break;
         default:

@@ -93,8 +93,6 @@ void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int rem
     localAddr = localAddress;
     remoteAddr = remoteAddress;
     remotePrt = remotePort;
-    EV_INFO << "socket bind-- localAddr: " << localAddr << "  , remoteAddr: " << remoteAddr << endl;
-    EV_INFO << "localPrt: " << localPrt << " , remotePort:" << remotePrt << endl;
 
     NdpOpenCommand *openCmd = new NdpOpenCommand();
     openCmd->setLocalAddr(localAddr);

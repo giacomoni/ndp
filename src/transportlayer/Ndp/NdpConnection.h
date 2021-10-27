@@ -62,11 +62,9 @@ public:
 
 public:
     bool active;    // set if the connection was initiated by an active open
-
+    bool delayedNack;
     unsigned int request_id;
     unsigned int internal_request_id;
-    bool isLongFlow;
-    bool isHeader;
 
     int IW;  //initial window size
     bool connFinished;
@@ -94,7 +92,6 @@ public:
     };
     typedef std::list<PacketsToSend> PacketsList;
     PacketsList receivedPacketsList;
-
     // connection identification by apps: socketId
     int socketId = -1;    // identifies connection within the app
     int getSocketId() const

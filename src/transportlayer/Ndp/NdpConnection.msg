@@ -27,9 +27,9 @@ struct NdpStateVariables
     
     unsigned int request_id;
     unsigned int internal_request_id;
-    bool isHeader;
     uint32 IW;
     bool connFinished;
+    bool delayedNack;
     uint32 numPacketsToGet;
     uint32 numPacketsToSend;
 
@@ -49,7 +49,6 @@ class NdpSendQueue extends cObject
     @existingClass;
     @descriptor(readonly);
     cPacketQueue dataToSendQueue;      // dataBuffer
-    cPacketQueue sentDataQueue;
 }
 
 class NdpConnection extends cObject

@@ -26,6 +26,7 @@ void NdpSinkApp::initialize(int stage)
 {
     EV_TRACE << "NdpSinkApp::initialize";
     cSimpleModule::initialize(stage);
+    recordStatistics = par("recordStatistics");
     if (stage == INITSTAGE_LOCAL) {
         bytesRcvd = 0;
         WATCH(bytesRcvd);
@@ -46,50 +47,60 @@ void NdpSinkApp::initialize(int stage)
 
 void NdpSinkApp::handleMessage(cMessage *msg)
 {
-    EV_TRACE << "NdpSinkApp:handleMessage Message " << msg->getKind() << endl;
     if (msg->getKind() == NDP_I_PEER_CLOSED) {
-        EV_INFO << "NDP_I_PEER_CLOSED message arrived - end of NDP connection" << endl;
-        tEndAdded = simTime();
+        EV_TRACE << "NdpSinkApp:handleMessage Message NDP_I_PEER_CLOSED" << endl;
+        if(recordStatistics == true){
+            EV_INFO << "NDP_I_PEER_CLOSED message arrived - end of NDP connection" << endl;
+            tEndAdded = simTime();
 
-        NdpCommand *controlInfo = check_and_cast<NdpCommand*>(msg->getControlInfo());
-        numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
-        std::string mod = "FatTreeNdp.centralSchedulerNdp";
-        cModule *centralMod = getModuleByPath(mod.c_str());
-        if (centralMod) {
-            int numFinishedFlows = centralMod->par("numCompletedShortFlows");
-            int newNumFinishedFlows = numFinishedFlows + 1;
-            centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
-            EV_INFO << "NdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows << endl;
+            NdpCommand *controlInfo = check_and_cast<NdpCommand*>(msg->getControlInfo());
+            numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
+            std::string mod = "FatTreeNdp.centralSchedulerNdp";
+            cModule *centralMod = getModuleByPath(mod.c_str());
+            if (centralMod && recordStatistics == true) {
+                int numFinishedFlows = centralMod->par("numCompletedShortFlows");
+                int newNumFinishedFlows = numFinishedFlows + 1;
+                centralMod->par("numCompletedShortFlows").setIntValue(newNumFinishedFlows);
+                EV_INFO << "NdpSinkApp::handleMessage  numCompletedShortFlows " << newNumFinishedFlows << endl;
+            }
         }
         delete msg;
     }
     else if (msg->getKind() == NDP_I_DATA) {
-        Packet *packet = check_and_cast<Packet*>(msg);
-        bytesRcvd += packet->getByteLength();
-        EV_INFO << "NDP DATA message arrived - bytesRcvd: " << bytesRcvd << endl;
-        emit(rcvdPkSignalNDP, packet);
-        // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
-        if (firstDataReceived == true) {
-            tStartAdded = packet->getTag<CreationTimeTag>()->getCreationTime();
-            firstDataReceived = false;
+        EV_TRACE << "NdpSinkApp:handleMessage Message NDP_I_DATA" << endl;
+        if(recordStatistics == true){
+            Packet *packet = check_and_cast<Packet*>(msg);
+            bytesRcvd += packet->getByteLength();
+            EV_INFO << "NDP DATA message arrived - bytesRcvd: " << bytesRcvd << endl;
+            emit(rcvdPkSignalNDP, packet);
+            // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
+            if (firstDataReceived == true) {
+                tStartAdded = packet->getTag<CreationTimeTag>()->getCreationTime();
+                firstDataReceived = false;
+            }
+            else{
+                simtime_t startTime = packet->getTag<CreationTimeTag>()->getCreationTime();
+                if(startTime < tStartAdded){
+                    tStartAdded = startTime;
+                }
+            }
+            EV_INFO << "Sink Application bytes received: " << bytesRcvd << " " << this->getFullPath() << std::endl;
         }
         else{
-            simtime_t startTime = packet->getTag<CreationTimeTag>()->getCreationTime();
-            if(startTime < tStartAdded){
-                tStartAdded = startTime;
-            }
+            //IGNORE
         }
-        EV_INFO << "bytesRcvd  " << bytesRcvd << " " << this->getFullPath() << std::endl;
     }
     else if (msg->getKind() == NDP_I_ESTABLISHED) {
+        EV_TRACE << "NdpSinkApp:handleMessage Message NDP_I_ESTABLISHED" << endl;
         EV_INFO << "NDP_I_ESTABLISHED message arrived - deleting message" << endl;
         delete msg;
     }
-    else {
+    else{
+        EV_TRACE << "NdpSinkApp:handleMessage Message UNKNOWN" << endl;
         EV_WARN << "Unknown Message Type Arrived at Sink App" << endl;
-        // must be data or some kind of indication -- can be dropped
         delete msg;
-    }
+        // must be data or some kind of indication -- can be dropped
+        }
 }
 
 void NdpSinkApp::finish()
@@ -100,11 +111,16 @@ void NdpSinkApp::finish()
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
     EV_INFO << "Flow Completion Time:=    " << FCT << endl;
     // don't emit the FCT of the background flows(no need), we just observe the shorter length flows
-    emit(fctRecordv3, FCT);
-    emit(goodputSigNdp, throughput);
-    emit(numRcvTrimmedHeaderSigNdp, numRcvTrimmedHeader);
-    EV_INFO << "NdpSinkApp::finish() bytesRcvd " << endl;
-    EV_INFO << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath() << endl;
+    if (recordStatistics == true) {
+        emit(fctRecordv3, FCT);
+        emit(goodputSigNdp, throughput);
+        emit(numRcvTrimmedHeaderSigNdp, numRcvTrimmedHeader);
+        EV_INFO << "NdpSinkApp::finish() bytesRcvd " << endl;
+        EV_INFO << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath() << endl;
+
+        std::cout << "NdpSinkApp::finish() bytesRcvd " << endl;
+        std::cout << "bytesRcvd: " << bytesRcvd << "  " << this->getFullPath() << endl;
+    }
 }
 
 void NdpSinkApp::refreshDisplay() const

@@ -27,6 +27,7 @@ for i=1:length(kBytes)
     b=num2str(numServers);
     c=dlmread(fullfile('..','MatInstThroughput.csv'));
     r=sort(c);
+    rmmissing(r);
     shortFlows= r(1:end-numlongflowsRunningServers);
 %     plot(shortFlows,'linestyle', lineStyles{rem(i-1,numel(lineStyles))+1},...
 %         'coalor', myColors(i,:),...

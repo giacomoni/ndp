@@ -1,9 +1,12 @@
 echo " Running FatTree Traffic .... "
 find . -name "*.vec" -type f -delete|find . -name  "*.sca"  -type f -delete| find . -name "*.vci" -type f -delete | find . -name "*.csv" -type f -delete
-opp_run_release -u Cmdenv -m -n ../..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials:../../../../inet4/showcases -l ../../../src/ndp ../exp2-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
+opp_run_dbg -u Cmdenv -m -n ../..:../../../src:../../../../inet4/src:../../../../inet4/examples:../../../../inet4/tutorials:../../../../inet4/showcases -l ../../../src/ndp ../exp2-1-seed1.ini -c General -r "\$FatTreeSize==$(printf '%d' $1)  &&  \$numShortFlows==$(printf '%d' $2)"
 
 echo "Throughput"
-scavetool export -T s -f "module(**.app[*]) AND ("mohThroughputNDP:mean")"   -F CSV-S -o instThroughput.csv *.sca
+scavetool export -T s -f "module(**.app[*]) AND ("mohThroughputNDP:last")"   -F CSV-S -o instThroughput.csv *.sca
+echo "   "
+echo "Throughput 2 "
+scavetool export -T s -f "module(**.app[*]) AND ("instThroughputNDP:mean")"   -F CSV-S -o instThroughput2.csv *.sca
 echo "   "
 scavetool export -T s -f "module(**.app[*]) AND ("multicastGroupIdSignal:last")"   -F CSV-S -o multicastgroups.csv *.sca
 scavetool export -T s -f "module(**.app[*]) AND ("multisourceGroupIdSignal:last")"   -F CSV-S -o multisourcegroups.csv *.sca
@@ -15,7 +18,7 @@ echo "   "
 echo "header"
 scavetool export -T s -f "module(**.app[*]) AND ("numRcvTrimmedHeaderSigNdp:last")"   -F CSV-S -o numRcvHeader.csv *.sca
 echo "   "
- cat numRcvHeader.csv | cut -d, -f11  | sed "1 d" > MatNumRcvHeader.csv
+ cat numRcvHeader.csv | cut -d, -f7  | sed "1 d" > MatNumRcvHeader.csv
 echo "num trimmed packets"
 scavetool export -T s -f 'module(*.CoreRouter[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktCore.csv *.sca
 scavetool export -T s -f 'module(*.aggRouters[*].*) AND  name("numTrimmedPkt:last") '   -F CSV-S -o numTrimmedPktAgg.csv *.sca
@@ -70,6 +73,7 @@ cat a-fct.csv | cut -d, -f7  | sed "1 d" > aaMatFct.csv
 scavetool export -T s -f 'module(*.app[*]) AND name("packetReceived:sum(packetBytes)")    '   -F CSV-S -o a-flowsizes.csv *.sca
 cat a-flowsizes.csv | cut -d, -f7  | sed "1 d" > aaMatFlowSizes.csv
 cat instThroughput.csv | cut -d, -f7  | sed "1 d" > MatInstThroughput.csv
+cat instThroughput2.csv | cut -d, -f7  | sed "1 d" > MatInstThroughput2.csv
 cat coreRouterRcvdPkt.csv | cut -d, -f7  | sed "1 d" > MatCoreRouterRcvdPkt.csv
 cat coreRouterDropPkt.csv | cut -d, -f7  | sed "1 d" > MatCoreRouterDropPkt.csv
 

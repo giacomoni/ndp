@@ -45,8 +45,8 @@ void NdpConnection::sendInitialWindow()
 NdpEventCode NdpConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address src, L3Address dest)
 {
     EV_TRACE << "NdpConnection::process_RCV_SEGMENT" << endl;
-    EV_INFO << "Seg arrived: ";
-    printSegmentBrief(packet, ndpseg);
+    //EV_INFO << "Seg arrived: ";
+    //printSegmentBrief(packet, ndpseg);
     EV_DETAIL << "TCB: " << state->str() << "\n";
     NdpEventCode event;
     if (fsm.getState() == NDP_S_LISTEN) {
@@ -60,7 +60,6 @@ NdpEventCode NdpConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const 
         }
     }
     else {
-        EV_INFO << "Updating sock pair, then processing segment" << endl;
         ndpMain->updateSockPair(this, dest, src, ndpseg->getDestPort(), ndpseg->getSrcPort());
         event = processSegment1stThru8th(packet, ndpseg);
     }
@@ -71,6 +70,7 @@ NdpEventCode NdpConnection::process_RCV_SEGMENT(Packet *packet, const Ptr<const 
 NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<const NdpHeader> &ndpseg)
 {
     EV_TRACE << "NdpConnection::processSegment1stThru8th" << endl;
+    EV_INFO << "_________________________________________" << endl;
     NdpEventCode event = NDP_E_IGNORE;
     // (S.1)   at the sender: NACK Arrived at the sender, then prepare the trimmed pkt for retranmission
     //        (not to transmit yet just make it to be the first one to transmit upon getting a pull pkt later)
@@ -78,7 +78,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££ NACK Arrived at the sender £££££££££££££££££££ Tx
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     ASSERT(fsm.getState() == NDP_S_ESTABLISHED);
-    EV_INFO << "Connection confirmed established!" << endl;
     if (ndpseg->getNackBit() == true) {
         EV_INFO << "Nack arrived at the sender - move data packet to front" << endl;
         sendQueue->nackArrived(ndpseg->getNackNo());
@@ -97,9 +96,13 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // ££££££££££££££££££££££££ REQUEST Arrived at the sender £££££££££££££££
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    if (ndpseg->isPullPacket() == true) {
+    if (ndpseg->isPullPacket() == true || ((ndpseg->getNackBit() == true) && (state->delayedNack == true))) {
         int requestsGap = ndpseg->getPullSequenceNumber() - state->internal_request_id;
         EV_INFO << "Pull packet arrived at the sender - request gap " << requestsGap << endl;
+        if(state->delayedNack == true){
+            requestsGap = 1;
+            state->delayedNack = false;
+        }
         if (requestsGap >= 1) {
             //  we send Packets  based on requestsGap value
             // if the requestsGap is smaller than 1 that means we received a delayed request which we need to  ignore
@@ -122,7 +125,12 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 }
                 else {
                     EV_WARN << "No Ndp header within the send queue!" << endl;
-                    //    --state->internal_request_id;
+                    state->delayedNack = true;
+                    //EV_INFO << "No Ndp header within the send queue!" << endl;
+                    //--state->internal_request_id;
+                    //state->internal_request_id = state->internal_request_id - requestsGap;
+                    //--state->request_id;
+
                 }
             }
         }
@@ -143,7 +151,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
         if (state->numberReceivedPackets == 0 && state->connNotAddedYet == true) {
             getNDPMain()->requestCONNMap[getNDPMain()->connIndex] = this; // moh added
             state->connNotAddedYet = false;
-            EV << "sendFirstRequest sendFirstRequest sendFirstRequest sendFirstRequest .\n";
             ++getNDPMain()->connIndex;
             EV_INFO << "sending first request" << endl;
             getNDPMain()->sendFirstRequest();
@@ -182,7 +189,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 getNDPMain()->requestCONNMap[getNDPMain()->connIndex] = this; // moh added
                 ++getNDPMain()->connIndex;
                 state->connNotAddedYet = false;
-                EV << "sendFirstRequest() " << endl;
+                EV << "Requesting Pull Timer" << endl;
                 getNDPMain()->sendFirstRequest();
             }
             // %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -191,8 +198,10 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
             //  send any received Packet to the app
             auto tag = ndpseg->getTag(0);
             const CreationTimeTag *timeTag = dynamic_cast<const CreationTimeTag *>(tag);
-            packet->setFrontOffset(B(0));
-            packet->setBackOffset(B(1500));
+            //packet->setFrontOffset(B(0));
+            //packet->setBackOffset(B(1500));
+            Ptr<Chunk> msgRx;
+            msgRx = packet->removeAll();
             if (state->connFinished == false) {
                 EV_INFO << "Sending Data Packet to Application" << endl;
                 // buffer the received Packet segment
@@ -200,7 +209,9 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 itR = receivedPacketsList.begin();
                 std::advance(itR, seqNo); // increment the iterator by esi
                 // MOH: Send any received Packet to the app, just for now to test the Incast example, this shouldn't be the normal case
-                Packet *newPacket = packet->dup();
+                //Packet *newPacket = packet->dup();
+                std::string packetName = "DATAPKT-" + std::to_string(seqNo);
+                Packet *newPacket = new Packet(packetName.c_str(), msgRx);
                 newPacket->addTag<CreationTimeTag>()->setCreationTime(timeTag->getCreationTime());
                 PacketsToSend receivedPkts;
                 receivedPkts.pktId = seqNo;
@@ -208,6 +219,7 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 receivedPacketsList.push_back(receivedPkts);
                 newPacket->setKind(NDP_I_DATA); // TBD currently we never send NDP_I_URGENT_DATA
                 newPacket->addTag<SocketInd>()->setSocketId(socketId);
+                EV_INFO << "Sending to App packet: " << newPacket->str() << endl;
                 sendToApp(newPacket);
             }
             // All the Packets have been received
@@ -234,7 +246,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 void NdpConnection::addRequestToPullsQueue()
 {
     EV_TRACE << "NdpConnection::addRequestToPullsQueue" << endl;
-    EV_INFO << "Add new request packet to pullsQueue." << endl;
 
     ++state->request_id;
     char msgname[16];
@@ -251,7 +262,7 @@ void NdpConnection::addRequestToPullsQueue()
     ndpseg->setPullSequenceNumber(state->request_id);
     ndppack->insertAtFront(ndpseg);
     pullQueue.insert(ndppack);
-    EV_INFO << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength() << "\n\n\n\n";
+    EV_INFO << "Adding new request to the pull queue -- pullsQueue length now = " << pullQueue.getLength() << endl;
     bool napState = getNDPMain()->getNapState();
     if (napState == true) {
         EV_INFO << "Requesting Pull Timer (12 microseconds)" << endl;
@@ -294,8 +305,6 @@ void NdpConnection::setConnFinished()
 NdpEventCode NdpConnection::processSegmentInListen(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr)
 {
     EV_DETAIL << "Processing segment in LISTEN" << endl;
-    EV_INFO << "srcAddr" << srcAddr << endl;
-    EV_INFO << "destAddr" << destAddr << endl;
 
     if (ndpseg->getSynBit()) {
         EV_DETAIL << "SYN bit set: filling in foreign socket" << endl;
