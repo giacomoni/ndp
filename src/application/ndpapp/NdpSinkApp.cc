@@ -70,8 +70,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
         EV_TRACE << "NdpSinkApp:handleMessage Message NDP_I_DATA" << endl;
         if(recordStatistics == true){
             Packet *packet = check_and_cast<Packet*>(msg);
-            //bytesRcvd += packet->getByteLength();
-            bytesRcvd += 1500;
+            bytesRcvd += packet->getByteLength();
             EV_INFO << "NDP DATA message arrived - bytesRcvd: " << bytesRcvd << endl;
             emit(rcvdPkSignalNDP, packet);
             // Moh added: time stamp when receiving the first data packet (not the SYN, as the app wouldn't get that packet)
