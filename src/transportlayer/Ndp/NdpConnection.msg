@@ -29,7 +29,7 @@ struct NdpStateVariables
     unsigned int internal_request_id;
     uint32 IW;
     bool connFinished;
-    bool delayedNack;
+    int delayedNackNo;
     uint32 numPacketsToGet;
     uint32 numPacketsToSend;
 

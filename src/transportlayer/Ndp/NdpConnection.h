@@ -62,7 +62,7 @@ public:
 
 public:
     bool active;    // set if the connection was initiated by an active open
-    bool delayedNack;
+    int delayedNackNo;
     unsigned int request_id;
     unsigned int internal_request_id;
 

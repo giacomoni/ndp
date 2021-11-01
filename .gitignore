@@ -28,6 +28,7 @@ precompiled_*.h.*
 *.pcap
 *.anf
 *.elog
+*.png
 *.sca
 *.vec
 *.vci

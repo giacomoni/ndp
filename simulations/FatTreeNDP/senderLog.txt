@@ -1,0 +1,16 @@
+
+Running configuration General, run #2690...
+Scenario: $FatTreeSize=8, $0="randTM", $numShortFlows=500, $1=8, $repetition=0
+Assigned runID=General-2690-20211101-10:44:06-10102
+Setting up network "FatTreeNdp"...
+Initializing...
+
+Running simulation...
+0.053336501084 | FatTreeNdp.Pod[2].racks[0].servers[1].app[1] |Connecting to FatTreeNdp.Pod[2].racks[1].servers[2](10.0.3.89) port=87
+0.053336501084 | FatTreeNdp.Pod[2].racks[0].servers[1].app[1] |Socket Connection Finished
+0.053336501084 | FatTreeNdp.Pod[2].racks[0].servers[1].app[1] |Connecting to mmmmmFatTreeNdp.Pod[2].racks[1].servers[2](10.0.3.89) port=87
+0.053336501084 | FatTreeNdp.Pod[2].racks[0].servers[1].app[1] |connected
+
+<!> Simulation stopped with endSimulation() -- in module (inet::CentralSchedulerNdp) FatTreeNdp.centralSchedulerNdp (id=28), at t=0.173718659194s, event #7534575
+
+Calling finish() at end of Run #2690...

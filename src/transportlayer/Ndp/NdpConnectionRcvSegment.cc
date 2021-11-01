@@ -96,12 +96,12 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
     // ££££££££££££££££££££££££ REQUEST Arrived at the sender £££££££££££££££
     // ££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££££
-    if (ndpseg->isPullPacket() == true || ((ndpseg->getNackBit() == true) && (state->delayedNack == true))) {
+    if (ndpseg->isPullPacket() == true || ((ndpseg->getNackBit() == true) && (state->delayedNackNo > 0))) {
         int requestsGap = ndpseg->getPullSequenceNumber() - state->internal_request_id;
         EV_INFO << "Pull packet arrived at the sender - request gap " << requestsGap << endl;
-        if(state->delayedNack == true){
+        if(state->delayedNackNo > 0){
             requestsGap = 1;
-            state->delayedNack = false;
+            --state->delayedNackNo;
         }
         if (requestsGap >= 1) {
             //  we send Packets  based on requestsGap value
@@ -125,7 +125,8 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
                 }
                 else {
                     EV_WARN << "No Ndp header within the send queue!" << endl;
-                    state->delayedNack = true;
+                    ++state->delayedNackNo;
+                    --state->internal_request_id;
                     //EV_INFO << "No Ndp header within the send queue!" << endl;
                     //--state->internal_request_id;
                     //state->internal_request_id = state->internal_request_id - requestsGap;

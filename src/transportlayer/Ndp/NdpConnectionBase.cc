@@ -27,7 +27,7 @@ NdpStateVariables::NdpStateVariables() {
     connFinished = false;
     isfinalReceivedPrintedOut = false;
     numRcvdPkt = 0;
-    delayedNack = false;
+    delayedNackNo = 0;
     connNotAddedYet = true;
 
     active = false;

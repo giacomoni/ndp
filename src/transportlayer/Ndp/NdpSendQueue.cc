@@ -64,7 +64,7 @@ const std::tuple<Ptr<NdpHeader>, Packet*> NdpSendQueue::getNdpHeader()
         const auto &ndpseg = makeShared<NdpHeader>();
         Packet *queuePacket = check_and_cast<Packet*>(dataToSendQueue.pop());
         auto &appmsg = queuePacket->removeAtFront<GenericAppMsgNdp>();
-        appmsg->setChunkLength(B(1453));
+        appmsg->setChunkLength(B(1500));
         EV_INFO << "Data Sequence Number :" << appmsg->getSequenceNumber() << std::endl;
         std::string packetName = "DATAPKT-" + std::to_string(appmsg->getSequenceNumber());
         Packet *packet = new Packet(packetName.c_str());
@@ -89,7 +89,7 @@ void NdpSendQueue::moveFrontDataQueue(unsigned int sequenceNumber)
     const auto &payload = makeShared<GenericAppMsgNdp>();
     Packet *newPacket = new Packet(packetName.c_str());
     payload->setSequenceNumber(sequenceNumber);
-    payload->setChunkLength(B(1453));
+    payload->setChunkLength(B(1500));
     newPacket->insertAtBack(payload);
     if (dataToSendQueue.getLength() > 0) {
         dataToSendQueue.insertBefore(dataToSendQueue.front(), newPacket);
