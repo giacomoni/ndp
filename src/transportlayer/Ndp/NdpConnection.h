@@ -84,7 +84,6 @@ public:
 class INET_API NdpConnection : public cSimpleModule
 {
 public:
-
     struct PacketsToSend
     {
         unsigned int pktId;

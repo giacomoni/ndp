@@ -354,6 +354,7 @@ void CentralSchedulerNdp::scheduleLongFlows()
         cModuleType *moduleTypeDest = cModuleType::get("ndp.application.ndpapp.NdpSinkApp");
         std::string nameNdpAppDest = "app[" + std::to_string(newNumNdpSinkAppsDest - 1) + "]";
         cModule *newDestAppModule = moduleTypeDest->create(nameNdpAppDest.c_str(), destModule);
+        newDestAppModule->par("localAddress").setStringValue(dest.c_str());
         newDestAppModule->par("localPort").setIntValue(80 + newNumNdpSinkAppsDest);
         newDestAppModule->par("recordStatistics").setBoolValue(false);
         //   --------<ndpIn         appOut[]<----------
@@ -373,10 +374,6 @@ void CentralSchedulerNdp::scheduleLongFlows()
         newDestAppModule->par("localPort").setIntValue(80 + newNumNdpSinkAppsDest);
         newDestAppModule->par("recordStatistics").setBoolValue(false);
 
-        std::cout << "\n" << dest.c_str();
-        if(newDestAppModule->par("localAddress") == "FatTreeNdp.Pod[5].racks[0].servers[0]"){
-            std::cout << "\n\nFOUND!";
-        }
         // Sender  app
         cModule *ndpSrcModule = srcModule->getSubmodule("at");
         int newNDPGateOutSizeSrc = ndpSrcModule->gateSize("out") + 1;

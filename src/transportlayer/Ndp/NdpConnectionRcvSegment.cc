@@ -7,7 +7,6 @@
 #include "NdpConnection.h"
 #include "NdpSendQueue.h"
 #include "ndp_common/NdpHeader.h"
-#include "ndp_common/NdpHeader.h"
 #include "../contract/ndp/NdpCommand_m.h"
 #include "../../application/ndpapp/GenericAppMsgNdp_m.h"
 
@@ -247,7 +246,6 @@ NdpEventCode NdpConnection::processSegment1stThru8th(Packet *packet, const Ptr<c
 void NdpConnection::addRequestToPullsQueue()
 {
     EV_TRACE << "NdpConnection::addRequestToPullsQueue" << endl;
-
     ++state->request_id;
     char msgname[16];
     sprintf(msgname, "PULL-%d", state->request_id);

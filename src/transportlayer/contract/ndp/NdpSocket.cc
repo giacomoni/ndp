@@ -76,6 +76,7 @@ void NdpSocket::listen(bool fork)
     sendToNDP(request);
     sockstate = LISTENING;
 }
+
 void NdpSocket::accept(int socketId)
 {
     throw cRuntimeError("NdpSocket::accept(): never called");

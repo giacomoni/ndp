@@ -13,7 +13,8 @@ namespace inet {
 namespace ndp {
 Define_Module(NdpConnection);
 
-NdpStateVariables::NdpStateVariables() {
+NdpStateVariables::NdpStateVariables()
+{
     internal_request_id = 0;
     request_id = 0;  // source block number (8-bit unsigned integer)
 
@@ -33,18 +34,21 @@ NdpStateVariables::NdpStateVariables() {
     active = false;
 }
 
-std::string NdpStateVariables::str() const {
+std::string NdpStateVariables::str() const
+{
     std::stringstream out;
     return out.str();
 }
 
-std::string NdpStateVariables::detailedInfo() const {
+std::string NdpStateVariables::detailedInfo() const
+{
     std::stringstream out;
     out << "active=" << active << "\n";
     return out.str();
 }
 
-void NdpConnection::initConnection(Ndp *_mod, int _socketId) {
+void NdpConnection::initConnection(Ndp *_mod, int _socketId)
+{
     Enter_Method_Silent
     ();
 
@@ -57,7 +61,8 @@ void NdpConnection::initConnection(Ndp *_mod, int _socketId) {
     // queues and algorithm will be created on active or passive open
 }
 
-NdpConnection::~NdpConnection() {
+NdpConnection::~NdpConnection()
+{
 
     std::list<PacketsToSend>::iterator iter;  // received iterator
 
@@ -71,16 +76,18 @@ NdpConnection::~NdpConnection() {
     delete state;
 }
 
-void NdpConnection::handleMessage(cMessage *msg) {
+void NdpConnection::handleMessage(cMessage *msg)
+{
     if (msg->isSelfMessage()) {
         if (!processTimer(msg))
             EV_INFO << "\nConnection Attempted Removal!\n";
-    } else
-        throw cRuntimeError(
-                "model error: NdpConnection allows only self messages");
+    }
+    else
+        throw cRuntimeError("model error: NdpConnection allows only self messages");
 }
 
-bool NdpConnection::processTimer(cMessage *msg) {
+bool NdpConnection::processTimer(cMessage *msg)
+{
     printConnBrief();
     EV_DETAIL << msg->getName() << " timer expired\n";
 
@@ -92,66 +99,64 @@ bool NdpConnection::processTimer(cMessage *msg) {
     return performStateTransition(event);
 }
 
-bool NdpConnection::processNDPSegment(Packet *packet,
-        const Ptr<const NdpHeader> &ndpseg, L3Address segSrcAddr,
-        L3Address segDestAddr) {
+bool NdpConnection::processNDPSegment(Packet *packet, const Ptr<const NdpHeader> &ndpseg, L3Address segSrcAddr, L3Address segDestAddr)
+{
     Enter_Method_Silent
     ();
 
     printConnBrief();
-    NdpEventCode event = process_RCV_SEGMENT(packet, ndpseg, segSrcAddr,
-            segDestAddr);
+    NdpEventCode event = process_RCV_SEGMENT(packet, ndpseg, segSrcAddr, segDestAddr);
     // then state transitions
     return performStateTransition(event);
 }
 
-bool NdpConnection::processAppCommand(cMessage *msg) {
+bool NdpConnection::processAppCommand(cMessage *msg)
+{
     Enter_Method_Silent
     ();
 
     printConnBrief();
 
-    NdpCommand *ndpCommand = check_and_cast_nullable<NdpCommand*>(
-            msg->removeControlInfo());
+    NdpCommand *ndpCommand = check_and_cast_nullable<NdpCommand*>(msg->removeControlInfo());
     NdpEventCode event = preanalyseAppCommandEvent(msg->getKind());
     EV_INFO << "App command eventName: " << eventName(event) << "\n";
-//     std::cout << "App command: " << eventName(event) << std::endl;
     switch (event) {
-    case NDP_E_OPEN_ACTIVE:
-        process_OPEN_ACTIVE(event, ndpCommand, msg);
-        break;
+        case NDP_E_OPEN_ACTIVE:
+            process_OPEN_ACTIVE(event, ndpCommand, msg);
+            break;
 
-    case NDP_E_OPEN_PASSIVE:
-        process_OPEN_PASSIVE(event, ndpCommand, msg);
-        break;
+        case NDP_E_OPEN_PASSIVE:
+            process_OPEN_PASSIVE(event, ndpCommand, msg);
+            break;
 
-    default:
-        throw cRuntimeError(ndpMain, "wrong event code");
+        default:
+            throw cRuntimeError(ndpMain, "wrong event code");
     }
 
     // then state transitions
     return performStateTransition(event);
 }
 
-NdpEventCode NdpConnection::preanalyseAppCommandEvent(int commandCode) {
+NdpEventCode NdpConnection::preanalyseAppCommandEvent(int commandCode)
+{
     switch (commandCode) {
-    case NDP_C_OPEN_ACTIVE:
-        return NDP_E_OPEN_ACTIVE;
+        case NDP_C_OPEN_ACTIVE:
+            return NDP_E_OPEN_ACTIVE;
 
-    case NDP_C_OPEN_PASSIVE:
-        return NDP_E_OPEN_PASSIVE;
+        case NDP_C_OPEN_PASSIVE:
+            return NDP_E_OPEN_PASSIVE;
 
-    default:
-        throw cRuntimeError(ndpMain, "Unknown message kind in app command");
+        default:
+            throw cRuntimeError(ndpMain, "Unknown message kind in app command");
     }
 }
 
-bool NdpConnection::performStateTransition(const NdpEventCode &event) {
+bool NdpConnection::performStateTransition(const NdpEventCode &event)
+{
     ASSERT(fsm.getState() != NDP_S_CLOSED); // closed connections should be deleted immediately
 
     if (event == NDP_E_IGNORE) {    // e.g. discarded segment
-        EV_DETAIL << "Staying in state: " << stateName(fsm.getState())
-                         << " (no FSM event)\n";
+        EV_DETAIL << "Staying in state: " << stateName(fsm.getState()) << " (no FSM event)\n";
         return true;
     }
 
@@ -161,114 +166,108 @@ bool NdpConnection::performStateTransition(const NdpEventCode &event) {
     int oldState = fsm.getState();
 
     switch (fsm.getState()) {
-    case NDP_S_INIT:
-        switch (event) {
-        case NDP_E_OPEN_PASSIVE:
-            FSM_Goto(fsm, NDP_S_LISTEN);
+        case NDP_S_INIT:
+            switch (event) {
+                case NDP_E_OPEN_PASSIVE:
+                    FSM_Goto(fsm, NDP_S_LISTEN);
+                    break;
+
+                case NDP_E_OPEN_ACTIVE:
+                    FSM_Goto(fsm, NDP_S_ESTABLISHED);
+                    break;
+
+                default:
+                    break;
+            }
             break;
 
-        case NDP_E_OPEN_ACTIVE:
-            FSM_Goto(fsm, NDP_S_ESTABLISHED);
+        case NDP_S_LISTEN:
+            switch (event) {
+                case NDP_E_OPEN_ACTIVE:
+                    FSM_Goto(fsm, NDP_S_SYN_SENT);
+                    break;
 
-//            FSM_Goto(fsm, NDP_S_SYN_SENT); mohhh
+                case NDP_E_RCV_SYN:
+                    FSM_Goto(fsm, NDP_S_SYN_RCVD);
+                    break;
+
+                default:
+                    break;
+            }
             break;
 
-        default:
-            break;
-        }
-        break;
+        case NDP_S_SYN_RCVD:
+            switch (event) {
 
-    case NDP_S_LISTEN:
-        switch (event) {
-        case NDP_E_OPEN_ACTIVE:
-            FSM_Goto(fsm, NDP_S_SYN_SENT);
+                default:
+                    break;
+            }
             break;
 
-        case NDP_E_RCV_SYN:
-            FSM_Goto(fsm, NDP_S_SYN_RCVD);
+        case NDP_S_SYN_SENT:
+            switch (event) {
+
+                case NDP_E_RCV_SYN:
+                    FSM_Goto(fsm, NDP_S_SYN_RCVD);
+                    break;
+
+                default:
+                    break;
+            }
             break;
 
-        default:
-            break;
-        }
-        break;
+        case NDP_S_ESTABLISHED:
+            switch (event) {
 
-    case NDP_S_SYN_RCVD:
-        switch (event) {
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_SYN_SENT:
-        switch (event) {
-
-        case NDP_E_RCV_SYN:
-            FSM_Goto(fsm, NDP_S_SYN_RCVD);
+                default:
+                    break;
+            }
             break;
 
-        default:
+        case NDP_S_CLOSED:
             break;
-        }
-        break;
-
-    case NDP_S_ESTABLISHED:
-        switch (event) {
-
-        default:
-            break;
-        }
-        break;
-
-    case NDP_S_CLOSED:
-        break;
     }
 
     if (oldState != fsm.getState()) {
-        EV_INFO << "Transition: " << stateName(oldState) << " --> "
-                       << stateName(fsm.getState()) << "  (event was: "
-                       << eventName(event) << ")\n";
-        EV_DEBUG_C("testing") << ndpMain->getName() << ": "
-                                     << stateName(oldState) << " --> "
-                                     << stateName(fsm.getState()) << "  (on "
-                                     << eventName(event) << ")\n";
+        EV_INFO << "Transition: " << stateName(oldState) << " --> " << stateName(fsm.getState()) << "  (event was: " << eventName(event) << ")\n";
+        EV_DEBUG_C("testing") << ndpMain->getName() << ": " << stateName(oldState) << " --> " << stateName(fsm.getState()) << "  (on " << eventName(event) << ")\n";
 
         // cancel timers, etc.
         stateEntered(fsm.getState(), oldState, event);
-    } else {
-        EV_DETAIL << "Staying in state: " << stateName(fsm.getState())
-                         << " (event was: " << eventName(event) << ")\n";
+    }
+    else {
+        EV_DETAIL << "Staying in state: " << stateName(fsm.getState()) << " (event was: " << eventName(event) << ")\n";
     }
 
     return fsm.getState() != NDP_S_CLOSED;
 }
 
-void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event) {
+void NdpConnection::stateEntered(int state, int oldState, NdpEventCode event)
+{
     // cancel timers
     switch (state) {
-    case NDP_S_INIT:
-        // we'll never get back to INIT
-        break;
+        case NDP_S_INIT:
+            // we'll never get back to INIT
+            break;
 
-    case NDP_S_LISTEN:
-        // we may get back to LISTEN from SYN_RCVD
-        break;
+        case NDP_S_LISTEN:
+            // we may get back to LISTEN from SYN_RCVD
+            break;
 
-    case NDP_S_SYN_RCVD:
-    case NDP_S_SYN_SENT:
-        break;
+        case NDP_S_SYN_RCVD:
+        case NDP_S_SYN_SENT:
+            break;
 
-    case NDP_S_ESTABLISHED:
-        // we're in ESTABLISHED, these timers are no longer needed
-        // NDP_I_ESTAB notification moved inside event processing
-        break;
+        case NDP_S_ESTABLISHED:
+            // we're in ESTABLISHED, these timers are no longer needed
+            // NDP_I_ESTAB notification moved inside event processing
+            break;
 
-    case NDP_S_CLOSED:
-        sendIndicationToApp(NDP_I_CLOSED);
-        // all timers need to be cancelled
-        ndpAlgorithm->connectionClosed();
-        break;
+        case NDP_S_CLOSED:
+            sendIndicationToApp(NDP_I_CLOSED);
+            // all timers need to be cancelled
+            ndpAlgorithm->connectionClosed();
+            break;
     }
 }
 } // namespace NDP

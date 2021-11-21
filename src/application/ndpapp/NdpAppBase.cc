@@ -68,7 +68,6 @@ void NdpAppBase::close()
 
 void NdpAppBase::socketEstablished(NdpSocket*)
 {
-
     // *redefine* to perform or schedule first sending
     EV_INFO << "connected" << endl;
 }
@@ -87,7 +86,7 @@ void NdpAppBase::socketPeerClosed(NdpSocket *socket_)
 void NdpAppBase::socketClosed(NdpSocket*)
 {
     // *redefine* to start another session etc.
-    EV_INFO << "connection closed\n";
+    EV_INFO << "connection closed" << endl;
 }
 
 void NdpAppBase::socketFailure(NdpSocket*, int code)

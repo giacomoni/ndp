@@ -6,7 +6,6 @@ import inet.common.packet.chunk.Chunk;
 
 namespace inet;
 
- 
 class GenericAppMsgNdp extends FieldsChunk
 {
   

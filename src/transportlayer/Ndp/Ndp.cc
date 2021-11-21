@@ -285,7 +285,6 @@ void Ndp::addSockPair(NdpConnection *conn, L3Address localAddr, L3Address remote
     key.remoteAddr = conn->remoteAddr = remoteAddr;
     key.localPort = conn->localPort = localPort;
     key.remotePort = conn->remotePort = remotePort;
-
     // make sure connection is unique
     auto it = ndpConnMap.find(key);
     if (it != ndpConnMap.end()) {

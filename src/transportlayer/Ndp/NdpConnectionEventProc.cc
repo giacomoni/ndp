@@ -66,7 +66,6 @@ void NdpConnection::process_OPEN_PASSIVE(NdpEventCode &event, NdpCommand *ndpCom
         default:
             throw cRuntimeError(ndpMain, "Error processing command OPEN_PASSIVE: connection already exists");
     }
-
     delete openCmd;
     delete msg;
 }
