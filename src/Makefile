@@ -2,7 +2,7 @@
 # OMNeT++/OMNEST Makefile for $(LIB_PREFIX)ndp
 #
 # This file was generated with the command:
-#  opp_makemake --make-so -f --deep -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(INET4_PROJ\)/src -lINET$$\(D\)
+#  opp_makemake --make-so -f --deep -KECMP_PROJ=../../ecmp -KINET4_PROJ=../../inet4 -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(ECMP_PROJ\)/src -L$$\(INET4_PROJ\)/src -lecmp$$\(D\) -lINET$$\(D\)
 #
 
 # Name of target to be created (-o option)
@@ -16,7 +16,7 @@ INCLUDE_PATH = -I$(INET4_PROJ)/src
 EXTRA_OBJS =
 
 # Additional libraries (-L, -l options)
-LIBS = $(LDFLAG_LIBPATH)$(INET4_PROJ)/src  -lINET$(D)
+LIBS = $(LDFLAG_LIBPATH)$(ECMP_PROJ)/src $(LDFLAG_LIBPATH)$(INET4_PROJ)/src  -lecmp$(D) -lINET$(D)
 
 # Output directory
 PROJECT_OUTPUT_DIR = ../out
@@ -32,13 +32,6 @@ OBJS = \
     $O/common/TopologyEcmp.o \
     $O/common/queue/NdpSwitchQueue.o \
     $O/common/scheduler/CentralSchedulerNdp.o \
-    $O/networklayer/configurator/base/NetworkConfiguratorBaseEcmp.o \
-    $O/networklayer/configurator/ipv4/Ipv4NetworkConfiguratorEcmp.o \
-    $O/networklayer/configurator/ipv4/Ipv4NodeConfiguratorEcmp.o \
-    $O/networklayer/ipv4/Ipv4Ecmp.o \
-    $O/networklayer/ipv4/Ipv4NetworkLayerEcmp.o \
-    $O/networklayer/ipv4/Ipv4RoutingTableEcmp.o \
-    $O/networklayer/ipv4/RoutingTableParserEcmp.o \
     $O/transportlayer/Ndp/Ndp.o \
     $O/transportlayer/Ndp/NdpConnectionBase.o \
     $O/transportlayer/Ndp/NdpConnectionEventProc.o \
@@ -65,6 +58,7 @@ MSGFILES = \
 SMFILES =
 
 # Other makefile variables (-K)
+ECMP_PROJ=../../ecmp
 INET4_PROJ=../../inet4
 
 #------------------------------------------------------------------------------
@@ -90,7 +84,7 @@ include $(CONFIGFILE)
 # Simulation kernel and user interface libraries
 OMNETPP_LIBS = -loppenvir$D $(KERNEL_LIBS) $(SYS_LIBS)
 ifneq ($(TOOLCHAIN_NAME),clangc2)
-LIBS += -Wl,-rpath,$(abspath $(INET4_PROJ)/src)
+LIBS += -Wl,-rpath,$(abspath $(ECMP_PROJ)/src) -Wl,-rpath,$(abspath $(INET4_PROJ)/src)
 endif
 
 COPTS = $(CFLAGS) $(IMPORT_DEFINES) -DINET_IMPORT $(INCLUDE_PATH) -I$(OMNETPP_INCL_DIR)

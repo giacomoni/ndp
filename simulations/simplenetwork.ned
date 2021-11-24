@@ -9,7 +9,7 @@ package ndp.simulations;
 import ndp.node.StandardHostNdp;
 import inet.networklayer.configurator.ipv4.Ipv4FlatNetworkConfigurator;
 import inet.networklayer.configurator.ipv4.Ipv4NetworkConfigurator;
-import ndp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
+import ecmp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
 import inet.node.inet.Router;
 import ndp.base.RouterNdp;
 //import inet.node.inet.StandardHost;

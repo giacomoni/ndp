@@ -10,7 +10,7 @@ import inet.transportlayer.contract.IUdp;
 import inet.applications.tunapp.TunnelApp;
 
 import ndp.node.ApplicationLayerNodeBaseEcmp;
-import ndp.networklayer.ipv4.Ipv4NetworkLayerEcmp;
+import ecmp.networklayer.ipv4.Ipv4NetworkLayerEcmp;
 import ndp.transportlayer.contract.INdp;
 
 module StandardHostNdp extends ApplicationLayerNodeBaseEcmp

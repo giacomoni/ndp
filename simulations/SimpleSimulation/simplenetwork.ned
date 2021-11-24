@@ -7,7 +7,7 @@ package ndp.simulations.SimpleSimulation;
 
 
 import ndp.node.StandardHostNdp;
-import ndp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
+import ecmp.networklayer.configurator.ipv4.Ipv4NetworkConfiguratorEcmp;
 import inet.node.inet.Router;
 import ndp.base.RouterNdp;
 import ned.DatarateChannel;

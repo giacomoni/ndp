@@ -3,6 +3,7 @@
 	<name>ndp</name>
 	<comment></comment>
 	<projects>
+		<project>ecmp</project>
 		<project>inet4</project>
 	</projects>
 	<buildSpec>

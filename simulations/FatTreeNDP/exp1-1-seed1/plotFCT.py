@@ -9,6 +9,7 @@ import random
 def getResults(file):
     results = pd.read_csv(file, header=None,  names=["FCT"])
     results = results.reset_index(drop=True)
+    results = results.dropna()
     print(results)
     return results;
 
