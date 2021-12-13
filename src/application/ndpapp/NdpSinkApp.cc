@@ -55,8 +55,7 @@ void NdpSinkApp::handleMessage(cMessage *msg)
 
             NdpCommand *controlInfo = check_and_cast<NdpCommand*>(msg->getControlInfo());
             numRcvTrimmedHeader = controlInfo->getNumRcvTrimmedHeader();
-            std::string mod = "FatTreeNdp.centralSchedulerNdp";
-            cModule *centralMod = getModuleByPath(mod.c_str());
+            cModule *centralMod =  this->getParentModule()->getModuleByPath("centralScheduler");
             if (centralMod && recordStatistics == true) {
                 int numFinishedFlows = centralMod->par("numCompletedShortFlows");
                 int newNumFinishedFlows = numFinishedFlows + 1;
@@ -111,6 +110,11 @@ void NdpSinkApp::finish()
     double FCT = SIMTIME_DBL(tEndAdded - tStartAdded);
     EV_INFO << "Flow Completion Time:=    " << FCT << endl;
     // don't emit the FCT of the background flows(no need), we just observe the shorter length flows
+
+    std::cout << "Bytes Received: " << bytesRcvd << endl;
+    std::cout << "Time Start: " << tStartAdded << endl;
+    std::cout << "Time End: " << tEndAdded << endl;
+    std::cout << "Throughput: " << throughput << endl;
     if (recordStatistics == true) {
         emit(fctRecordv3, FCT);
         emit(goodputSigNdp, throughput);

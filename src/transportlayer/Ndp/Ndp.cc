@@ -212,6 +212,10 @@ void Ndp::removeConnection(NdpConnection *conn)
 NdpConnection* Ndp::findConnForSegment(const Ptr<const NdpHeader> &ndpseg, L3Address srcAddr, L3Address destAddr)
 {
     SockPair key;
+//    std::cout << "srcAddr" << srcAddr.str() << endl;
+//    std::cout << "destAddr" << destAddr.str() << endl;
+//    std::cout << "seg destPort" << ndpseg->getDestPort() << endl;
+//    std::cout << "seg srcPort" << ndpseg->getSrcPort() << endl;
     key.localAddr = destAddr;
     key.remoteAddr = srcAddr;
     key.localPort = ndpseg->getDestPort();

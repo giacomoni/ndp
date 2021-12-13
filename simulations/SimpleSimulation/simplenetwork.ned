@@ -17,10 +17,10 @@ network simplenetwork
 {
     parameters:
     	@display("bgb=512,395");
-    	int numberOfClients = default(1);
+    	int numberOfClients = default(2);
     	int numberOfNormalFlows = default(1);
-    	int numberOfLongerFlows = default(5);
-        int numberOfRouters = default(3);
+    	int numberOfLongerFlows = default(0);
+        int numberOfRouters = default(1);
     types:
         channel ethernetline extends DatarateChannel
         {
@@ -41,7 +41,7 @@ network simplenetwork
             @display("p=252,50,m,n,$numberOfRouters,150");
         }
     connections:
-        for i=0..sizeof(client)-1, for j=0..sizeof(router)-1 {
+       for i=0..sizeof(client)-1, for j=0..sizeof(router)-1 {
             client[i].pppg++ <--> ethernetline <--> router[j].pppg++;
         }
         for i=0..sizeof(router)-1{
