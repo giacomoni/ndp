@@ -1,4 +1,4 @@
-# NDP - Re-architecting datacenter networks and stacks for low latency and high performance OMNeT++/INET Implementation
+# Receiver-Driven approach without Congestion Control - GEANT project code
 
 
 
