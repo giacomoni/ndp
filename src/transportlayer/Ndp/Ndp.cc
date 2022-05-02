@@ -177,7 +177,8 @@ void Ndp::handleLowerPacket(Packet *packet)
 
 NdpConnection* Ndp::createConnection(int socketId)
 {
-    auto moduleType = cModuleType::get("ndp.transportlayer.Ndp.NdpConnection");
+    // auto moduleType = cModuleType::get("ndp.transportlayer.Ndp.NdpConnection");
+    auto moduleType = cModuleType::get("mltcp.transportlayer.RLNdpConnection");
     char submoduleName[24];
     sprintf(submoduleName, "conn-%d", socketId);
     auto module = check_and_cast<NdpConnection*>(moduleType->createScheduleInit(submoduleName, this));

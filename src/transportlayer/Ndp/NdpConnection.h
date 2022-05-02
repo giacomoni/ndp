@@ -5,6 +5,7 @@
 #include <inet/networklayer/common/L3Address.h>
 #include <inet/common/packet/ChunkQueue.h>
 #include <queue>
+#include <deque>
 
 #include "ndp_common/NdpHeader.h"
 #include "../../transportlayer/Ndp/Ndp.h"
@@ -76,6 +77,8 @@ public:
 
     int numberReceivedPackets;
     int numberSentPackets;
+
+        
 
     bool connNotAddedYet;
     bool isfinalReceivedPrintedOut;

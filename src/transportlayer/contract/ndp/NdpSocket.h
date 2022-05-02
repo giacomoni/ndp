@@ -197,7 +197,7 @@ public:
      *
      * TODO: maybe create in the future applications that can accept multiple incoming NDP connections
      */
-    void accept(int socketId);
+    void accept(int socketId){};
 
     /**
      * Connect to the a remote socket given its remote address and port. The localAddress is also

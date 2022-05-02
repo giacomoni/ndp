@@ -77,10 +77,10 @@ void NdpSocket::listen(bool fork)
     sockstate = LISTENING;
 }
 
-void NdpSocket::accept(int socketId)
-{
-    throw cRuntimeError("NdpSocket::accept(): never called");
-}
+// void NdpSocket::accept(int socketId)
+// {
+//     throw cRuntimeError("NdpSocket::accept(): never called");
+// }
 
 void NdpSocket::connect(L3Address localAddress, L3Address remoteAddress, int remotePort, unsigned int numPacketsToSend)
 {

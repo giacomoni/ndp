@@ -16,35 +16,43 @@ import ned.IBidirectionalChannel;
 network simplenetwork
 {
     parameters:
-    	@display("bgb=512,395");
-    	int numberOfClients = default(2);
-    	int numberOfNormalFlows = default(1);
-    	int numberOfLongerFlows = default(0);
+        @display("bgb=512,395");
+        int numberOfClients = default(5);
+        int numberOfNormalFlows = default(1);
+        int numberOfLongerFlows = default(0);
         int numberOfRouters = default(1);
     types:
         channel ethernetline extends DatarateChannel
         {
-            delay =  1us;
+            delay = 0.01ms;
             datarate = 1Gbps;
         }
     submodules:
         client[numberOfClients]: StandardHostNdp {
-            @display("p=44,50,m,n,$numberOfClients,150");
+            @display("p=162,225,m,n,$numberOfClients,150");
         }
         configurator: Ipv4NetworkConfiguratorEcmp {
             @display("p=450,350");
         }
-        server: StandardHostNdp {
-            @display("p=431,50");
+        server1: StandardHostNdp {
+            @display("p=464,117");
         }
-        router[numberOfRouters]: RouterNdp {
-            @display("p=252,50,m,n,$numberOfRouters,150");
+        server2: StandardHostNdp {
+            @display("p=340,23");
+        }
+        router1: RouterNdp {
+            @display("p=162,117,m,n,$numberOfRouters,150");
+        }
+        router2: RouterNdp {
+            @display("p=340,117,m,n,$numberOfRouters,150");
         }
     connections:
-       for i=0..sizeof(client)-1, for j=0..sizeof(router)-1 {
-            client[i].pppg++ <--> ethernetline <--> router[j].pppg++;
-        }
-        for i=0..sizeof(router)-1{
-            router[i].pppg++ <--> ethernetline <--> server.pppg++;
-        }
-} 
+        client[0].pppg++ <--> ethernetline <--> router1.pppg++;
+        client[1].pppg++ <--> ethernetline <--> router1.pppg++;
+        router1.pppg++ <--> ethernetline <--> router2.pppg++;
+        client[2].pppg++ <--> ethernetline <--> router2.pppg++;
+        client[3].pppg++ <--> ethernetline <--> router2.pppg++;
+        client[4].pppg++ <--> ethernetline <--> router2.pppg++;
+        router2.pppg++ <--> ethernetline <--> server1.pppg++;
+        router2.pppg++ <--> ethernetline <--> server2.pppg++;
+}
