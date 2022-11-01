@@ -10,7 +10,7 @@ cleanall: checkmakefiles
 	rm -f src/Makefile
 
 makefiles:
-	cd src && opp_makemake -f --deep
+	cd src && opp_makemake --make-so -f --deep -KECMP_PROJ=../../ecmp -KINET4_PROJ=../../inet -DINET_IMPORT -I$$\(INET4_PROJ\)/src -L$$\(ECMP_PROJ\)/src -L$$\(INET4_PROJ\)/src -lecmp$$\(D\) -lINET$$\(D\)
 
 checkmakefiles:
 	@if [ ! -f src/Makefile ]; then \
